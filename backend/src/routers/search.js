@@ -1,20 +1,14 @@
-const express = require("express");
-const router = express.Router();
-const { searchMovies } = require("../tmdbClient");
+import { Router } from 'express'
+const router = Router()
+import { titleSearchController } from '../controllers/titleSearchController.js'
 
-router.get("/search", async (req, res) => {
-    try {
-        const q = req.query.q;
-        const page = req.query.page || 1;
+router.get('/titlesearch', async (req, res) => {
+  const result = await titleSearchController(req)
+  if (result) {
+    res.json(result)
+  } else {
+    res.status(500).json({ error: 'Failed to get titles' })
+  }
+})
 
-        if (!q) return res.status(400).json({error: "Missing query param q"});
-        const data = await searchMovies(q, page);
-        res.json(data);
-    }
-    catch (err) {
-        console.error("Error searching movies:", err.message || err);
-        res.status(500).json({error: "Failed to search movies"});
-    }
-});
-
-module.exports = router;
+export default router
