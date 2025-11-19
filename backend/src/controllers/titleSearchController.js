@@ -1,5 +1,5 @@
-import { getTitles, getMovieDetails, getTvDetails } from '../tmdbClient.js'
-import { getTitleDetails } from '../omdbClient.js'
+import { getImdbRating } from './imdbRatingController.js'
+import { getTitles } from '../tmdbClient.js'
 
 async function titleSearchController(req) {
   const q = req.query.q
@@ -10,25 +10,12 @@ async function titleSearchController(req) {
 
   const detailedResults = await Promise.all(
     filteredResults.map(async item => {
-      let imdb_id = null
-
-      if (item.media_type === 'movie') {
-        const details = await getMovieDetails(item.id)
-        imdb_id = details.imdb_id
-      } else if (item.media_type === 'tv') {
-        const details = await getTvDetails(item.id)
-        imdb_id = details.external_ids?.imdb_id
-      }
-
-      let imdb_rating = null
-      if (imdb_id) {
-        const omdbDetails = await getTitleDetails(imdb_id)
-        imdb_rating = omdbDetails.imdbRating
-      }
-      return { ...item, imdb_rating }
+      const filteredObject = await getImdbRating(item, item.media_type)
+      return filteredObject
     })
   )
-  const filteredData = { ...data, results: detailedResults }
+  const clearedResults = detailedResults.filter(item => item !== null)
+  const filteredData = { ...data, results: clearedResults }
   return filteredData
 }
 
