@@ -29,6 +29,12 @@ async function loginController(req, res) {
       expiresIn: '24h',
     })
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    })
+
     return res.status(200).json({
       user: {
         user_id: user.user_id,
