@@ -63,7 +63,7 @@ function Header() {
               </>
             ) : (
               <>
-                <span className="text-white me-2">Hello, {user.username}</span>
+                <span className="text-white me-2 noBack">Hello, {user.username}</span>
                 <button
                   onClick={logout}
                   className="btn btn-danger btn-sm"

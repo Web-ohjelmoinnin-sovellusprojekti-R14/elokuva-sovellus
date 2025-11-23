@@ -285,7 +285,7 @@ p.mt-2.text-white {
 }
 
 .modal-window {
-  background: #ffffff;
+  background: #232323;
   padding: 25px;
   border-radius: 10px;
   width: 350px;
@@ -299,6 +299,17 @@ p.mt-2.text-white {
   text-align: center;
   font-weight: bold;
   font-size: 22px;
+  color: #ffffff;
+}
+
+.btn-primary {
+  background-color: #4b7cb1 !important;
+  border-color: #4b7cb1 !important;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
 }
 
 @keyframes fadeIn {
