@@ -11,9 +11,7 @@ const omdb = axios.create({
 })
 
 async function getTitleDetails(i) {
-  const res = await omdb.get('/', {
-    params: { i },
-  })
+  const res = await omdb.get('/', { params: { i }, timeout: 500 })
   return res.data
 }
 

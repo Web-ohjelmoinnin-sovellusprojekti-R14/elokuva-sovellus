@@ -18,15 +18,22 @@ async function nowInCinema(page, region) {
   return res.data
 }
 
-async function getTitles(query) {
-  const res = await tmdb.get('/search/multi', {
-    params: { query },
+async function getMovies(query, page) {
+  const res = await tmdb.get('/search/movie', {
+    params: { query, page },
+  })
+  return res.data
+}
+
+async function getTvSeries(query, page) {
+  const res = await tmdb.get('/search/tv', {
+    params: { query, page },
   })
   return res.data
 }
 
 async function getMovieDetails(movie_id) {
-  const res = await tmdb.get('/movie/' + movie_id)
+  const res = await tmdb.get(`/movie/${movie_id}/external_ids`)
   return res.data
 }
 
@@ -38,4 +45,4 @@ async function getTvDetails(series_id) {
   return { ...details, external_ids }
 }
 
-export { nowInCinema, getTitles, getMovieDetails, getTvDetails }
+export { nowInCinema, getMovies, getTvSeries, getMovieDetails, getTvDetails }
