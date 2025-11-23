@@ -1,5 +1,5 @@
 import { nowInCinema } from '../tmdbClient.js'
-import { getImdbRating } from './imdbRatingController.js'
+import { getMovieImdbRating } from './imdbRatingController.js'
 
 async function nowInCinemaController(req) {
   const page = req.query.page || 1
@@ -9,7 +9,7 @@ async function nowInCinemaController(req) {
 
   const detailedResults = await Promise.all(
     data.results.map(async item => {
-      const filteredObject = await getImdbRating(item, 'movie')
+      const filteredObject = await getMovieImdbRating(item)
       return filteredObject
     })
   )
