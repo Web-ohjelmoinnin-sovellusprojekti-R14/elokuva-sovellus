@@ -173,6 +173,25 @@
   transform: scale(1.05);
 }
 
+.imdb-badge {
+  position: absolute;
+  top: 0.4em;
+  right: 0.4em;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 0.25em 0.6em;
+  border-radius: 0.5em;
+  color: gold;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border: 1px solid gold;
+  transition: font-size 0.25s ease;
+  z-index: 10;
+}
+
+.movie-card:hover .imdb-badge {
+  font-size: 0.9rem;
+}
+
 .movies h2 {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
@@ -186,6 +205,38 @@
 
 .text-white{
   background-color: rgb(102, 102, 102);
+}
+
+p.mt-2.text-white {
+    border-radius: 6px;
+}
+
+.noBack {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.movie-title-parent{
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  background-color: rgb(102, 102, 102);
+  border-radius: 6px;
+  padding: 4px;
+  margin-top: 7px;
+
+  height: 2.6rem;
+  line-height: 1.3;
+}
+
+.movie-title {
+  margin-top: 0 !important;
+  margin-bottom: 0;
+  text-align: center;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .title-bg {
@@ -220,6 +271,45 @@
 
 .title-under:hover {
   color: #747272;
+}
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-window {
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 10px;
+  width: 350px;
+  max-width: 90%;
+  box-shadow: 0px 0px 25px rgba(0,0,0,0.3);
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-title {
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 22px;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 768px) {

@@ -1,18 +1,25 @@
 import React from "react";
 import Header from "./components/Header";
 import SubHeader from "./components//SubHeader";
-import MoviesSection from "./components/MoviesSection";
-import PopularSection from "./components/PopularSection";
 import "./styles.css";
+
+import { Routes, Route } from "react-router-dom";
+
+import NowInCinemaPage from "./pages/NowInCinemaPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
-    <div>
+    <>
+      {/* On every page */}
       <Header />
       <SubHeader />
-      <PopularSection />
-      <MoviesSection />
-    </div>
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/now-in-cinema" element={<NowInCinemaPage />} />
+      </Routes>
+    </>
   );
 }
 

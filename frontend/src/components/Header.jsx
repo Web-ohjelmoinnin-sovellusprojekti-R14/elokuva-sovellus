@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import LoginModal from "./modals/LoginModal";
+import RegisterModal from "./modals/RegisterModal";
 
 function Header() {
   const spinImage = (e) => {
@@ -10,7 +13,15 @@ function Header() {
     e.currentTarget.style.transform = "rotate(0deg)";
   };
 
+  const { user, logout } = useAuth();
+  const [openLogin, setOpenLogin] = useState(false);
+  const [openRegister, setOpenRegister] = useState(false);
+
   return (
+    <>
+      <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
+      <RegisterModal isOpen={openRegister} onClose={() => setOpenRegister(false)} />
+
     <header className="site-header bg-dark">
       <div className="container header-inner">
 
@@ -34,13 +45,41 @@ function Header() {
           />
         </div>
 
-        <div className="header-right">
-          <a href="#signin" className="btn btn-outline-light btn-sm">Sign In</a>
-          <a href="#signup" className="btn btn-light btn-sm">Sign Up</a>
-          <a href="#groups" className="btn btn-outline-light btn-sm">Groups</a>
-        </div>
+                          <div className="header-right">
+            {!user ? (
+              <>
+                <button
+                  onClick={() => setOpenLogin(true)}
+                  className="btn btn-outline-light btn-sm"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => setOpenRegister(true)}
+                  className="btn btn-light btn-sm"
+                >
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <>
+                <span className="text-white me-2">Hello, {user.username}</span>
+                <button
+                  onClick={logout}
+                  className="btn btn-danger btn-sm"
+                >
+                  Log Out
+                </button>
+              </>
+            )}
+            <a href="#groups" className="btn btn-outline-light btn-sm">
+              Groups
+            </a>
+          </div>
+
       </div>
     </header>
+    </>
   );
 }
 

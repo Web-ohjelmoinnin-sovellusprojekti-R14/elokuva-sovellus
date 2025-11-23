@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function SubHeader() {
   return (
@@ -8,7 +9,7 @@ function SubHeader() {
         <a href="#series" className="category">Series</a>
         <a href="#cartoons" className="category">Cartoons</a>
         <a href="#anime" className="category">Anime</a>
-        <a href="#cinema" className="category">In cinemas</a>
+        <Link to="/now-in-cinema" className="category">In cinemas</Link>
       </div>
 
       <div className="search-box">
