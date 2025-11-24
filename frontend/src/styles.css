@@ -185,7 +185,7 @@
   font-size: 0.85rem;
   border: 1px solid gold;
   transition: font-size 0.25s ease;
-  z-index: 10;
+  z-index: 9;
 }
 
 .movie-card:hover .imdb-badge {

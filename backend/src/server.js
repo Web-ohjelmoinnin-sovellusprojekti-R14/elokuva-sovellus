@@ -10,6 +10,8 @@ import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
 import loginRouter from './routers/login.js'
 
+import cookieParser from 'cookie-parser'
+
 const app = express()
 
 app.use(cors({
@@ -18,6 +20,7 @@ app.use(cors({
 }))
 
 app.use(json())
+app.use(cookieParser())
 
 app.use('/api', searchRouter)
 app.use('/api', nowInCinemaRouter)

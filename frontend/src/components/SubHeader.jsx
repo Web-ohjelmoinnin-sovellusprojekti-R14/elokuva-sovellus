@@ -8,7 +8,7 @@ function SubHeader() {
 
   const searchRef = useRef(null);
 
-  // Закрытие dropdown по клику вне
+  // Close dropdown
   useEffect(() => {
     function handleClickOutside(e) {
       if (searchRef.current && !searchRef.current.contains(e.target)) {
@@ -19,7 +19,7 @@ function SubHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Поиск при вводе текста с дебаунсом
+  // Debounce
   useEffect(() => {
     if (!query) {
       setResults([]);
@@ -109,7 +109,6 @@ function SubHeader() {
             {!loading && results.length > 5 && (
               <button
                 className="btn btn-primary w-100 mt-2"
-                style={{ backgroundColor: "#4b7cb1", borderColor: "#4b7cb1" }}
               >
                 Show All Results
               </button>

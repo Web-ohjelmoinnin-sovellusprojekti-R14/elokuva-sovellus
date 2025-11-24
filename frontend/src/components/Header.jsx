@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import LoginModal from "./modals/LoginModal";
 import RegisterModal from "./modals/RegisterModal";
+import { Link } from "react-router-dom";
 
 function Header() {
   const spinImage = (e) => {
@@ -26,14 +27,16 @@ function Header() {
       <div className="container header-inner">
 
         <div className="header-left">
-          <img
-            src="images/logoMain.png"
-            className="site-logo"
-            alt="Logo"
-            loading="lazy"
-            onMouseOver={spinImage}
-            onMouseOut={resetSpin}
-          />
+          <Link to="/">
+            <img
+              src="images/logoMain.png"
+              className="site-logo"
+              alt="Logo"
+              loading="lazy"
+              onMouseOver={spinImage}
+              onMouseOut={resetSpin}
+            />
+          </Link>
           <span className="logo-text">Best films are here</span>
         </div>
 
