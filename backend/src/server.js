@@ -9,13 +9,16 @@ import searchRouter from './routers/search.js'
 import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
 import loginRouter from './routers/login.js'
+import advancedSearchRouter from './routers/advancedSearch.js'
 
 const app = express()
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}))
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  })
+)
 
 app.use(json())
 
@@ -23,7 +26,7 @@ app.use('/api', searchRouter)
 app.use('/api', nowInCinemaRouter)
 app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
-
+app.use('/api', advancedSearchRouter)
 
 app.get('/api/me', (req, res) => {
   const token = req.cookies.token
@@ -37,8 +40,8 @@ app.get('/api/me', (req, res) => {
     return res.json({
       user: {
         user_id: decoded.user_id,
-        username: decoded.username
-      }
+        username: decoded.username,
+      },
     })
   } catch (err) {
     return res.status(401).json({ user: null })
