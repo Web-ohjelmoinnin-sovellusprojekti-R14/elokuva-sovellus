@@ -45,4 +45,56 @@ async function getTvDetails(series_id) {
   return { ...details, external_ids }
 }
 
-export { nowInCinema, getMovies, getTvSeries, getMovieDetails, getTvDetails }
+async function discoverMovies(
+  page,
+  year_min,
+  year_max,
+  include_adult,
+  with_genres,
+  rating_min,
+  rating_max,
+  with_origin_country
+) {
+  const params = {}
+  params.page = page
+  if (year_min) params['release_date.gte'] = year_min
+  if (year_max) params['release_date.lte'] = year_max
+  if (include_adult) params.include_adult = true
+  if (with_genres) params.with_genres = with_genres
+  if (rating_min) params['vote_average.gte'] = rating_min - 1
+  if (rating_max) params['vote_average.lte'] = rating_max
+  params.sort_by = 'vote_count.desc'
+  if (with_origin_country) params.with_origin_country = with_origin_country
+  const res = await tmdb.get('/discover/movie', {
+    params: params,
+  })
+  return res.data
+}
+
+async function discoverTvSeries(
+  page,
+  year_min,
+  year_max,
+  include_adult,
+  with_genres,
+  rating_min,
+  rating_max,
+  with_origin_country
+) {
+  const params = {}
+  params.page = page
+  if (year_min) params['first_air_date.gte'] = year_min
+  if (year_max) params['first_air_date.lte'] = year_max
+  if (include_adult) params.include_adult = true
+  if (with_genres) params.with_genres = with_genres
+  if (rating_min) params['vote_average.gte'] = rating_min - 1
+  if (rating_max) params['vote_average.lte'] = rating_max
+  params.sort_by = 'vote_count.desc'
+  if (with_origin_country) params.with_origin_country = with_origin_country
+  const res = await tmdb.get('/discover/tv', {
+    params: params,
+  })
+  return res.data
+}
+
+export { nowInCinema, getMovies, getTvSeries, getMovieDetails, getTvDetails, discoverMovies, discoverTvSeries }
