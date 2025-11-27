@@ -10,6 +10,7 @@ import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
 import loginRouter from './routers/login.js'
 import advancedSearchRouter from './routers/advancedSearch.js'
+import titleDataRouter from './routers/titleData.js'
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.use('/api', nowInCinemaRouter)
 app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
 app.use('/api', advancedSearchRouter)
+app.use('/api', titleDataRouter)
 
 app.get('/api/me', (req, res) => {
   const token = req.cookies.token

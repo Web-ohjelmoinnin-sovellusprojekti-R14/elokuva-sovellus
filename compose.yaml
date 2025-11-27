@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env # use this if you have a .env, optional
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000" # dev mode, adjust to "80:80" for static/prod nginx
+    depends_on:
+      - backend
