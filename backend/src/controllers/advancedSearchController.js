@@ -10,6 +10,7 @@ async function advancedSearchMovies(
   imdb_rating_max,
   with_origin_country
 ) {
+  const media_type = 'movie'
   const foundMovies = await discoverMovies(
     page,
     year_min,
@@ -22,7 +23,8 @@ async function advancedSearchMovies(
   )
   const detailedMovies = await Promise.all(
     foundMovies.results.map(async item => {
-      const detailedObject = await getMovieImdbRating(item)
+      let detailedObject = await getMovieImdbRating(item)
+      detailedObject.media_type = media_type
       return detailedObject
     })
   )
@@ -51,6 +53,7 @@ async function advancedSearchTvSeries(
   imdb_rating_max,
   with_origin_country
 ) {
+  const media_type = 'tv'
   const foundTvSeries = await discoverTvSeries(
     page,
     year_min,
@@ -61,24 +64,23 @@ async function advancedSearchTvSeries(
     imdb_rating_max,
     with_origin_country
   )
+  foundTvSeries.results.map(item => console.log(item))
   const detailedTvSeries = await Promise.all(
     foundTvSeries.results.map(async item => {
-      const detailedObject = await getTvSeriesImdbRating(item)
+      let detailedObject = await getTvSeriesImdbRating(item)
+      detailedObject.media_type = media_type
       return detailedObject
     })
   )
-  try {
-    if (!imdb_rating_min && !imdb_rating_max) {
-      return detailedTvSeries
-    } else if (imdb_rating_min && !imdb_rating_max) {
-      const filteredTvSeries = detailedTvSeries.results.filter(item => item.imdb_rating >= imdb_rating_min)
-      return filteredTvSeries
-    } else if (!imdb_rating_min && imdb_rating_max) {
-      const filteredTvSeries = detailedTvSeries.results.filter(item => item.imdb_rating <= imdb_rating_max)
-      return filteredTvSeries
-    }
-  } catch (e) {
-    return { error: 'IMDb rating must be a number' }
+  detailedTvSeries.map(item => console.log(item))
+  if (!imdb_rating_min && !imdb_rating_max) {
+    return detailedTvSeries
+  } else if (imdb_rating_min && !imdb_rating_max) {
+    const filteredTvSeries = detailedTvSeries.filter(item => item.imdb_rating >= imdb_rating_min)
+    return filteredTvSeries
+  } else if (!imdb_rating_min && imdb_rating_max) {
+    const filteredTvSeries = detailedTvSeries.filter(item => item.imdb_rating <= imdb_rating_max)
+    return filteredTvSeries
   }
 }
 
@@ -105,11 +107,10 @@ async function advancedSearchController(
         imdb_rating_max,
         with_origin_country
       )
-      console.log(responseMovies)
       responseMovies.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
       return responseMovies
     case 'tv':
-      const responseTvSeries = await advancedSearchTvSeries(
+      let responseTvSeries = await advancedSearchTvSeries(
         page,
         year_min,
         year_max,
@@ -119,7 +120,10 @@ async function advancedSearchController(
         imdb_rating_max,
         with_origin_country
       )
-      responseTvSeries.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
+      responseTvSeries = responseTvSeries.filter(item => item != null)
+      responseTvSeries.sort((a, b) => {
+        return Number(b.imdb_rating) - Number(a.imdb_rating)
+      })
       return responseTvSeries
     case null:
       const firstResponse = await advancedSearchMovies(
@@ -142,7 +146,6 @@ async function advancedSearchController(
         imdb_rating_max,
         with_origin_country
       )
-
       const results = [...firstResponse, ...secondResponse]
       results.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
       return results

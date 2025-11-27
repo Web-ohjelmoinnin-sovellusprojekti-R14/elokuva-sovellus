@@ -1,11 +1,11 @@
-import { getMovieDetails, getTvDetails } from '../tmdbClient.js'
+import { getMovieExtrenalIds, getTvExtrenalIds } from '../tmdbClient.js'
 import { getTitleDetails } from '../omdbClient.js'
 
 async function getMovieImdbRating(item) {
   let imdb_id = null
   console.log('Title: ' + item.title)
   console.log('Time before getMovieDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
-  const details = await getMovieDetails(item.id)
+  const details = await getMovieExtrenalIds(item.id)
   console.log('Time after getMovieDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
   imdb_id = details.imdb_id
   console.log('IMDb id of ' + item.title + ': ' + imdb_id)
@@ -34,7 +34,7 @@ async function getTvSeriesImdbRating(item) {
   console.log('Name: ' + item.name)
 
   console.log('Time before getTvDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
-  const details = await getTvDetails(item.id)
+  const details = await getTvExtrenalIds(item.id)
   console.log('Time after getTvDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
   imdb_id = details.external_ids?.imdb_id
   console.log('IMDb id of ' + item.name + ': ' + imdb_id)

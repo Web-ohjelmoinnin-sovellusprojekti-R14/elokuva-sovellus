@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const MOVIES_PER_PAGE = 18;
 
@@ -24,7 +24,9 @@ export default function NowInCinemaPage() {
         let hasMore = true;
 
         while (hasMore) {
-          const res = await fetch(`http://localhost:5000/api/now_in_cinema?page=${page}`);
+          const res = await fetch(
+            `http://localhost:5000/api/now_in_cinema?page=${page}`
+          );
           const data = await res.json();
 
           if (!data || !data.results || data.results.length === 0) {
@@ -51,7 +53,10 @@ export default function NowInCinemaPage() {
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
   const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
-  const currentMovies = allMovies.slice(startIndex, startIndex + MOVIES_PER_PAGE);
+  const currentMovies = allMovies.slice(
+    startIndex,
+    startIndex + MOVIES_PER_PAGE
+  );
 
   if (loading) {
     return (
@@ -88,13 +93,9 @@ export default function NowInCinemaPage() {
                   style={{ position: "relative" }}
                 >
                   {/* IMDb Badge */}
-                  {movie.imdb_rating && (
-                    <div
-                      className="imdb-badge"
-                    >
-                      ⭐ {movie.imdb_rating}
-                    </div>
-                  )}
+                  <div className="imdb-badge">
+                    ⭐ {movie.imdb_rating ? movie.imdb_rating : "N/A"}
+                  </div>
 
                   {/* Poster */}
                   <img
@@ -105,15 +106,18 @@ export default function NowInCinemaPage() {
                       boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
                       height: "280px",
                       objectFit: "cover",
-                      width: "100%"
+                      width: "100%",
                     }}
                   />
 
                   {/* Title */}
-                  <div class = "movie-title-parent">
-                  <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  <div class="movie-title-parent">
+                    <p
+                      className="movie-title text-white"
+                      style={{ fontSize: "0.9rem" }}
+                    >
                       {movie.title}
-                  </p>
+                    </p>
                   </div>
                 </div>
               );
@@ -131,8 +135,12 @@ export default function NowInCinemaPage() {
                 ← Previous
               </button>
 
-              <span className="text-white noBack mx-4" style={{ fontSize: "1.1rem" }}>
-                Page <strong>{currentPage}</strong> From <strong>{totalPages}</strong>
+              <span
+                className="text-white noBack mx-4"
+                style={{ fontSize: "1.1rem" }}
+              >
+                Page <strong>{currentPage}</strong> From{" "}
+                <strong>{totalPages}</strong>
               </span>
 
               <button
@@ -146,7 +154,9 @@ export default function NowInCinemaPage() {
           )}
         </>
       ) : (
-        <p className="text-white text-center">Not found current films from Cinemas.</p>
+        <p className="text-white text-center">
+          Not found current films from Cinemas.
+        </p>
       )}
     </section>
   );
