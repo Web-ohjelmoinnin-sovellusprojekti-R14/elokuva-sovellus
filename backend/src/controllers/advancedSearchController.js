@@ -1,5 +1,9 @@
 import { discoverMovies, discoverTvSeries } from '../tmdbClient.js'
 import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
+
+const MAX_APP_ITEMS = 110
+const MAX_TMDB_PAGES = 6
+
 async function advancedSearchMovies(
   page,
   year_min,
@@ -154,4 +158,50 @@ async function advancedSearchController(
   }
 }
 
-export { advancedSearchController }
+const cache = {}
+
+function buildCacheKey(params) {
+  return JSON.stringify(params)
+}
+
+async function buildCombinedResults(baseParams) {
+  const combined = []
+  let tmdbPage = 1
+
+  while (tmdbPage <= MAX_TMDB_PAGES && combined.length < MAX_APP_ITEMS) {
+    const pageResponse = await advancedSearchController(
+      tmdbPage,
+      baseParams.media_type,
+      baseParams.year_min,
+      baseParams.year_max,
+      baseParams.imdb_rating_min,
+      baseParams.imdb_rating_max,
+      baseParams.include_adult,
+      baseParams.with_genres,
+      baseParams.with_origin_country
+    )
+
+    console.log(
+      'advancedSearchController page',
+      tmdbPage,
+      'len =',
+      Array.isArray(pageResponse) ? pageResponse.length : 'not array'
+    )
+
+    if (!pageResponse || !Array.isArray(pageResponse) || pageResponse.length === 0) {
+      break
+    }
+
+    combined.push(...pageResponse)
+
+    if (combined.length >= MAX_APP_ITEMS) {
+      break
+    }
+
+    tmdbPage += 1
+  }
+
+  return combined.slice(0, MAX_APP_ITEMS)
+}
+
+export { buildCacheKey, buildCombinedResults }
