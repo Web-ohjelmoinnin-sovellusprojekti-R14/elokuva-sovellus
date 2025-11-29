@@ -84,10 +84,21 @@ async function discoverMovies(
   if (year_max) params['release_date.lte'] = year_max
   if (include_adult) params.include_adult = true
   if (with_genres) params.with_genres = with_genres
-  if (rating_min) params['vote_average.gte'] = rating_min - 0.8
-  if (rating_max) params['vote_average.lte'] = rating_max
+  if (rating_min) {
+    let rating_min_float = parseFloat(rating_min) - 0.8
+    if (rating_min_float > 10) rating_min_float = 10
+    if (rating_min_float < 0) rating_min_float = 0
+    params['vote_average.gte'] = rating_min_float.toString()
+  }
+  if (rating_max) {
+    let rating_max_float = parseFloat(rating_max) + 0.6
+    if (rating_max_float > 10) rating_max_float = 10
+    if (rating_max_float < 0) rating_max_float = 0
+    params['vote_average.lte'] = rating_max_float.toString()
+  }
   params.sort_by = 'vote_count.desc'
   if (with_origin_country) params.with_origin_country = with_origin_country
+  console.log('Params for discoverMovies: ' + JSON.stringify(params))
   const res = await tmdb.get('/discover/movie', {
     params: params,
   })
@@ -110,10 +121,21 @@ async function discoverTvSeries(
   if (year_max) params['first_air_date.lte'] = year_max
   if (include_adult) params.include_adult = true
   if (with_genres) params.with_genres = with_genres
-  if (rating_min) params['vote_average.gte'] = rating_min - 1
-  if (rating_max) params['vote_average.lte'] = rating_max
+  if (rating_min) {
+    let rating_min_float = parseFloat(rating_min) - 0.8
+    if (rating_min_float > 10) rating_min_float = 10
+    if (rating_min_float < 0) rating_min_float = 0
+    params['vote_average.gte'] = rating_min_float.toString()
+  }
+  if (rating_max) {
+    let rating_max_float = parseFloat(rating_max) + 0.6
+    if (rating_max_float > 10) rating_max_float = 10
+    if (rating_max_float < 0) rating_max_float = 0
+    params['vote_average.lte'] = rating_max_float.toString()
+  }
   params.sort_by = 'vote_count.desc'
   if (with_origin_country) params.with_origin_country = with_origin_country
+  console.log('Params for discoverTvSeries: ' + JSON.stringify(params))
   const res = await tmdb.get('/discover/tv', {
     params: params,
   })
