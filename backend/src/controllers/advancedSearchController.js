@@ -28,18 +28,26 @@ async function advancedSearchMovies(
   const detailedMovies = await Promise.all(
     foundMovies.results.map(async item => {
       let detailedObject = await getMovieImdbRating(item)
-      detailedObject.media_type = media_type
+      if (detailedObject) detailedObject.media_type = media_type
       return detailedObject
     })
   )
+  console.log('All detailed movies: ' + JSON.stringify(detailedMovies))
   try {
     if (!imdb_rating_min && !imdb_rating_max) {
       return detailedMovies
     } else if (imdb_rating_min && !imdb_rating_max) {
-      const filteredMovies = detailedMovies.filter(item => item.imdb_rating >= imdb_rating_min)
+      const filteredMovies = detailedMovies.filter(item => {
+        if (!item || item.imdb_rating == null) return false
+        return Number(item.imdb_rating) >= Number(imdb_rating_min)
+      })
       return filteredMovies
     } else if (!imdb_rating_min && imdb_rating_max) {
-      const filteredMovies = detailedMovies.filter(item => item.imdb_rating <= imdb_rating_max)
+      const filteredMovies = detailedMovies.filter(item => {
+        if (!item || item.imdb_rating == null) return false
+        return Number(item.imdb_rating) <= Number(imdb_rating_max)
+      })
+
       return filteredMovies
     }
   } catch (e) {
@@ -68,22 +76,27 @@ async function advancedSearchTvSeries(
     imdb_rating_max,
     with_origin_country
   )
-  foundTvSeries.results.map(item => console.log(item))
   const detailedTvSeries = await Promise.all(
     foundTvSeries.results.map(async item => {
       let detailedObject = await getTvSeriesImdbRating(item)
-      detailedObject.media_type = media_type
+      if (detailedObject) detailedObject.media_type = media_type
       return detailedObject
     })
   )
-  detailedTvSeries.map(item => console.log(item))
+  console.log('All detailed series: ' + JSON.stringify(detailedTvSeries))
   if (!imdb_rating_min && !imdb_rating_max) {
     return detailedTvSeries
   } else if (imdb_rating_min && !imdb_rating_max) {
-    const filteredTvSeries = detailedTvSeries.filter(item => item.imdb_rating >= imdb_rating_min)
+    const filteredTvSeries = detailedTvSeries.filter(item => {
+      if (!item || item.imdb_rating == null) return false
+      return Number(item.imdb_rating) >= Number(imdb_rating_min)
+    })
     return filteredTvSeries
   } else if (!imdb_rating_min && imdb_rating_max) {
-    const filteredTvSeries = detailedTvSeries.filter(item => item.imdb_rating <= imdb_rating_max)
+    const filteredTvSeries = detailedTvSeries.filter(item => {
+      if (!item || item.imdb_rating == null) return false
+      return Number(item.imdb_rating) <= Number(imdb_rating_max)
+    })
     return filteredTvSeries
   }
 }
@@ -101,7 +114,7 @@ async function advancedSearchController(
 ) {
   switch (media_type) {
     case 'movie':
-      const responseMovies = await advancedSearchMovies(
+      let responseMovies = await advancedSearchMovies(
         page,
         year_min,
         year_max,
@@ -111,6 +124,9 @@ async function advancedSearchController(
         imdb_rating_max,
         with_origin_country
       )
+
+      responseMovies = Array.isArray(responseMovies) ? responseMovies : []
+      responseMovies = responseMovies.filter(item => item != null)
       responseMovies.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
       return responseMovies
     case 'tv':
@@ -150,15 +166,14 @@ async function advancedSearchController(
         imdb_rating_max,
         with_origin_country
       )
-      const results = [...firstResponse, ...secondResponse]
+      let results = [...firstResponse, ...secondResponse]
+      results = results.filter(item => item != null)
       results.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
       return results
     default:
       return { error: "Media type parameter can either be 'movie' or 'tv'" }
   }
 }
-
-const cache = {}
 
 function buildCacheKey(params) {
   return JSON.stringify(params)

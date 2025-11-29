@@ -8,7 +8,7 @@ const baseURL = process.env.OMDB_BASE_URL || 'http://www.omdbapi.com/'
 
 const omdb = axios.create({
   baseURL,
-  timeout: 500,
+  timeout: 1000,
   params: { apikey: apiKey },
 })
 
