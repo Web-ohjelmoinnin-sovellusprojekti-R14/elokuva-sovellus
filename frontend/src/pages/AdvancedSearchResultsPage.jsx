@@ -1,0 +1,272 @@
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import ClickablePoster from "../components/ClickablePoster";
+
+const ITEMS_PER_PAGE = 18;
+
+const GENRE_MAP = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Sci-Fi",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western"
+};
+
+export default function AdvancedSearchResultsPage() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const category = params.get("category") || "movies";
+
+  const [allItems, setAllItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchBatch = async (batch = 1) => {
+    if (batch === 1) {
+      setLoading(true);
+      setAllItems([]);
+      setCurrentPage(1);
+    }
+    else { setLoadingMore(true); }
+
+    try {
+      const url = new URL(`http://localhost:5000/api/category/${category}`);
+      url.searchParams.set("batch", batch);
+      
+      for (const [key, value] of params.entries()) {
+        if (key !== "category" && value && !key.includes("rating")) {
+          if (key === "country") { url.searchParams.set("with_origin_country", value); }
+          else { url.searchParams.set(key, value); }
+        }
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Network error");
+      const data = await res.json();
+
+      let newItems = (data.results || []).filter(Boolean);
+
+      const ratingMin = parseFloat(params.get("rating_min") || 0);
+      const ratingMax = parseFloat(params.get("rating_max") || 10);
+      const yearFrom = parseInt(params.get("year_from") || 0);
+      const yearTo = parseInt(params.get("year_to") || 9999);
+
+      newItems = newItems.filter(item => {
+        const rating = parseFloat(item.imdb_rating || 0);
+        if (rating < ratingMin || rating > ratingMax) return false;
+
+        const yearStr = item.release_date || item.first_air_date || "";
+        const year = parseInt(yearStr.slice(0, 4));
+        if (year < yearFrom || year > yearTo) return false;
+
+        if (params.get("adult") === "0" && item.adult) return false;
+
+        return true;
+      });
+
+      if (ratingMin > 0 || ratingMax < 10) {
+        newItems.sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating));
+      }
+
+      setAllItems(prev => batch === 1 ? newItems : [...prev, ...newItems]);
+      setHasMore(data.hasMore !== false);
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load");
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    setAllItems([]);
+    setCurrentPage(1);
+    setHasMore(true);
+    setError(null);
+    fetchBatch(1);
+  }, [location.search]);
+
+  const totalLoadedItems = allItems.length;
+  const totalPagesAvailable = Math.ceil(totalLoadedItems / ITEMS_PER_PAGE);
+  const isOnLastPage = currentPage >= totalPagesAvailable;
+
+  const goNext = () => {
+    if (isOnLastPage && hasMore) {
+      const nextBatch = Math.floor((totalLoadedItems - 1) / 110) + 2;
+      fetchBatch(nextBatch);
+    }
+    setCurrentPage(p => p + 1);
+  };
+
+  const goPrev = () => {
+    if (currentPage > 1) setCurrentPage(p => p - 1);
+  };
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const pageItems = allItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const getTitle = () => {
+    const map = {
+      movies: "Films",
+      series: "Series",
+      anime: "Anime",
+      cartoons: "Cartoons"
+    };
+
+    const baseTitle = map[category] || "Content";
+
+    const filters = [];
+
+    const genreParam = params.get("with_genres");
+    if (genreParam) {
+      const genreNames = genreParam.split(",").map(id => GENRE_MAP[id] || `Genre ${id}`);
+      filters.push(genreNames.join(" + "));
+    }
+
+    const from = params.get("year_from");
+    const to = params.get("year_to");
+    if (from || to) { filters.push(`${from || "..."}–${to || "..."}`); }
+
+    const ratingMin = params.get("rating_min");
+    const ratingMax = params.get("rating_max");
+    if (ratingMin || ratingMax) {
+      if (ratingMin && ratingMax) {
+        filters.push(`Rating: ${ratingMin}–${ratingMax}`);
+      } else if (ratingMin) {
+        filters.push(`Rating from ${ratingMin}`);
+      } else if (ratingMax) {
+        filters.push(`Rating up to ${ratingMax}`);
+      }
+    }
+
+    if (params.get("adult") === "0") { filters.push("Under 18"); }
+
+    const country = params.get("country");
+    if (country) { filters.push(country); }
+
+    return filters.length > 0 
+      ? `${baseTitle} — ${filters.join(" + ")}`
+      : baseTitle;
+  };
+
+  if (loading && allItems.length === 0) {
+    return (
+      <section className="popular container-md text-center py-5">
+        <p className="text-white" style={{ fontSize: "1.8rem" }}>
+          Loading {getTitle().toLowerCase()}...
+        </p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return <p className="text-danger text-center py-5 fs-3">{error}</p>;
+  }
+
+  if (allItems.length === 0) {
+    return (
+      <section className="popular container-md text-center py-5">
+        <p className="text-white" style={{ fontSize: "1.8rem" }}>Nothing found</p>
+      </section>
+    );
+  }
+
+  return (
+        <section className="popular container-md" style={{ padding: "60px 0" }}>
+            <h2 className="title-bg mb-4 text-white noBack">
+                {getTitle()} ({totalLoadedItems}{hasMore ? "" : "."})
+            </h2>
+
+            <div className="row g-3">
+                {pageItems.map(item => (
+                    <div
+                        key={`${item.id}-${item.media_type || "movie"}`}
+                        className="col-6 col-md-4 col-lg-2 text-center movie-card"
+                        style={{ position: "relative" }}
+                    >
+                        {item.imdb_rating && (
+                            <div className="imdb-badge">⭐ {item.imdb_rating}</div>
+                        )}
+{/*
+                        <img
+                            src={
+                                item.poster_path
+                                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
+                                    : "/images/no-poster.png"
+                            }
+                            alt={item.title || item.name}
+                            className="img-fluid rounded"
+                            style={{
+                                height: "280px",
+                                objectFit: "cover",
+                                width: "100%",
+                                boxShadow: "0 4px 15px rgba(0,0,0,0.6)"
+                            }}
+                        />
+*/}
+                        <ClickablePoster item={item} />
+
+                        <div className="movie-title-parent">
+                            <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                                {item.title || item.name}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="text-center my-5">
+                <button
+                    className="btn btn-outline-light me-3"
+                    disabled={currentPage === 1}
+                    onClick={goPrev}
+                >
+                    ← Previous
+                </button>
+
+                <span
+                    className="text-white mx-4 noBack"
+                    style={{ fontSize: "1.1rem" }}
+                >
+                    Page <strong>{currentPage}</strong> of{" "}
+                    <strong>{totalPagesAvailable}{hasMore ? "+" : ""}</strong>
+                </span>
+
+                <button
+                    className="btn btn-outline-light ms-3"
+                    onClick={goNext}
+                    disabled={loadingMore || (!hasMore && isOnLastPage)}
+                >
+                    {loadingMore ? "Loading..." : "Next →"}
+                </button>
+            </div>
+
+            {!hasMore && isOnLastPage && totalLoadedItems > 0 && (
+                <p className="text-center text-white-50 mt-4">
+                    You've seen everything!
+                </p>
+            )}
+        </section>
+    );
+}

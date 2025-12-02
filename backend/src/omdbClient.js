@@ -16,11 +16,15 @@ axiosRetry(omdb, {
   retries: 3,
   retryDelay: (retryCount) => {
     const delay = axiosRetry.exponentialDelay(retryCount)
-    console.log(`Retry omdb ${retryCount}, waiting ${delay}ms`)
+    console.log(`Retry OMDB request ${retryCount}, waiting ${delay}ms`)
     return delay
   },
-  retryCondition: axiosRetry.isRetryableError
+  retryCondition: (error) => {
+    return axiosRetry.isRetryableError(error) || axiosRetry.isRetryableError(error) ||
+      error.code === 'ECONNABORTED' || error.response?.status === 429 || error.response?.status >= 500
+  }
 })
+
 
 async function getTitleDetails(i) {
   const res = await omdb.get('/', {

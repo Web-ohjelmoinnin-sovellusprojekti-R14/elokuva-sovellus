@@ -7,17 +7,28 @@ import { Routes, Route } from "react-router-dom";
 
 import NowInCinemaPage from "./pages/NowInCinemaPage";
 import HomePage from "./pages/HomePage";
+import SearchResultsPage from "./pages/SearchResultsPage";
+import FilmsByTypePages from "./pages/FilmsByTypePage";
+import AdvancedSearchResultsPage from "./pages/AdvancedSearchResultsPage";
+import TitleDetails from "./pages/TitleDetails";
+import MusicPlayer from "./components/MusicPlayer";
 
 function App() {
+
   return (
     <>
       {/* On every page */}
+      <MusicPlayer />
       <Header />
       <SubHeader />
 
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/now-in-cinema" element={<NowInCinemaPage />} />
+        <Route path="/search" element={<SearchResultsPage />} />
+        <Route path="/type" element={<FilmsByTypePages />} />
+        <Route path="/advanced-search" element={<AdvancedSearchResultsPage />} />
+        <Route path="/title/:id/:mediaType" element={<TitleDetails />} />
       </Routes>
     </>
   );

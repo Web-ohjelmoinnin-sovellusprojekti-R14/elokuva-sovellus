@@ -48,37 +48,37 @@ function Header() {
           />
         </div>
 
-                          <div className="header-right">
-            {!user ? (
-              <>
-                <button
-                  onClick={() => setOpenLogin(true)}
-                  className="btn btn-outline-light btn-sm"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => setOpenRegister(true)}
-                  className="btn btn-light btn-sm"
-                >
-                  Sign Up
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="text-white me-2 noBack">Hello, {user.username}</span>
-                <button
-                  onClick={logout}
-                  className="btn btn-danger btn-sm"
-                >
-                  Log Out
-                </button>
-              </>
-            )}
-            <a href="#groups" className="btn btn-outline-light btn-sm">
-              Groups
-            </a>
-          </div>
+        <div className="header-right">
+          {!user ? (
+            <>
+              <button
+                onClick={() => setOpenLogin(true)}
+                className="btn btn-outline-light btn-sm"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => setOpenRegister(true)}
+                className="btn btn-light btn-sm"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="text-white me-2 noBack">Hello, {user.username}</span>
+              <button
+                onClick={logout}
+                className="btn btn-danger btn-sm"
+              >
+                Log Out
+              </button>
+            </>
+          )}
+          <a href="#groups" className="btn btn-outline-light btn-sm">
+            Groups
+          </a>
+        </div>
 
       </div>
     </header>
