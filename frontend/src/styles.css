@@ -24,6 +24,60 @@
 .body {
   background-color: #2a2a49;
   padding: 0;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  width: 180px;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  animation: glow 6s infinite alternate ease-in-out;
+  opacity: 0.55;
+}
+
+body::before {
+  left: 0;
+  background: linear-gradient(180deg, #00d4ff, #7000ff);
+}
+
+body::after {
+  right: 0;
+  background: linear-gradient(180deg, #ff0000, #ff008c);
+}
+
+@keyframes glow {
+  0% { filter: blur(40px); opacity: 0.35; }
+  100% { filter: blur(70px); opacity: 0.75; }
+}
+
+.background-particles {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: blink 3s infinite ease-in-out;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.1; transform: scale(0.6); }
+  50% { opacity: 0.9; transform: scale(1); }
 }
 
 .logo-text {

@@ -19,9 +19,24 @@ function App() {
     <>
       {/* On every page */}
       <MusicPlayer />
+      <div className="background-particles">
+        {[...Array(40)].map((_, i) => {
+          const size = Math.random() * 5 + 4;
+          return (
+            <div
+              key={i}
+              className="particle"
+              style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`,
+                width: `${size}px`, height: `${size}px`,
+                animationDelay: `${Math.random() * 3}s`,
+              }}
+            />
+          );
+        })}
+      </div>
       <Header />
       <SubHeader />
-
+      
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/now-in-cinema" element={<NowInCinemaPage />} />
