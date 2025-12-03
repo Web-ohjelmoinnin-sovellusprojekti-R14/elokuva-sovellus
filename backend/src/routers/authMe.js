@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import authMe from '../controllers/authMe.js'
+import authMe from '../controllers/authMeControllers.js'
 
 const router = Router()
 router.get('/me', authMe)

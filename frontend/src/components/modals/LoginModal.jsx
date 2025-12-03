@@ -18,7 +18,7 @@ export default function LoginModal({ isOpen, onClose }) {
     }
     if (isOpen) window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -28,7 +28,7 @@ export default function LoginModal({ isOpen, onClose }) {
     }
     if (isOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -78,7 +78,7 @@ export default function LoginModal({ isOpen, onClose }) {
           <button className="btn btn-primary w-100">Log In</button>
         </form>
 
-        <button className="btn btn-link w-100 mt-2" onClick={onClose}>
+        <button className="btn btn-danger w-100 mt-2" onClick={onClose}>
           Close
         </button>
       </div>
