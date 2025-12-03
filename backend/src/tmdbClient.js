@@ -1,6 +1,7 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import dotenv from 'dotenv'
+import axiosRetry from 'axios-retry'
 dotenv.config()
 
 const apiKey = process.env.TMDB_API_KEY
@@ -37,15 +38,22 @@ async function nowInCinema(page, region) {
   return res.data
 }
 
-async function getTitles(query) {
-  const res = await tmdb.get('/search/multi', {
-    params: { query },
+async function getMovies(query, page) {
+  const res = await tmdb.get('/search/movie', {
+    params: { query, page },
+  })
+  return res.data
+}
+
+async function getTvSeries(query, page) {
+  const res = await tmdb.get('/search/tv', {
+    params: { query, page },
   })
   return res.data
 }
 
 async function getMovieDetails(movie_id) {
-  const res = await tmdb.get('/movie/' + movie_id)
+  const res = await tmdb.get(`/movie/${movie_id}`)
   return res.data
 }
 
@@ -64,6 +72,16 @@ async function getTvSeries(query, page) {
 }
 
 async function getTvDetails(series_id) {
+  const res = await tmdb.get(`/tv/${series_id}`)
+  return res.data
+}
+
+async function getMovieExtrenalIds(movie_id) {
+  const res = await tmdb.get(`/movie/${movie_id}/external_ids`)
+  return res.data
+}
+
+async function getTvExtrenalIds(series_id) {
   const detailsRes = await tmdb.get('/tv/' + series_id)
   const details = detailsRes.data
   const idsRes = await tmdb.get(`/tv/${series_id}/external_ids`)
