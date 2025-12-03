@@ -1,33 +1,32 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import dotenv from 'dotenv'
-import axiosRetry from 'axios-retry'
 dotenv.config()
 
 const apiKey = process.env.TMDB_API_KEY
 const baseURL = process.env.TMDB_BASE_URL || 'https://api.themoviedb.org/3'
-console.log("TMDB API KEY:", process.env.TMDB_API_KEY);
+console.log('TMDB API KEY:', process.env.TMDB_API_KEY)
 if (!process.env.TMDB_API_KEY) {
-  console.error("TMDB API key is missing! Check your .env file!");
-  process.exit(1);
+  console.error('TMDB API key is missing! Check your .env file!')
+  process.exit(1)
 }
 
 const tmdb = axios.create({
   baseURL,
-  timeout:1000,
+  timeout: 1000,
   params: { api_key: apiKey },
 })
 
 axiosRetry(tmdb, {
   retries: 3,
-  retryDelay: (retryCount) => {
+  retryDelay: retryCount => {
     const delay = axiosRetry.exponentialDelay(retryCount)
     console.log(`Retry TMDB request ${retryCount}, waiting ${delay}ms`)
     return delay
   },
-  retryCondition: (error) => {
+  retryCondition: error => {
     return axiosRetry.isRetryableError(error) || error.response?.status === 429
-  }
+  },
 })
 
 async function nowInCinema(page, region) {
@@ -57,36 +56,9 @@ async function getMovieDetails(movie_id) {
   return res.data
 }
 
-async function getMovies(query, page) {
-  const res = await tmdb.get('/search/movie', {
-    params: { query, page },
-  })
-  return res.data
-}
-
-async function getTvSeries(query, page) {
-  const res = await tmdb.get('/search/tv', {
-    params: { query, page },
-  })
-  return res.data
-}
-
 async function getTvDetails(series_id) {
   const res = await tmdb.get(`/tv/${series_id}`)
   return res.data
-}
-
-async function getMovieExtrenalIds(movie_id) {
-  const res = await tmdb.get(`/movie/${movie_id}/external_ids`)
-  return res.data
-}
-
-async function getTvExtrenalIds(series_id) {
-  const detailsRes = await tmdb.get('/tv/' + series_id)
-  const details = detailsRes.data
-  const idsRes = await tmdb.get(`/tv/${series_id}/external_ids`)
-  const external_ids = idsRes.data
-  return { ...details, external_ids }
 }
 
 async function getMovieExtrenalIds(movie_id) {
@@ -146,7 +118,7 @@ async function discoverTvSeries(
   if (with_genres) params.with_genres = with_genres
   //if (rating_min) params['vote_average.gte'] = rating_min - 1
   //if (rating_max) params['vote_average.lte'] = rating_max
-    if (rating_min) {
+  if (rating_min) {
     let rating_min_float = parseFloat(rating_min) - 0.8
     if (rating_min_float > 10) rating_min_float = 10
     if (rating_min_float < 0) rating_min_float = 0
@@ -166,5 +138,14 @@ async function discoverTvSeries(
   return res.data
 }
 
-export { nowInCinema, getTitles, getMovieDetails, getTvDetails, getMovies, 
-  getTvSeries, discoverTvSeries, discoverMovies, getMovieExtrenalIds, getTvExtrenalIds, }
+export {
+  nowInCinema,
+  getMovieDetails,
+  getTvDetails,
+  getMovies,
+  getTvSeries,
+  discoverTvSeries,
+  discoverMovies,
+  getMovieExtrenalIds,
+  getTvExtrenalIds,
+}
