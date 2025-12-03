@@ -11,13 +11,13 @@ import "./styles.css";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <App />
       </AuthProvider>
     </BrowserRouter>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
 
 document.body.style.backgroundColor = '#2a2a49';

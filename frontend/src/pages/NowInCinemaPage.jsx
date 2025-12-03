@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef} from "react";
+import ClickablePoster from "../components/ClickablePoster";
 
 const MOVIES_PER_PAGE = 18;
 
@@ -8,7 +9,12 @@ export default function NowInCinemaPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchAllPages = async () => {
       setLoading(true);
       setError(null);
@@ -19,7 +25,9 @@ export default function NowInCinemaPage() {
         let hasMore = true;
 
         while (hasMore) {
-          const res = await fetch(`http://localhost:5000/api/now_in_cinema?page=${page}`);
+          const res = await fetch(
+            `http://localhost:5000/api/now_in_cinema?page=${page}`
+          );
           const data = await res.json();
 
           if (!data || !data.results || data.results.length === 0) {
@@ -46,7 +54,10 @@ export default function NowInCinemaPage() {
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
   const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
-  const currentMovies = allMovies.slice(startIndex, startIndex + MOVIES_PER_PAGE);
+  const currentMovies = allMovies.slice(
+    startIndex,
+    startIndex + MOVIES_PER_PAGE
+  );
 
   if (loading) {
     return (
@@ -58,9 +69,7 @@ export default function NowInCinemaPage() {
     );
   }
 
-  if (error) {
-    return <p className="text-danger text-center">{error}</p>;
-  }
+  if (error) { return <p className="text-danger text-center">{error}</p>; }
 
   return (
     <section className="popular container-md" style={{ padding: "60px 0" }}>
@@ -82,7 +91,6 @@ export default function NowInCinemaPage() {
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
                   style={{ position: "relative" }}
                 >
-                  {/* IMDb Badge */}
                   {movie.imdb_rating && (
                     <div
                       className="imdb-badge"
@@ -90,8 +98,8 @@ export default function NowInCinemaPage() {
                       ⭐ {movie.imdb_rating}
                     </div>
                   )}
-
-                  {/* Poster */}
+                  <ClickablePoster item={movie} />
+                {/*
                   <img
                     src={poster}
                     alt={movie.title}
@@ -100,22 +108,20 @@ export default function NowInCinemaPage() {
                       boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
                       height: "280px",
                       objectFit: "cover",
-                      width: "100%"
+                      width: "100%",
                     }}
                   />
-
-                  {/* Title */}
+                */}
                   <div class = "movie-title-parent">
                   <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
                       {movie.title}
-                  </p>
+                    </p>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="text-center my-5">
               <button
@@ -126,8 +132,12 @@ export default function NowInCinemaPage() {
                 ← Previous
               </button>
 
-              <span className="text-white noBack mx-4" style={{ fontSize: "1.1rem" }}>
-                Page <strong>{currentPage}</strong> From <strong>{totalPages}</strong>
+              <span
+                className="text-white noBack mx-4"
+                style={{ fontSize: "1.1rem" }}
+              >
+                Page <strong>{currentPage}</strong> From{" "}
+                <strong>{totalPages}</strong>
               </span>
 
               <button
@@ -141,7 +151,9 @@ export default function NowInCinemaPage() {
           )}
         </>
       ) : (
-        <p className="text-white text-center">Not found current films from Cinemas.</p>
+        <p className="text-white text-center">
+          Not found current films from Cinemas.
+        </p>
       )}
     </section>
   );
