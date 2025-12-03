@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef} from "react";
+import ClickablePoster from "../components/ClickablePoster";
 
 const MOVIES_PER_PAGE = 18;
 
@@ -68,9 +69,7 @@ export default function NowInCinemaPage() {
     );
   }
 
-  if (error) {
-    return <p className="text-danger text-center">{error}</p>;
-  }
+  if (error) { return <p className="text-danger text-center">{error}</p>; }
 
   return (
     <section className="popular container-md" style={{ padding: "60px 0" }}>
@@ -92,12 +91,15 @@ export default function NowInCinemaPage() {
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
                   style={{ position: "relative" }}
                 >
-                  {/* IMDb Badge */}
-                  <div className="imdb-badge">
-                    ⭐ {movie.imdb_rating ? movie.imdb_rating : "N/A"}
-                  </div>
-
-                  {/* Poster */}
+                  {movie.imdb_rating && (
+                    <div
+                      className="imdb-badge"
+                    >
+                      ⭐ {movie.imdb_rating}
+                    </div>
+                  )}
+                  <ClickablePoster item={movie} />
+                {/*
                   <img
                     src={poster}
                     alt={movie.title}
@@ -109,13 +111,9 @@ export default function NowInCinemaPage() {
                       width: "100%",
                     }}
                   />
-
-                  {/* Title */}
-                  <div class="movie-title-parent">
-                    <p
-                      className="movie-title text-white"
-                      style={{ fontSize: "0.9rem" }}
-                    >
+                */}
+                  <div class = "movie-title-parent">
+                  <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
                       {movie.title}
                     </p>
                   </div>
@@ -124,7 +122,6 @@ export default function NowInCinemaPage() {
             })}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="text-center my-5">
               <button

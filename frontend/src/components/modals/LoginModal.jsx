@@ -18,7 +18,7 @@ export default function LoginModal({ isOpen, onClose }) {
     }
     if (isOpen) window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -28,7 +28,7 @@ export default function LoginModal({ isOpen, onClose }) {
     }
     if (isOpen) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

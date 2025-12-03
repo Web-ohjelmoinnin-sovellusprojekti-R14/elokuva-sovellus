@@ -1,0 +1,67 @@
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import ClickablePoster from "./ClickablePoster";
+
+const AnimeSection = () => {
+  const [topAnime, setTopAnime] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/category/anime?batch=1")
+      .then(res => res.json())
+      .then(data => {
+        setTopAnime(data.results.slice(0, 12));
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="popular container-md py-5 text-center">
+        <h2 className="title-bg mb-4 text-white">Anime</h2>
+        <div className="spinner-border text-light" role="status" />
+      </section>
+    );
+  }
+
+  return (
+    <section className="popular container-md py-5">
+      <h2 className="title-bg mb-4 text-white noBack">
+        Anime
+      </h2>
+
+      <div className="row g-3 g-md-4">
+        {topAnime.map((anime) => (
+          <div
+            key={anime.id}
+            className="col-6 col-md-4 col-lg-2 text-center movie-card"
+            style={{ position: "relative" }}
+          >
+            {anime.imdb_rating && (
+              <div className="imdb-badge">⭐ {anime.imdb_rating}</div>
+            )}
+            <ClickablePoster item={{ ...anime, media_type: "tv" }}/>
+            <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                    {anime.title || anime.name}
+                </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-5">
+        <Link
+          to="/type?category=anime"
+          className="title-under mb-4"
+          style={{ fontSize: "1.1rem", fontWeight: "600" }}
+        >
+          Show more...
+        </Link>
+      </div>
+    </section>
+  );
+};
+
+export default AnimeSection;

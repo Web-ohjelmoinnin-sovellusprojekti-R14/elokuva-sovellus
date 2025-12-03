@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import LoginModal from "./modals/LoginModal";
 import RegisterModal from "./modals/RegisterModal";
+import { Link } from "react-router-dom";
 
 function Header() {
   const spinImage = (e) => {
@@ -26,14 +27,16 @@ function Header() {
       <div className="container header-inner">
 
         <div className="header-left">
-          <img
-            src="images/logoMain.png"
-            className="site-logo"
-            alt="Logo"
-            loading="lazy"
-            onMouseOver={spinImage}
-            onMouseOut={resetSpin}
-          />
+          <Link to="/">
+            <img
+              src="images/logoMain.png"
+              className="site-logo"
+              alt="Logo"
+              loading="lazy"
+              onMouseOver={spinImage}
+              onMouseOut={resetSpin}
+            />
+          </Link>
           <span className="logo-text">Best films are here</span>
         </div>
 
@@ -45,37 +48,37 @@ function Header() {
           />
         </div>
 
-                          <div className="header-right">
-            {!user ? (
-              <>
-                <button
-                  onClick={() => setOpenLogin(true)}
-                  className="btn btn-outline-light btn-sm"
-                >
-                  Sign In
-                </button>
-                <button
-                  onClick={() => setOpenRegister(true)}
-                  className="btn btn-light btn-sm"
-                >
-                  Sign Up
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="text-white me-2 noBack">Hello, {user.username}</span>
-                <button
-                  onClick={logout}
-                  className="btn btn-danger btn-sm"
-                >
-                  Log Out
-                </button>
-              </>
-            )}
-            <a href="#groups" className="btn btn-outline-light btn-sm">
-              Groups
-            </a>
-          </div>
+        <div className="header-right">
+          {!user ? (
+            <>
+              <button
+                onClick={() => setOpenLogin(true)}
+                className="btn btn-outline-light btn-sm"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => setOpenRegister(true)}
+                className="btn btn-light btn-sm"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="text-white me-2 noBack">Hello, {user.username}</span>
+              <button
+                onClick={logout}
+                className="btn btn-danger btn-sm"
+              >
+                Log Out
+              </button>
+            </>
+          )}
+          <a href="#groups" className="btn btn-outline-light btn-sm">
+            Groups
+          </a>
+        </div>
 
       </div>
     </header>

@@ -1,222 +1,74 @@
-import { discoverMovies, discoverTvSeries } from '../tmdbClient.js'
-import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
+import { discoverMovies, discoverTvSeries } from '../tmdbClient.js';
+import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js';
 
-const MAX_APP_ITEMS = 110
-const MAX_TMDB_PAGES = 6
-
-async function advancedSearchMovies(
-  page,
-  year_min,
-  year_max,
-  include_adult,
-  with_genres,
-  imdb_rating_min,
-  imdb_rating_max,
-  with_origin_country
-) {
-  const media_type = 'movie'
-  const foundMovies = await discoverMovies(
-    page,
-    year_min,
-    year_max,
-    include_adult,
-    with_genres,
-    imdb_rating_min,
-    imdb_rating_max,
-    with_origin_country
-  )
-  const detailedMovies = await Promise.all(
-    foundMovies.results.map(async item => {
-      let detailedObject = await getMovieImdbRating(item)
-      if (detailedObject) detailedObject.media_type = media_type
-      return detailedObject
-    })
-  )
-  console.log('All detailed movies: ' + JSON.stringify(detailedMovies))
-  try {
-    if (!imdb_rating_min && !imdb_rating_max) {
-      return detailedMovies
-    } else if (imdb_rating_min && !imdb_rating_max) {
-      const filteredMovies = detailedMovies.filter(item => {
-        if (!item || item.imdb_rating == null) return false
-        return Number(item.imdb_rating) >= Number(imdb_rating_min)
-      })
-      return filteredMovies
-    } else if (!imdb_rating_min && imdb_rating_max) {
-      const filteredMovies = detailedMovies.filter(item => {
-        if (!item || item.imdb_rating == null) return false
-        return Number(item.imdb_rating) <= Number(imdb_rating_max)
-      })
-
-      return filteredMovies
-    }
-  } catch (e) {
-    return { error: 'IMDb rating must be a number' }
-  }
-}
-
-async function advancedSearchTvSeries(
-  page,
-  year_min,
-  year_max,
-  include_adult,
-  with_genres,
-  imdb_rating_min,
-  imdb_rating_max,
-  with_origin_country
-) {
-  const media_type = 'tv'
-  const foundTvSeries = await discoverTvSeries(
-    page,
-    year_min,
-    year_max,
-    include_adult,
-    with_genres,
-    imdb_rating_min,
-    imdb_rating_max,
-    with_origin_country
-  )
-  const detailedTvSeries = await Promise.all(
-    foundTvSeries.results.map(async item => {
-      let detailedObject = await getTvSeriesImdbRating(item)
-      if (detailedObject) detailedObject.media_type = media_type
-      return detailedObject
-    })
-  )
-  console.log('All detailed series: ' + JSON.stringify(detailedTvSeries))
-  if (!imdb_rating_min && !imdb_rating_max) {
-    return detailedTvSeries
-  } else if (imdb_rating_min && !imdb_rating_max) {
-    const filteredTvSeries = detailedTvSeries.filter(item => {
-      if (!item || item.imdb_rating == null) return false
-      return Number(item.imdb_rating) >= Number(imdb_rating_min)
-    })
-    return filteredTvSeries
-  } else if (!imdb_rating_min && imdb_rating_max) {
-    const filteredTvSeries = detailedTvSeries.filter(item => {
-      if (!item || item.imdb_rating == null) return false
-      return Number(item.imdb_rating) <= Number(imdb_rating_max)
-    })
-    return filteredTvSeries
-  }
-}
-
-async function advancedSearchController(
-  page,
-  media_type,
-  year_min,
-  year_max,
-  imdb_rating_min,
-  imdb_rating_max,
-  include_adult,
-  with_genres,
-  with_origin_country
-) {
-  switch (media_type) {
-    case 'movie':
-      let responseMovies = await advancedSearchMovies(
-        page,
-        year_min,
-        year_max,
-        include_adult,
-        with_genres,
-        imdb_rating_min,
-        imdb_rating_max,
-        with_origin_country
-      )
-
-      responseMovies = Array.isArray(responseMovies) ? responseMovies : []
-      responseMovies = responseMovies.filter(item => item != null)
-      responseMovies.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
-      return responseMovies
-    case 'tv':
-      let responseTvSeries = await advancedSearchTvSeries(
-        page,
-        year_min,
-        year_max,
-        include_adult,
-        with_genres,
-        imdb_rating_min,
-        imdb_rating_max,
-        with_origin_country
-      )
-      responseTvSeries = responseTvSeries.filter(item => item != null)
-      responseTvSeries.sort((a, b) => {
-        return Number(b.imdb_rating) - Number(a.imdb_rating)
-      })
-      return responseTvSeries
-    case null:
-      const firstResponse = await advancedSearchMovies(
-        page,
-        year_min,
-        year_max,
-        include_adult,
-        with_genres,
-        imdb_rating_min,
-        imdb_rating_max,
-        with_origin_country
-      )
-      const secondResponse = await advancedSearchTvSeries(
-        page,
-        year_min,
-        year_max,
-        include_adult,
-        with_genres,
-        imdb_rating_min,
-        imdb_rating_max,
-        with_origin_country
-      )
-      let results = [...firstResponse, ...secondResponse]
-      results = results.filter(item => item != null)
-      results.sort((a, b) => Number(b.imdb_rating) - Number(a.imdb_rating))
-      return results
-    default:
-      return { error: "Media type parameter can either be 'movie' or 'tv'" }
-  }
-}
+const MAX_TMDB_PAGES = 6;
+const MAX_ITEMS = 110;
+const cache = new Map();
 
 function buildCacheKey(params) {
-  return JSON.stringify(params)
+  const sortedKeys = Object.keys(params).sort();
+  const keyObj = {};
+  for (const k of sortedKeys) keyObj[k] = params[k];
+  return JSON.stringify(keyObj);
 }
 
-async function buildCombinedResults(baseParams) {
-  const combined = []
-  let tmdbPage = 1
+async function enrichItems(items, expectedType) {
+  const tasks = items.map(async (item) => {
+    try {
+      if (expectedType === 'movie' || item.media_type === 'movie') {
+        const rated = await getMovieImdbRating(item);
+        return rated ? { ...rated, media_type: 'movie' } : null;
+      } else {
+        const rated = await getTvSeriesImdbRating(item);
+        return rated ? { ...rated, media_type: 'tv' } : null;
+      }
+    } catch (err) {
+      console.error('Error enriching item:', item.id, err.message);
+      return null;
+    }
+  });
 
-  while (tmdbPage <= MAX_TMDB_PAGES && combined.length < MAX_APP_ITEMS) {
-    const pageResponse = await advancedSearchController(
-      tmdbPage,
-      baseParams.media_type,
-      baseParams.year_min,
-      baseParams.year_max,
-      baseParams.imdb_rating_min,
-      baseParams.imdb_rating_max,
-      baseParams.include_adult,
-      baseParams.with_genres,
-      baseParams.with_origin_country
-    )
+  const enriched = await Promise.all(tasks);
+  return enriched
+    .filter(item => item !== null && item.imdb_rating && parseFloat(item.imdb_rating) >= 5.0)
+    .sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating));
+}
 
-    console.log(
-      'advancedSearchController page',
-      tmdbPage,
-      'len =',
-      Array.isArray(pageResponse) ? pageResponse.length : 'not array'
-    )
+async function buildCombinedResults(params) {
+  const { batchNum = 1, media_type, year_min, year_max, include_adult, with_genres, with_origin_country } = params;
 
-    if (!pageResponse || !Array.isArray(pageResponse) || pageResponse.length === 0) {
-      break
+  const startTmdbPage = (batchNum - 1) * 6 + 1;
+  const endTmdbPage = startTmdbPage + 5;
+
+  const results = [];
+
+  const shouldSearchMovies = params.media_type === 'movie';
+  const shouldSearchTv     = params.media_type === 'tv';
+
+  for (let page = startTmdbPage; page <= endTmdbPage && results.length < 110; page++) {
+    const promises = [];
+
+    if (shouldSearchMovies) {
+      promises.push(discoverMovies(page, year_min, year_max, include_adult, with_genres, null, null, with_origin_country));
+    }
+    if (shouldSearchTv) {
+      promises.push(discoverTvSeries(page, year_min, year_max, include_adult, with_genres, null, null, with_origin_country));
     }
 
-    combined.push(...pageResponse)
+    const responses = await Promise.all(promises);
 
-    if (combined.length >= MAX_APP_ITEMS) {
-      break
+    for (const res of responses) {
+      if (!res?.results?.length) continue;
+
+      const type = res.results[0].title ? 'movie' : 'tv';
+      const enriched = await enrichItems(res.results, type);
+      results.push(...enriched);
+
+      if (results.length >= 110) break;
     }
-
-    tmdbPage += 1
   }
 
-  return combined.slice(0, MAX_APP_ITEMS)
+  return results.slice(0, 110);
 }
 
-export { buildCacheKey, buildCombinedResults }
+export { buildCacheKey, buildCombinedResults };
