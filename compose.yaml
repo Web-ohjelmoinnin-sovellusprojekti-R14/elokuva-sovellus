@@ -6,11 +6,7 @@ services:
       - "5000:5000"
     env_file:
       - ./backend/.env
-    depends_on:
-      postgres:
-        condition: service_healthy # Waits for Postgres to be ready
-    environment:
-      - DB_HOST=postgres # Critical: use service name, not localhost
+    # no postgres service here
 
   frontend:
     build: ./frontend
@@ -18,22 +14,3 @@ services:
       - "3000:3000"
     depends_on:
       - backend
-
-  postgres:
-    image: postgres:16
-    ports:
-      - "5432:5432" # Optional: for local pgAdmin/psql access
-    environment:
-      POSTGRES_DB: yourdb # Create this DB automatically
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data # Persist data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-volumes:
-  postgres_data:
