@@ -3,16 +3,17 @@ dotenv.config()
 
 import express, { json } from 'express'
 import cors from 'cors'
-import jwt from 'jsonwebtoken'
 
 import searchRouter from './routers/search.js'
 import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
 import loginRouter from './routers/login.js'
-import categoriesRouter from './routers/categories.js';
-
-import advancedSearchRouter from './routers/advancedSearch.js'
+import categoriesRouter from './routers/categories.js'
+import saveReviewRouter from './routers/saveReview.js'
 import titleDataRouter from './routers/titleData.js'
+import authMeRouter from './routers/authMe.js'
+import logoutRouter from './routers/logout.js'
+import getReviewsRouter from './routers/getReviews.js'
 
 import cookieParser from 'cookie-parser'
 
@@ -32,33 +33,12 @@ app.use('/api', searchRouter)
 app.use('/api', nowInCinemaRouter)
 app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
-app.use('/api', categoriesRouter);
+app.use('/api', categoriesRouter)
 app.use('/api', titleDataRouter)
-
-app.get('/api/me', (req, res) => {
-  const token = req.cookies.token
-
-  if (!token) {
-    return res.status(401).json({ user: null })
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    return res.json({
-      user: {
-        user_id: decoded.user_id,
-        username: decoded.username,
-      },
-    })
-  } catch (err) {
-    return res.status(401).json({ user: null })
-  }
-})
-
-app.post('/api/logout', (req, res) => {
-  res.clearCookie('token')
-  res.status(200).json({ message: 'Logged out' })
-})
+app.use('/api', saveReviewRouter)
+app.use('/api', authMeRouter)
+app.use('/api', logoutRouter)
+app.use('/api', getReviewsRouter)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
