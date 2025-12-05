@@ -14,6 +14,7 @@ import titleDataRouter from './routers/titleData.js'
 import authMeRouter from './routers/authMe.js'
 import logoutRouter from './routers/logout.js'
 import getReviewsRouter from './routers/getReviews.js'
+import deleteReviewRouter from './routers/deleteReview.js'
 
 import cookieParser from 'cookie-parser'
 
@@ -39,6 +40,7 @@ app.use('/api', saveReviewRouter)
 app.use('/api', authMeRouter)
 app.use('/api', logoutRouter)
 app.use('/api', getReviewsRouter)
+app.use('/api', deleteReviewRouter)
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {

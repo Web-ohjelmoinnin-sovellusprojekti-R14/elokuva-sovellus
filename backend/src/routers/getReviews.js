@@ -1,11 +1,11 @@
 import { Router } from 'express'
 const router = Router()
 import { getReviewsByUserIdController, getReviewsByMovieIdController } from '../controllers/getReviewsController.js'
-import { authMiddleware } from '../middleware/authMiddleware.js'
+import { authMe } from '../controllers/authMeController.js'
 
-router.get('/get_reviews_by_user_id', authMiddleware, async (req, res) => {
+router.get('/get_reviews_by_user_id', authMe, async (req, res) => {
   try {
-    const user_id = req.token.user_id
+    const user_id = req.user.user_id
 
     const response = await getReviewsByUserIdController(user_id)
     return res.status(201).json(response)
@@ -14,7 +14,7 @@ router.get('/get_reviews_by_user_id', authMiddleware, async (req, res) => {
   }
 })
 
-router.get('/get_reviews_by_movie_id', authMiddleware, async (req, res) => {
+router.get('/get_reviews_by_movie_id', authMe, async (req, res) => {
   try {
     const movie_id = req.query.movie_id
     const response = await getReviewsByMovieIdController(movie_id)

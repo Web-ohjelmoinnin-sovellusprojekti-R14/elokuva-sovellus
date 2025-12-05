@@ -1,15 +1,16 @@
 import jwt from 'jsonwebtoken'
 
-function authMe(req, res) {
-  const token = req.cookies.token
-  if (!token) return res.status(401).json({ user: null })
+function authMe(req, res, next) {
+  const token = req.cookies?.token
+  if (!token) return res.status(401).json({ error: 'Token missing' })
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    return res.json({ user: decoded })
-  } catch {
-    return res.status(401).json({ user: null })
+    req.user = { user_id: decoded.user_id, username: decoded.username }
+    next()
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' })
   }
 }
 
-export default authMe
+export { authMe }
