@@ -1,11 +1,11 @@
 import { Router } from 'express'
 const router = Router()
 import { saveReviewController } from '../controllers/saveReviewController.js'
-import { authMiddleware } from '../middleware/authMiddleware.js'
+import { authMe } from '../controllers/authMeController.js'
 
-router.post('/save_review', authMiddleware, async (req, res) => {
+router.post('/save_review', authMe, async (req, res) => {
   try {
-    const user_id = req.token.user_id
+    const user_id = req.user.user_id
     const rating = req.body.rating
     const movie_id = req.body.movie_id
     const comment = req.body.comment || ''
