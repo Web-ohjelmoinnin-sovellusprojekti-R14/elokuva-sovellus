@@ -9,8 +9,9 @@ router.post('/save_review', authMe, async (req, res) => {
     const rating = req.body.rating
     const movie_id = req.body.movie_id
     const comment = req.body.comment || ''
+    const media_type = req.body.media_type
 
-    const response = await saveReviewController(rating, user_id, movie_id, comment, res)
+    const response = await saveReviewController(rating, user_id, movie_id, comment, media_type, res)
     return res.status(201).json(response)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to save review' })
