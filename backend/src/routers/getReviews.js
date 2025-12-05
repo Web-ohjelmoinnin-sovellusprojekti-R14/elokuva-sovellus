@@ -17,7 +17,8 @@ router.get('/get_reviews_by_user_id', authMe, async (req, res) => {
 router.get('/get_reviews_by_movie_id', authMe, async (req, res) => {
   try {
     const movie_id = req.query.movie_id
-    const response = await getReviewsByMovieIdController(movie_id)
+    const media_type = req.query.media_type
+    const response = await getReviewsByMovieIdController(movie_id, media_type)
     return res.status(201).json(response)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to get reviews by Movie ID' })
