@@ -1,4 +1,4 @@
-import { getImdbRating } from './imdbRatingController.js'
+import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
 import { getMovies, getTvSeries } from '../tmdbClient.js'
 
 async function titleSearchController(req) {
@@ -9,20 +9,20 @@ async function titleSearchController(req) {
   const tvSeries = await getTvSeries(query, page)
 
   const detailedMovies = await Promise.all(
-    movies.results.map(item => getImdbRating({ ...item, media_type: 'movie' }, 'movie'))
+    movies.results.map(item => getMovieImdbRating({ ...item, media_type: 'movie' }, false))
   )
   const detailedTv = await Promise.all(
-    tvSeries.results.map(item => getImdbRating({ ...item, media_type: 'tv' }, 'tv'))
+    tvSeries.results.map(item => getTvSeriesImdbRating({ ...item, media_type: 'tv' }, false))
   )
 
   const combinedResults = [...detailedMovies, ...detailedTv]
-  .filter(item => item !== null)
-  .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .filter(item => item !== null)
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
 
   return {
     results: combinedResults,
     total_pages: Math.min(movies.total_pages + tvSeries.total_pages, 10),
-    total_results: combinedResults.length
+    total_results: combinedResults.length,
   }
 }
 

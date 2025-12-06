@@ -138,6 +138,20 @@ async function discoverTvSeries(
   return res.data
 }
 
+async function getTrailerUrl(tmdbId, mediaType) {
+  const endpoint = mediaType === 'movie' ? `/movie/${tmdbId}/videos` : `/tv/${tmdbId}/videos`
+
+  const res = await tmdb.get(endpoint)
+
+  const videos = res.data.results || []
+
+  const trailer = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer')
+
+  if (!trailer) return null
+
+  return `https://www.youtube.com/watch?v=${trailer.key}`
+}
+
 export {
   nowInCinema,
   getMovieDetails,
@@ -148,4 +162,5 @@ export {
   discoverMovies,
   getMovieExtrenalIds,
   getTvExtrenalIds,
+  getTrailerUrl,
 }
