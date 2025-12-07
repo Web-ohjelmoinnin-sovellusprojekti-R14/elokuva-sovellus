@@ -3,7 +3,7 @@ import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingControlle
 
 const MAX_TMDB_PAGES = 6;
 const MAX_ITEMS = 110;
-const cache = new Map();
+const cache = new Map(); 
 
 function buildCacheKey(params) {
   const sortedKeys = Object.keys(params).sort();

@@ -84,4 +84,4 @@ export default function LoginModal({ isOpen, onClose }) {
       </div>
     </div>
   );
-}
+} 

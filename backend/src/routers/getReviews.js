@@ -4,7 +4,7 @@ import { authMe } from '../controllers/authMeController.js';
 
 const router = Router();
 
-router.get('/get_reviews_by_user_id', authMe, async (req, res) => {
+router.get('/get_reviews_by_user_id', authMe, async (req, res) => { 
   try {
     const user_id = req.user.user_id;
     const response = await getReviewsByUserIdController(user_id);

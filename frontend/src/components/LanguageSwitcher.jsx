@@ -21,7 +21,7 @@ export default function LanguageSwitcher() {
     document.documentElement.lang = code;
     setOpen(false);
   };
-
+ 
   return (
     <div
       ref={wrapperRef}

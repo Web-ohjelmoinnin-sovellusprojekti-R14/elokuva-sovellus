@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
+ 
 function SubHeader() {
     const [query, setQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);

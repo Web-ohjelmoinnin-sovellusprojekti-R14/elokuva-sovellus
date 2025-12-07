@@ -15,7 +15,7 @@ import MusicPlayer from "./components/MusicPlayer";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import Footer from "./components/Footer";
 import UserReviewsPage from "./pages/UserReviewsPage";
-
+ 
 function App() {
   return (
     <div className="app-wrapper">

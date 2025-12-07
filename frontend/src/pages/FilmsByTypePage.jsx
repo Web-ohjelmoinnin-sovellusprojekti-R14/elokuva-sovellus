@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
-
+ 
 const ITEMS_PER_PAGE = 18;
 
 export default function SearchResultsPage() {

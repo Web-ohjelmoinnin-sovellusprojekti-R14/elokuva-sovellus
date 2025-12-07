@@ -2,7 +2,7 @@ import pool from '../db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-async function getReviewsByUserIdController(user_id) {
+async function getReviewsByUserIdController(user_id) { 
   if (!user_id) {
     throw new Error('User ID is not provided')
   }

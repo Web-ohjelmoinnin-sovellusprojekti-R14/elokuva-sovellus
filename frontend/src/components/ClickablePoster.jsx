@@ -20,7 +20,7 @@ const ClickablePoster = ({ item }) => {
     poster.classList.add(animationType);
     setTimeout(() => { navigate(`/title/${item.id}/${mediaType}`); }, 350);
   };
-
+ 
   return (
     <div
       className="d-block text-decoration-none"

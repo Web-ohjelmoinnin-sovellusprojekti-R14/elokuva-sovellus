@@ -3,7 +3,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 function StarRaiting({ rating, setRating }) {
 const [hoverRating, setHoverRating] = useState(0);
-
+ 
   return (
     <div className="d-flex align-items-center mb-2">
       {[...Array(10)].map((_, i) => {

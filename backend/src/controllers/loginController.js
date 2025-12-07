@@ -29,7 +29,7 @@ async function loginController(req, res) {
       expiresIn: '24h',
     })
 
-    res.cookie("token", token, {
+    res.cookie("token", token, { 
       httpOnly: true,
       secure: false,
       sameSite: "lax",

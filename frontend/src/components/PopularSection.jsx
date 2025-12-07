@@ -53,7 +53,7 @@ useEffect(() => {
       </section>
     );
   }
-
+ 
   return (
     <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">

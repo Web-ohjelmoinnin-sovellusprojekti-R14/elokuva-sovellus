@@ -3,7 +3,7 @@ import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingControlle
 
 async function getTitleDetails(id, media_type) {
   try {
-  switch (media_type) {
+  switch (media_type) { 
     case 'movie':
       const movieDetails = await getMovieDetails(id)
       const movieResponse = getMovieImdbRating(movieDetails, true)

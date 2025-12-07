@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import StarRaiting from "../components/StarRaiting";
-
+ 
 const IMG = "https://image.tmdb.org/t/p";
 
 export default function TitleDetails() {

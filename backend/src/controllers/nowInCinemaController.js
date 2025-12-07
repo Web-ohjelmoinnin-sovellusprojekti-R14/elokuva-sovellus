@@ -7,7 +7,7 @@ async function nowInCinemaController(req) {
 
   const data = await nowInCinema(page, region)
 
-  const detailedResults = await Promise.all(
+  const detailedResults = await Promise.all( 
     data.results.map(async item => {
       const filteredObject = await getMovieImdbRating(item)
       return filteredObject

@@ -89,4 +89,4 @@ const [userReviews, setUserReviews] = useState({});
   );
 };
 
-export default AnimeSection;
+export default AnimeSection; 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
-
+ 
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 const groupByRating = (reviews) => {

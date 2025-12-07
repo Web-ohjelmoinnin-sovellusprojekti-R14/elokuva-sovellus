@@ -4,7 +4,7 @@ import { buildCacheKey, buildCombinedResults } from '../controllers/advancedSear
 
 const ITEMS_PER_PAGE = 18;
 const BATCH_SIZE = 110;
-const cache = {};
+const cache = {}; 
 
 router.get('/advanced_search', async (req, res) => {
   try {

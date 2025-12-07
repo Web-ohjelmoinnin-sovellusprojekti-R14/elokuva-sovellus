@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-
+ 
 function Footer() {
   return (
     <footer className="footer bg-dark text-white py-3 mt-5 movies">

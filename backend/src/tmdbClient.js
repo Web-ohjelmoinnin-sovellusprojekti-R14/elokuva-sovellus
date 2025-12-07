@@ -178,3 +178,4 @@ async function getTrailerUrl(tmdbId, mediaType) {
 
 export { nowInCinema, getTitles, getMovieDetails, getTvDetails, getMovies, 
   getTvSeries, discoverTvSeries, discoverMovies, getMovieExtrenalIds, getTvExtrenalIds, getTrailerUrl}
+ 

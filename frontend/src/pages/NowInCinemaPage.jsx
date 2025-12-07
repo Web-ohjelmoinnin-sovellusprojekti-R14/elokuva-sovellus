@@ -3,7 +3,7 @@ import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 
 const MOVIES_PER_PAGE = 18;
-
+ 
 export default function NowInCinemaPage() {
   const [allMovies, setAllMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

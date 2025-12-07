@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-
+ 
 export default function SignInPage() {
   const { setUser } = useContext(AuthContext);
   const [username, setUsername] = useState("");

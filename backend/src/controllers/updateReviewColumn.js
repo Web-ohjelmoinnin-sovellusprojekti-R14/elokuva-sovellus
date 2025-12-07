@@ -3,7 +3,7 @@ dotenv.config();
 
 import pool from '../db.js';
 
-async function changeRatingToFloat() {
+async function changeRatingToFloat() { 
   try {
     await pool.query(`
       ALTER TABLE "review" 
