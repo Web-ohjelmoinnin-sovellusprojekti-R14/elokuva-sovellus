@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ClickablePoster from "./ClickablePoster";
-import { useAuth } from "../context/AuthContext";
 
 const PopularSection = () => {
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -23,26 +21,6 @@ const PopularSection = () => {
     fetchTrending();
   }, []);
 
-const [userReviews, setUserReviews] = useState({});
-
-useEffect(() => {
-  if (!user) return;
-
-  fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-    credentials: "include",
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (!Array.isArray(data)) return;
-      const reviewMap = {};
-      data.forEach(r => {
-        reviewMap[`${r.movie_id}`] = r.rating;
-      });
-      setUserReviews(reviewMap);
-    })
-    .catch(err => console.error(err));
-}, [user]);
-
   if (loading) {
     return (
       <section className="popular container-md py-5 text-center">
@@ -59,7 +37,7 @@ useEffect(() => {
       <h2 className="title-bg mb-4 text-white noBack">
         Trending this week
       </h2>
-      <div className="row g-3 g-md-4 px-2">
+      <div className="row g-3 g-md-4">
         {trending.slice(0, 12).map((item) => (
           <div
             key={`${item.media_type}-${item.id}`}
@@ -67,10 +45,7 @@ useEffect(() => {
             style={{ position: "relative" }}
           >
             {item.imdb_rating && (
-              <div className="imdb-badge"> ⭐ {item.imdb_rating}</div>
-            )}
-            {user && userReviews[item.id] && (
-              <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+              <div className="imdb-badge">⭐ {item.imdb_rating}</div>
             )}
             <ClickablePoster item={item}/>
             <div className="movie-title-parent">
