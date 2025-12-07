@@ -2,7 +2,6 @@ import { getMovieDetails, getTvDetails } from '../tmdbClient.js'
 import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
 
 async function getTitleDetails(id, media_type) {
-  try {
   switch (media_type) {
     case 'movie':
       const movieDetails = await getMovieDetails(id)
@@ -15,7 +14,6 @@ async function getTitleDetails(id, media_type) {
     default:
       return { error: 'Media type is not provided' }
   }
-}catch(err){ console.error(`TMDB failed for ${media_type} ${id}:`, err.message); throw err;}
 }
 
 export { getTitleDetails }

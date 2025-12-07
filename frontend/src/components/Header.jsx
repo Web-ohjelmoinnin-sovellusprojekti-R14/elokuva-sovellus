@@ -29,7 +29,7 @@ function Header() {
         <div className="header-left">
           <Link to="/">
             <img
-              src={`${process.env.PUBLIC_URL}/images/logoMain.png`}
+              src="images/logoMain.png"
               className="site-logo"
               alt="Logo"
               loading="lazy"
@@ -42,7 +42,7 @@ function Header() {
 
         <div className="header-center">
           <img
-            src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
+            src="images/mainTitle.png"
             className="site-title-img"
             alt="Site Title"
           />
@@ -66,11 +66,7 @@ function Header() {
             </>
           ) : (
             <>
-            {user && (
-              <Link to="/my-reviews" className="hello-user-link text-white me-2 noBack">
-                Hello, {user.username}
-              </Link>
-            )}
+              <span className="text-white me-2 noBack">Hello, {user.username}</span>
               <button
                 onClick={logout}
                 className="btn btn-danger btn-sm"

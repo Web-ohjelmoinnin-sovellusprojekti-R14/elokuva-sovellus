@@ -1,68 +1,10 @@
-import { getMovieDetails, getTvDetails, getMovieExtrenalIds, getTvExtrenalIds, getTrailerUrl} from '../tmdbClient.js';
+import { getMovieExtrenalIds, getTrailerUrl, getTvExtrenalIds } from '../tmdbClient.js'
 
 import { getTitleDetails } from '../omdbClient.js'
 import pLimit from 'p-limit'
 
 const limit = pLimit(5)
 const ratingCache = new Map()
-
-async function getImdbRating(item, mediaType = 'movie') {
-  return limit(async () => {
-    const tmdbId = item.id;
-    const cacheKey = `${mediaType}:${tmdbId}`;
-
-    if (ratingCache.has(cacheKey)) {
-      const cached = ratingCache.get(cacheKey);
-      return { ...item, imdb_rating: cached };
-    }
-
-    let imdbId = null;
-
-    try {
-      imdbId = item.imdb_id;
-
-      if (!imdbId) {
-        const externalIds = mediaType === 'movie'
-          ? await import('../tmdbClient.js').then(m => m.getMovieExtrenalIds(tmdbId))
-          : await import('../tmdbClient.js').then(m => m.getTvExtrenalIds(tmdbId));
-
-        imdbId = externalIds.imdb_id || externalIds.external_ids?.imdb_id;
-      }
-
-      if (!imdbId) {
-        return fallbackRating(item);
-      }
-
-      const omdbData = await getTitleDetails(imdbId);
-
-      if (omdbData?.Response === 'True' && omdbData.imdbRating && omdbData.imdbRating !== 'N/A') {
-        const rating = parseFloat(omdbData.imdbRating).toFixed(1);
-        ratingCache.set(cacheKey, rating);
-        return { ...item, imdb_rating: rating };
-      }
-
-      return fallbackRating(item);
-
-    } catch (error) {
-      return fallbackRating(item);
-    }
-  });
-}
-
-function fallbackRating(item) {
-  const tmdbRating = item.vote_average;
-  const fallback = tmdbRating ? parseFloat(tmdbRating.toFixed(1)) : null;
-
-  if (fallback && fallback >= 1.0) {
-    const tmdbId = item.id;
-    const mediaType = item.media_type || (item.title ? 'movie' : 'tv');
-    const cacheKey = `${mediaType}:${tmdbId}`;
-    ratingCache.set(cacheKey, fallback);
-    return { ...item, imdb_rating: fallback };
-  }
-
-  return { ...item, imdb_rating: null };
-}
 
 async function getMovieImdbRating(item, forTitlePage) {
   let imdb_id = null
