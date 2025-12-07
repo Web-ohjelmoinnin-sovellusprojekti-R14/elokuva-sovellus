@@ -3,16 +3,18 @@ dotenv.config()
 
 import express, { json } from 'express'
 import cors from 'cors'
-import jwt from 'jsonwebtoken'
 
 import searchRouter from './routers/search.js'
 import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
 import loginRouter from './routers/login.js'
-import categoriesRouter from './routers/categories.js';
-
-import advancedSearchRouter from './routers/advancedSearch.js'
+import categoriesRouter from './routers/categories.js'
+import saveReviewRouter from './routers/saveReview.js'
 import titleDataRouter from './routers/titleData.js'
+import authMeRouter from './routers/authMe.js'
+import logoutRouter from './routers/logout.js'
+import getReviewsRouter from './routers/getReviews.js'
+import deleteReviewRouter from './routers/deleteReview.js'
 
 import cookieParser from 'cookie-parser'
 

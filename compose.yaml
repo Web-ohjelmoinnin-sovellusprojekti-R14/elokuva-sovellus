@@ -5,10 +5,12 @@ services:
     ports:
       - "5000:5000"
     env_file:
-      - ./backend/.env # use this if you have a .env, optional
+      - ./backend/.env
+    # no postgres service here
+
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000" # dev mode, adjust to "80:80" for static/prod nginx
+      - "3000:3000"
     depends_on:
       - backend

@@ -136,4 +136,4 @@ async function getTvSeriesImdbRating(item, forTitlePage) {
   return { ...item, imdb_rating, media_type }
 }
 
-export { getImdbRating, getMovieImdbRating, getTvSeriesImdbRating }
+export { getMovieImdbRating, getTvSeriesImdbRating }
