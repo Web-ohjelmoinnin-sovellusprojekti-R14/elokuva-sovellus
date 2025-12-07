@@ -13,13 +13,13 @@ if (!process.env.TMDB_API_KEY) {
 
 const tmdb = axios.create({
   baseURL,
-  timeout: 1000,
+  timeout:1500,
   params: { api_key: apiKey },
 })
 
 axiosRetry(tmdb, {
-  retries: 3,
-  retryDelay: retryCount => {
+  retries: 4,
+  retryDelay: (retryCount) => {
     const delay = axiosRetry.exponentialDelay(retryCount)
     console.log(`Retry TMDB request ${retryCount}, waiting ${delay}ms`)
     return delay
@@ -53,6 +53,30 @@ async function getTvSeries(query, page) {
 
 async function getMovieDetails(movie_id) {
   const res = await tmdb.get(`/movie/${movie_id}`)
+  return res.data
+}
+
+async function getMovies(query, page) {
+  const res = await tmdb.get('/search/movie', {
+    params: { query, page },
+  })
+  return res.data
+  /*  const res = await tmdb.get('/search/movie', {
+    params: { 
+      query,
+      page,
+      include_adult: true,
+      language: 'ru-RU',
+      region: 'RU'
+    },
+  });
+  return res.data;*/
+}
+
+async function getTvSeries(query, page) {
+  const res = await tmdb.get('/search/tv', {
+    params: { query, page },
+  })
   return res.data
 }
 
@@ -152,15 +176,5 @@ async function getTrailerUrl(tmdbId, mediaType) {
   return `https://www.youtube.com/watch?v=${trailer.key}`
 }
 
-export {
-  nowInCinema,
-  getMovieDetails,
-  getTvDetails,
-  getMovies,
-  getTvSeries,
-  discoverTvSeries,
-  discoverMovies,
-  getMovieExtrenalIds,
-  getTvExtrenalIds,
-  getTrailerUrl,
-}
+export { nowInCinema, getTitles, getMovieDetails, getTvDetails, getMovies, 
+  getTvSeries, discoverTvSeries, discoverMovies, getMovieExtrenalIds, getTvExtrenalIds, getTrailerUrl}

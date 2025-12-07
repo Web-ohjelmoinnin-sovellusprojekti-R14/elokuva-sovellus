@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ClickablePoster from "./ClickablePoster";
+import { useAuth } from "../context/AuthContext";
 
 const AnimeSection = () => {
   const [topAnime, setTopAnime] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch("http://localhost:5000/api/category/anime?batch=1")
@@ -15,6 +17,26 @@ const AnimeSection = () => {
       })
       .catch(() => setLoading(false));
   }, []);
+
+const [userReviews, setUserReviews] = useState({});
+
+  useEffect(() => {
+    if (!user) return;
+  
+    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const reviewMap = {};
+        data.forEach(r => {
+          reviewMap[`${r.movie_id}`] = r.rating;
+        });
+        setUserReviews(reviewMap);
+      })
+      .catch(err => console.error(err));
+  }, [user]);
 
   if (loading) {
     return (
@@ -31,7 +53,7 @@ const AnimeSection = () => {
         Anime
       </h2>
 
-      <div className="row g-3 g-md-4">
+      <div className="row g-3 g-md-4 px-2">
         {topAnime.map((anime) => (
           <div
             key={anime.id}
@@ -40,6 +62,9 @@ const AnimeSection = () => {
           >
             {anime.imdb_rating && (
               <div className="imdb-badge">⭐ {anime.imdb_rating}</div>
+            )}
+            {user && userReviews[anime.id] && (
+              <div className="user-badge"> ✭ {userReviews[anime.id]} </div>
             )}
             <ClickablePoster item={{ ...anime, media_type: "tv" }}/>
             <div className="movie-title-parent">

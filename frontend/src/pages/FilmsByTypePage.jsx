@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
+import { useAuth } from "../context/AuthContext";
 
 const ITEMS_PER_PAGE = 18;
 
@@ -17,6 +18,7 @@ export default function SearchResultsPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState(null);
+    const { user } = useAuth();
 
     const fetchBatch = async (batch = 1) => {
         if (batch === 1) setLoading(true);
@@ -58,6 +60,26 @@ export default function SearchResultsPage() {
         fetchBatch(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
+
+    const [userReviews, setUserReviews] = useState({});
+    
+    useEffect(() => {
+      if (!user) return;
+    
+      fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+        credentials: "include",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (!Array.isArray(data)) return;
+          const reviewMap = {};
+          data.forEach(r => {
+            reviewMap[`${r.movie_id}`] = r.rating;
+          });
+          setUserReviews(reviewMap);
+        })
+        .catch(err => console.error(err));
+    }, [user]);  
 
     const totalLoadedItems = allItems.length;
     const totalPagesAvailable = Math.ceil(totalLoadedItems / ITEMS_PER_PAGE);
@@ -104,12 +126,12 @@ export default function SearchResultsPage() {
     if (error) return <p className="text-danger text-center">{error}</p>;
 
     return (
-        <section className="popular container-md" style={{ padding: "60px 0" }}>
+        <section className="popular container-md py-5" >
             <h2 className="title-bg mb-4 text-white noBack">
                 {getTitle()} ({totalLoadedItems}{hasMore ? "" : "."})
             </h2>
 
-            <div className="row g-3">
+            <div className="row g-3 g-md-4 px-2">
                 {pageItems.map(item => (
                     <div
                         key={`${item.id}-${item.media_type || "movie"}`}
@@ -119,23 +141,9 @@ export default function SearchResultsPage() {
                         {item.imdb_rating && (
                             <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                         )}
-{/*
-                        <img
-                            src={
-                                item.poster_path
-                                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                                    : "/images/no-poster.png"
-                            }
-                            alt={item.title || item.name}
-                            className="img-fluid rounded"
-                            style={{
-                                height: "280px",
-                                objectFit: "cover",
-                                width: "100%",
-                                boxShadow: "0 4px 15px rgba(0,0,0,0.6)"
-                            }}
-                        />
-*/}
+                        {user && userReviews[item.id] && (
+                            <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+                        )}
                         <ClickablePoster item={item} />
 
                         <div className="movie-title-parent">

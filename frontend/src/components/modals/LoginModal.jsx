@@ -45,7 +45,7 @@ export default function LoginModal({ isOpen, onClose }) {
 
     onClose();
 
-    navigate("/");
+    //navigate("/");
   }
 
   return (

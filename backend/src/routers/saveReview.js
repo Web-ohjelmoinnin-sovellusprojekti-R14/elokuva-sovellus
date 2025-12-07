@@ -1,21 +1,22 @@
-import { Router } from 'express'
-const router = Router()
-import { saveReviewController } from '../controllers/saveReviewController.js'
-import { authMe } from '../controllers/authMeController.js'
+import { Router } from 'express';
+import { saveReviewController } from '../controllers/saveReviewController.js';
+import { authMe } from '../controllers/authMeController.js';
+
+const router = Router();
 
 router.post('/save_review', authMe, async (req, res) => {
   try {
-    const user_id = req.user.user_id
-    const rating = req.body.rating
-    const movie_id = req.body.movie_id
-    const comment = req.body.comment || ''
-    const media_type = req.body.media_type
+    const { user_id } = req.user;
+    const { rating, movie_id, comment, media_type } = req.body;
 
-    const response = await saveReviewController(rating, user_id, movie_id, comment, media_type, res)
-    return res.status(201).json(response)
+    if (!movie_id) return res.status(400).json({ error: 'movie_id is required' });
+
+    const result = await saveReviewController(rating, user_id, movie_id, comment, media_type);
+    return res.status(201).json(result);
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to save review' })
+    console.error('save_review error:', err);
+    return res.status(400).json({ error: err.message || 'Failed to save review' });
   }
-})
+});
 
-export default router
+export default router;

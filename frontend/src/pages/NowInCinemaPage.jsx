@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef} from "react";
 import ClickablePoster from "../components/ClickablePoster";
+import { useAuth } from "../context/AuthContext";
 
 const MOVIES_PER_PAGE = 18;
 
@@ -10,6 +11,7 @@ export default function NowInCinemaPage() {
   const [error, setError] = useState(null);
 
   const hasFetched = useRef(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (hasFetched.current) return;
@@ -51,6 +53,26 @@ export default function NowInCinemaPage() {
     fetchAllPages();
   }, []);
 
+  const [userReviews, setUserReviews] = useState({});
+  
+  useEffect(() => {
+    if (!user) return;
+  
+    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const reviewMap = {};
+        data.forEach(r => {
+          reviewMap[`${r.movie_id}`] = r.rating;
+        });
+        setUserReviews(reviewMap);
+      })
+      .catch(err => console.error(err));
+  }, [user]);
+
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
   const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
@@ -72,14 +94,14 @@ export default function NowInCinemaPage() {
   if (error) { return <p className="text-danger text-center">{error}</p>; }
 
   return (
-    <section className="popular container-md" style={{ padding: "60px 0" }}>
+    <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">
         Now in Cinemas ({totalMovies} films)
       </h2>
 
       {currentMovies.length > 0 ? (
         <>
-          <div className="row g-3">
+          <div className="row g-3 g-md-4 px-2">
             {currentMovies.map((movie) => {
               const poster = movie.poster_path
                 ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
@@ -91,12 +113,9 @@ export default function NowInCinemaPage() {
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
                   style={{ position: "relative" }}
                 >
-                  {movie.imdb_rating && (
-                    <div
-                      className="imdb-badge"
-                    >
-                      ⭐ {movie.imdb_rating}
-                    </div>
+                  {movie.imdb_rating && (<div className="imdb-badge">⭐ {movie.imdb_rating}</div>)}
+                  {user && userReviews[movie.id] && (
+                    <div className="user-badge"> ✭ {userReviews[movie.id]} </div>
                   )}
                   <ClickablePoster item={movie} />
                 {/*
@@ -108,7 +127,7 @@ export default function NowInCinemaPage() {
                       boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
                       height: "280px",
                       objectFit: "cover",
-                      width: "100%",
+                      width: "100%"
                     }}
                   />
                 */}
