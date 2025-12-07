@@ -332,7 +332,7 @@ const goToFilteredSearch = () => {
             </div>
 
             <div className="search-box position-relative" ref={searchRef}>
-                <img src="images/searchMain.png" alt="Search" className={`search-icon ${searchLoading ? "searching" : ""}`} />
+                <img src={`${process.env.PUBLIC_URL}/images/searchMain.png`} alt="Search" className={`search-icon ${searchLoading ? "searching" : ""}`} />
 
                 <input
                     type="text"

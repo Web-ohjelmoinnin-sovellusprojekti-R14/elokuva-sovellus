@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
+import { useAuth } from "../context/AuthContext";
 
 const ITEMS_PER_PAGE = 18;
 
@@ -13,6 +14,7 @@ export default function SearchResultsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { user } = useAuth();
 
   //const hasFetched = useRef(false);
 
@@ -55,6 +57,26 @@ export default function SearchResultsPage() {
     else { setAllItems([]); }
   }, [query]);
 
+  const [userReviews, setUserReviews] = useState({});
+  
+  useEffect(() => {
+    if (!user) return;
+  
+    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (!Array.isArray(data)) return;
+        const reviewMap = {};
+        data.forEach(r => {
+          reviewMap[`${r.movie_id}`] = r.rating;
+        });
+        setUserReviews(reviewMap);
+      })
+      .catch(err => console.error(err));
+  }, [user]);
+
   const totalItems = allItems.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -74,14 +96,14 @@ export default function SearchResultsPage() {
   if (error) return <p className="text-danger text-center">{error}</p>;
 
   return (
-    <section className="popular container-md" style={{ padding: "60px 0" }}>
+    <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">
         Search Results for "{query}" ({totalItems})
       </h2>
 
       {pageItems.length > 0 ? (
         <>
-          <div className="row g-3">
+          <div className="row g-3 g-md-4 px-2">
             {pageItems.map((item) => {
               const poster = item.poster_path
                 ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
@@ -96,19 +118,9 @@ export default function SearchResultsPage() {
                   {item.imdb_rating && (
                     <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                   )}
-{/*
-                  <img
-                    src={poster}
-                    alt={item.title || item.name}
-                    className="img-fluid rounded"
-                    style={{
-                      boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
-                      height: "280px",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                  />
-*/}
+                  {user && userReviews[item.id] && (
+                    <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+                  )}
                   <ClickablePoster item={item} />
                   <div className="movie-title-parent">
                     <p

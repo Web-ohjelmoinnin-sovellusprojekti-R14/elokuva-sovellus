@@ -16,6 +16,11 @@ import titleDataRouter from './routers/titleData.js'
 
 import cookieParser from 'cookie-parser'
 
+import getReviewsRouter from './routers/getReviews.js'
+import saveReviewRouter from './routers/saveReview.js'
+import deleteReviewRouter from './routers/deleteReview.js'
+import { getCurrentUser } from './controllers/authMeController.js';
+
 const app = express()
 
 app.use(
@@ -32,8 +37,14 @@ app.use('/api', searchRouter)
 app.use('/api', nowInCinemaRouter)
 app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
-app.use('/api', categoriesRouter);
+app.use('/api', categoriesRouter)
 app.use('/api', titleDataRouter)
+
+app.use('/api', getReviewsRouter)
+app.use('/api', saveReviewRouter)
+app.use('/api', deleteReviewRouter)
+
+app.get('/api/me', getCurrentUser)
 
 app.get('/api/me', (req, res) => {
   const token = req.cookies.token
