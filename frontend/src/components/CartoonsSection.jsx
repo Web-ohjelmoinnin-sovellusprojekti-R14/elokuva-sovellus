@@ -59,7 +59,7 @@ const CartoonsSection = () => {
       </h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {topCartoons.map((cartoon) => (
+        {topCartoons.map((cartoon) => ( 
           <div
             key={cartoon.id}
             className="col-6 col-md-4 col-lg-2 text-center movie-card"
