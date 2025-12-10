@@ -2,7 +2,7 @@ import pool from '../db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-async function deleteReviewController(review_id, user_id, res) {
+async function deleteReviewController(review_id, user_id, res) { 
   if (!review_id) {
     return res.status(400).json({ error: 'Review ID is not provided' })
   }

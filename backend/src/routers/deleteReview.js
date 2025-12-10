@@ -3,7 +3,7 @@ const router = Router()
 import { deleteReviewController } from '../controllers/deleteReviewController.js'
 import { authMe } from '../controllers/authMeController.js'
 
-router.delete('/delete_review', authMe, async (req, res) => {
+router.delete('/delete_review', authMe, async (req, res) => { 
   try {
     const review_id = req.query.review_id
     const user_id = req.user.user_id

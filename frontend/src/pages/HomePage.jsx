@@ -3,7 +3,7 @@ import MoviesSection from "../components/MoviesSection";
 import SeriesSection from "../components/SeriesSection";
 import CartoonsSection from "../components/CartoonsSection";
 import AnimeSection from "../components/AnimeSection";
-
+ 
 import LoadingScreen from "../components/LoadingScreen";
 import React, { useState, useEffect } from "react";
 

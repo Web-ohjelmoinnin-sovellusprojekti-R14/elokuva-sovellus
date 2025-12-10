@@ -4,7 +4,7 @@ import { buildCacheKey, buildCombinedResults } from '../controllers/advancedSear
 
 const ITEMS_PER_PAGE = 18;
 const BATCH_SIZE = 110;
-const cache = {};
+const cache = {}; 
 
 router.get('/advanced_search', async (req, res) => {
   try {
@@ -44,7 +44,7 @@ router.get('/advanced_search', async (req, res) => {
     const cacheKey = `${buildCacheKey(baseParams)}:batch${batchNum}`;
 
     if (!cache[cacheKey]) {
-      console.log('Building batch', batchNum, 'with params:', baseParams);
+      //console.log('Building batch', batchNum, 'with params:', baseParams);
       const results = await buildCombinedResults({ ...baseParams, batchNum });
 
       cache[cacheKey] = {

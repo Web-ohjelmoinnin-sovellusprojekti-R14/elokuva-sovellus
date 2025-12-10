@@ -1,7 +1,7 @@
-import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
+import { getMovieImdbRating, getTvSeriesImdbRating, getImdbRating } from './imdbRatingController.js'
 import { getMovies, getTvSeries } from '../tmdbClient.js'
 
-async function titleSearchController(req) {
+async function titleSearchController(req) { 
   const query = req.query.q || ''
   const page = req.query.page || 1
 
@@ -9,10 +9,10 @@ async function titleSearchController(req) {
   const tvSeries = await getTvSeries(query, page)
 
   const detailedMovies = await Promise.all(
-    movies.results.map(item => getMovieImdbRating({ ...item, media_type: 'movie' }, false))
+    movies.results.map(item => getImdbRating({ ...item, media_type: 'movie' }, 'movie'))
   )
   const detailedTv = await Promise.all(
-    tvSeries.results.map(item => getTvSeriesImdbRating({ ...item, media_type: 'tv' }, false))
+    tvSeries.results.map(item => getImdbRating({ ...item, media_type: 'tv' }, 'tv'))
   )
 
   const combinedResults = [...detailedMovies, ...detailedTv]

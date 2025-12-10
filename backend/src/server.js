@@ -18,6 +18,8 @@ import deleteReviewRouter from './routers/deleteReview.js'
 
 import cookieParser from 'cookie-parser'
 
+import { getCurrentUser } from './controllers/authMeController.js';
+
 const app = express()
 
 app.use(
@@ -36,13 +38,40 @@ app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', titleDataRouter)
-app.use('/api', saveReviewRouter)
-app.use('/api', authMeRouter)
-app.use('/api', logoutRouter)
+
 app.use('/api', getReviewsRouter)
+app.use('/api', saveReviewRouter)
 app.use('/api', deleteReviewRouter)
+
+app.get('/api/me', getCurrentUser)
+
+app.get('/api/me', (req, res) => {
+  const token = req.cookies.token
+
+  if (!token) {
+    return res.status(401).json({ user: null })
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    return res.json({
+      user: {
+        user_id: decoded.user_id,
+        username: decoded.username,
+      },
+    })
+  } catch (err) {
+    return res.status(401).json({ user: null })
+  }
+})
+
+app.post('/api/logout', (req, res) => {
+  res.clearCookie('token')
+  res.status(200).json({ message: 'Logged out' })
+})
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+ 

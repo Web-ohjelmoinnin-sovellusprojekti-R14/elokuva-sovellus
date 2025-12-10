@@ -3,4 +3,4 @@ function logoutController(req, res) {
   return res.json({ message: "Logged out" });
 }
 
-export default logoutController;
+export default logoutController; 

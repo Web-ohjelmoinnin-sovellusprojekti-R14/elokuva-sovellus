@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
-
+import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../hooks/useTranslation";
+ 
 const ITEMS_PER_PAGE = 18;
 
 export default function SearchResultsPage() {
+    const { t } = useTranslation();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
 
@@ -17,6 +20,7 @@ export default function SearchResultsPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState(null);
+    const { user } = useAuth();
 
     const fetchBatch = async (batch = 1) => {
         if (batch === 1) setLoading(true);
@@ -59,6 +63,26 @@ export default function SearchResultsPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
 
+    const [userReviews, setUserReviews] = useState({});
+    
+    useEffect(() => {
+      if (!user) return;
+    
+      fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+        credentials: "include",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (!Array.isArray(data)) return;
+          const reviewMap = {};
+          data.forEach(r => {
+            reviewMap[`${r.movie_id}`] = r.rating;
+          });
+          setUserReviews(reviewMap);
+        })
+        .catch(err => console.error(err));
+    }, [user]);  
+
     const totalLoadedItems = allItems.length;
     const totalPagesAvailable = Math.ceil(totalLoadedItems / ITEMS_PER_PAGE);
     const isOnLastPage = currentPage >= totalPagesAvailable;
@@ -92,10 +116,11 @@ export default function SearchResultsPage() {
     };
 
     if (loading && allItems.length === 0) {
+        const categoryKey = q ? "search" : category ? category : "content";
         return (
             <section className="popular container-md text-center py-5">
                 <p className="text-white" style={{ fontSize: "1.8rem" }}>
-                    Loading {getTitle().toLowerCase()}...
+                    {t("def_loading")} {t(`loading_category_${category || (q ? "search" : "content")}`)}...
                 </p>
             </section>
         );
@@ -104,12 +129,12 @@ export default function SearchResultsPage() {
     if (error) return <p className="text-danger text-center">{error}</p>;
 
     return (
-        <section className="popular container-md" style={{ padding: "60px 0" }}>
+        <section className="popular container-md py-5" >
             <h2 className="title-bg mb-4 text-white noBack">
                 {getTitle()} ({totalLoadedItems}{hasMore ? "" : "."})
             </h2>
 
-            <div className="row g-3">
+            <div className="row g-3 g-md-4 px-2">
                 {pageItems.map(item => (
                     <div
                         key={`${item.id}-${item.media_type || "movie"}`}
@@ -119,23 +144,9 @@ export default function SearchResultsPage() {
                         {item.imdb_rating && (
                             <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                         )}
-{/*
-                        <img
-                            src={
-                                item.poster_path
-                                    ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                                    : "/images/no-poster.png"
-                            }
-                            alt={item.title || item.name}
-                            className="img-fluid rounded"
-                            style={{
-                                height: "280px",
-                                objectFit: "cover",
-                                width: "100%",
-                                boxShadow: "0 4px 15px rgba(0,0,0,0.6)"
-                            }}
-                        />
-*/}
+                        {user && userReviews[item.id] && (
+                            <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+                        )}
                         <ClickablePoster item={item} />
 
                         <div className="movie-title-parent">
@@ -153,14 +164,14 @@ export default function SearchResultsPage() {
                     disabled={currentPage === 1}
                     onClick={goPrev}
                 >
-                    ← Previous
+                    ← {t("previous")}
                 </button>
 
                 <span
                     className="text-white mx-4 noBack"
                     style={{ fontSize: "1.1rem" }}
                 >
-                    Page <strong>{currentPage}</strong> of{" "}
+                    {t("page")} <strong>{currentPage}</strong> {t("of")}{" "}
                     <strong>{totalPagesAvailable}{hasMore ? "+" : ""}</strong>
                 </span>
 
@@ -169,13 +180,13 @@ export default function SearchResultsPage() {
                     onClick={goNext}
                     disabled={loadingMore || (!hasMore && isOnLastPage)}
                 >
-                    {loadingMore ? "Loading..." : "Next →"}
+                    {loadingMore ? (t("def_loading")) : (<> {t("next")} →</>)}
                 </button>
             </div>
 
             {!hasMore && isOnLastPage && totalLoadedItems > 0 && (
                 <p className="text-center text-white-50 mt-4">
-                    You've seen everything!
+                    {t("seen_everything")}
                 </p>
             )}
         </section>

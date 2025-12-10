@@ -3,7 +3,7 @@ import pool from '../db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-async function registrationController(req, res) {
+async function registrationController(req, res) { 
   const { username, password } = req.body
 
   if (!username || !password) {

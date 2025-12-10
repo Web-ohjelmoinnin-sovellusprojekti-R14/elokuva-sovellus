@@ -23,4 +23,4 @@ root.render(
 document.body.style.backgroundColor = '#2a2a49';
 document.body.style.margin = '0';
 document.body.style.padding = '0';
-document.body.style.minHeight = '100vh';
+document.body.style.minHeight = '100vh'; 
