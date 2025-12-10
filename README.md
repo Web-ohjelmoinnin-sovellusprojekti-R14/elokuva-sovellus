@@ -42,7 +42,7 @@ CREATE TABLE Review (
     review_id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES "User"(user_id),
     movie_id INTEGER REFERENCES Film(film_id),
-    rating INTEGER CHECK (rating BETWEEN 1 AND 10),
+    rating NUMERIC(3,1) CHECK (rating >= 1 AND rating <= 10),
     comment TEXT,
     created_at DATE
 );

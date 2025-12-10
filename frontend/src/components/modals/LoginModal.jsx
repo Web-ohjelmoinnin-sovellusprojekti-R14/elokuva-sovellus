@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function LoginModal({ isOpen, onClose }) {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -45,13 +47,13 @@ export default function LoginModal({ isOpen, onClose }) {
 
     onClose();
 
-    navigate("/");
+    //navigate("/");
   }
 
   return (
     <div className="modal-backdrop-custom">
       <div className="modal-window" ref={modalRef}>
-        <h2 className="modal-title">Sign In</h2>
+        <h2 className="modal-title">{t("sign_in")}</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
 
@@ -59,7 +61,7 @@ export default function LoginModal({ isOpen, onClose }) {
           <input
             type="text"
             className="form-control mb-2"
-            placeholder="Username"
+            placeholder={t("username")}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             autoFocus
@@ -69,19 +71,19 @@ export default function LoginModal({ isOpen, onClose }) {
           <input
             type="password"
             className="form-control mb-3"
-            placeholder="Password"
+            placeholder={t("password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          <button className="btn btn-primary w-100">Log In</button>
+          <button className="btn btn-primary w-100">{t("log_in")}</button>
         </form>
 
         <button className="btn btn-danger w-100 mt-2" onClick={onClose}>
-          Close
+          {t("close")}
         </button>
       </div>
     </div>
   );
-}
+} 

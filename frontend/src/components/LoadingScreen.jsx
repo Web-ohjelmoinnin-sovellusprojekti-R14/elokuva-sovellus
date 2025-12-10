@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
+ 
 const LoadingScreen = ({ isLoading }) => {
   return (
     <AnimatePresence mode="wait">

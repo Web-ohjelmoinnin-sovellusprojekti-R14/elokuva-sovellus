@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "../../hooks/useTranslation";
 
 export default function RegisterModal({ isOpen, onClose }) {
+  const { t } = useTranslation();
   const { register } = useAuth();
 
   const modalRef = useRef(null);
@@ -56,7 +58,7 @@ export default function RegisterModal({ isOpen, onClose }) {
   return (
     <div className="modal-backdrop-custom">
       <div className="modal-window" ref={modalRef}>
-        <h2 className="modal-title">Sign Up</h2>
+        <h2 className="modal-title">{t("sign_up")}</h2>
 
         {error && <div className="alert alert-danger">{error}</div>}
         {success && <div className="alert alert-success">{success}</div>}
@@ -65,7 +67,7 @@ export default function RegisterModal({ isOpen, onClose }) {
           <input
             type="text"
             className="form-control mb-2"
-            placeholder="Username"
+            placeholder={t("username")}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
@@ -73,18 +75,18 @@ export default function RegisterModal({ isOpen, onClose }) {
           <input
             type="password"
             className="form-control mb-3"
-            placeholder="Password"
+            placeholder={t("password")}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
 
-          <button className="btn btn-success w-100">Register</button>
+          <button className="btn btn-success w-100">{t("register")}</button>
         </form>
 
         <button className="btn btn-danger w-100 mt-2" onClick={onClose}>
-          Close
+          {t("close")}
         </button>
       </div>
     </div>
   );
-}
+} 

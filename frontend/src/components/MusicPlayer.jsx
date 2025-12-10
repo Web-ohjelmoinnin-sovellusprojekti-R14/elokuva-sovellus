@@ -6,7 +6,7 @@ export default function MusicPlayer() {
   const [playing, setPlaying] = useState(true);
   const [volume, setVolume] = useState(savedVolume);
   const [hovered, setHovered] = useState(false);
-
+ 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;

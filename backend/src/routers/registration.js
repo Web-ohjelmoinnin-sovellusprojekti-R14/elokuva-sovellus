@@ -5,3 +5,4 @@ import { registrationController } from '../controllers/registrationController.js
 router.post('/register', registrationController)
 
 export default router
+ 

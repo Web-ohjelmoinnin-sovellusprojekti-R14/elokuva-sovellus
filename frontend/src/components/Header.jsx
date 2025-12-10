@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import LoginModal from "./modals/LoginModal";
 import RegisterModal from "./modals/RegisterModal";
 import { Link } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 function Header() {
   const spinImage = (e) => {
@@ -14,6 +15,7 @@ function Header() {
     e.currentTarget.style.transform = "rotate(0deg)";
   };
 
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
@@ -29,7 +31,7 @@ function Header() {
         <div className="header-left">
           <Link to="/">
             <img
-              src="images/logoMain.png"
+              src={`${process.env.PUBLIC_URL}/images/logoMain.png`}
               className="site-logo"
               alt="Logo"
               loading="lazy"
@@ -37,12 +39,12 @@ function Header() {
               onMouseOut={resetSpin}
             />
           </Link>
-          <span className="logo-text">Best films are here</span>
+          <span className="logo-text">{t("best_films")}</span>
         </div>
 
         <div className="header-center">
           <img
-            src="images/mainTitle.png"
+            src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
             className="site-title-img"
             alt="Site Title"
           />
@@ -55,28 +57,32 @@ function Header() {
                 onClick={() => setOpenLogin(true)}
                 className="btn btn-outline-light btn-sm"
               >
-                Sign In
+                {t("sign_in")}
               </button>
               <button
                 onClick={() => setOpenRegister(true)}
                 className="btn btn-light btn-sm"
               >
-                Sign Up
+                {t("sign_up")}
               </button>
             </>
           ) : (
             <>
-              <span className="text-white me-2 noBack">Hello, {user.username}</span>
+            {user && (
+              <Link to="/my-reviews" className="hello-user-link text-white me-2 noBack">
+                {t("hello")} {user.username}
+              </Link>
+            )}
               <button
                 onClick={logout}
                 className="btn btn-danger btn-sm"
               >
-                Log Out
+                {t("log_out")}
               </button>
             </>
           )}
           <a href="#groups" className="btn btn-outline-light btn-sm">
-            Groups
+            {t("groups")}
           </a>
         </div>
 
@@ -86,4 +92,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Header; 

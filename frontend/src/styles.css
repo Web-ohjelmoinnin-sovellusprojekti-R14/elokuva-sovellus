@@ -80,6 +80,119 @@ body::after {
   50% { opacity: 0.9; transform: scale(1); }
 }
 
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #222;
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb {
+  /*background: linear-gradient(180deg, #ff4d4d, #b30000);*/
+  background: linear-gradient(180deg, rgb(173, 169, 169), rgb(65, 61, 61));
+  border-radius: 12px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  /*background: linear-gradient(180deg, #9f5dd6, #6e6ec2);
+  background: linear-gradient(180deg, #5d83d6, #3462e0); */
+  background: linear-gradient(180deg, #5d83d6, #3462e0);
+}
+
+.poster-img {
+  height: 280px;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform .25s ease, opacity .25s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,.6);
+}
+
+.poster-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(255, 107, 0, .4);
+}
+
+.anim-portal {
+  animation: portalAnim .35s ease forwards;
+  transform-origin: center;
+}
+
+@keyframes portalAnim {
+  0% { 
+    transform: scale(1); 
+    filter: blur(0px); 
+    opacity: 1; 
+  }
+
+  20% { 
+    transform: scale(1.1); 
+  }
+
+  100% { 
+    transform: scale(0.8); 
+    opacity: 0;
+  }
+}
+
+footer {
+  flex-shrink: 0;
+}
+
+.footer-social-link {
+  color: #4697ee;
+  opacity: 0.7;
+  transition: 0.25s;
+}
+
+.footer-social-link:hover {
+  color: #448ddb;
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.hello-user-link {
+  position: relative;
+  font-weight: 600;
+  text-decoration: none;
+  color: white !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.hello-user-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #3462e0, #ff5100);
+  border-radius: 2px;
+  transition: width 0.45s ease;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.hello-user-link:hover {
+  color: #00d4ff !important;
+  transform: translateY(-2px);
+}
+
+.hello-user-link:hover::after {
+  width: 100%;
+}
+
 .logo-text {
   font-size: 1rem;
   color: white;
@@ -274,7 +387,26 @@ body::after {
   z-index: 9;
 }
 
+.user-badge {
+  position: absolute;
+  bottom: 18em;
+  right: 0.4em;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 0.25em 0.6em;
+  border-radius: 0.5em;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 0.85rem;
+  border: 1px solid #c4c4c4;
+  transition: font-size 0.25s ease;
+  z-index: 9;
+}
+
 .movie-card:hover .imdb-badge {
+  font-size: 0.9rem;
+}
+
+.movie-card:hover .user-badge {
   font-size: 0.9rem;
 }
 

@@ -1,10 +1,10 @@
 import { Router } from 'express'
 const router = Router()
-import { getMovieImdbRating, getTvSeriesImdbRating } from '../controllers/imdbRatingController.js'
+import { getImdbRating } from '../controllers/imdbRatingController.js'
 import pLimit from 'p-limit'
 
-const limit = pLimit(10)
-const TMDB_KEY = process.env.TMDB_API_KEY
+const limit = pLimit(4); 
+const TMDB_KEY = process.env.TMDB_API_KEY;
 
 const PAGES_PER_BATCH = 6
 const ITEMS_PER_BATCH = 110
@@ -36,15 +36,15 @@ async function getBatch(category, batchNum = 1, filters = {}) {
   const startPage = (batchNum - 1) * PAGES_PER_BATCH + 1
 
   const BASE_URLS = {
-    movies: `https://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&vote_count.gte=300`,
-    series: `https://api.themoviedb.org/3/discover/tv?sort_by=vote_average.desc&vote_count.gte=150`,
+    movies: `https://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&vote_count.gte=300&without_genres=16`,
+    series: `https://api.themoviedb.org/3/discover/tv?sort_by=vote_average.desc&vote_count.gte=150&without_original_language=ja`,
     cartoons: `https://api.themoviedb.org/3/discover/movie?sort_by=vote_average.desc&vote_count.gte=200&with_genres=16&without_original_language=ja`,
     anime: `https://api.themoviedb.org/3/discover/tv?sort_by=vote_average.desc&vote_count.gte=100&with_genres=16&with_original_language=ja`,
   }
 
   const FILTER_URLS = {
-    movies: `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&vote_count.gte=50`,
-    series: `https://api.themoviedb.org/3/discover/tv?sort_by=popularity.desc&vote_count.gte=30`,
+    movies: `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&vote_count.gte=50&without_genres=16`,
+    series: `https://api.themoviedb.org/3/discover/tv?sort_by=popularity.desc&vote_count.gte=30&without_original_language=ja`,
     cartoons: `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&vote_count.gte=50&with_genres=16&without_original_language=ja`,
     anime: `https://api.themoviedb.org/3/discover/tv?sort_by=popularity.desc&vote_count.gte=30&with_genres=16&with_original_language=ja`,
   }
@@ -86,13 +86,7 @@ async function getBatch(category, batchNum = 1, filters = {}) {
 
   const enriched = await Promise.all(
     rawItems.map(item =>
-      limit(() => {
-        if (baseType == 'movie') {
-          return getMovieImdbRating({ ...item, media_type: 'movie' }, false)
-        } else {
-          return getTvSeriesImdbRating({ ...item, media_type: 'tv' }, false)
-        }
-      })
+      limit(() => getImdbRating({ ...item, media_type: baseType }, baseType))
     )
   )
 
@@ -130,13 +124,7 @@ router.get('/trending', async (req, res) => {
 
     const withImdb = await Promise.all(
       data.results.slice(0, 20).map(item =>
-        limit(() => {
-          if (item.media_type == 'movie') {
-            return getMovieImdbRating(item, false)
-          } else {
-            return getTvSeriesImdbRating(item, false)
-          }
-        })
+        limit(() => getImdbRating(item, item.media_type))
       )
     )
 

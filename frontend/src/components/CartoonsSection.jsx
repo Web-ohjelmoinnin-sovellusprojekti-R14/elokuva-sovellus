@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ClickablePoster from "./ClickablePoster";
+import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 const CartoonsSection = () => {
+  const { t } = useTranslation();
   const [topCartoons, setTopCartoons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetch("http://localhost:5000/api/category/cartoons?batch=1")
@@ -19,25 +23,45 @@ const CartoonsSection = () => {
       });
   }, []);
 
+    const [userReviews, setUserReviews] = useState({});
+  
+    useEffect(() => {
+      if (!user) return;
+    
+      fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+        credentials: "include",
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (!Array.isArray(data)) return;
+          const reviewMap = {};
+          data.forEach(r => {
+            reviewMap[`${r.movie_id}`] = r.rating;
+          });
+          setUserReviews(reviewMap);
+        })
+        .catch(err => console.error(err));
+    }, [user]);
+
   if (loading) {
     return (
       <section className="popular container-md py-5 text-center">
-        <h2 className="title-bg mb-4 text-white">Cartoons</h2>
+        <h2 className="title-bg mb-4 text-white">{t("cartoons")}</h2>
         <div className="spinner-border text-light" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("loading")}</span>
         </div>
       </section>
     );
   }
-
+ 
   return (
     <section className="movies container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">
-        Cartoons
+        {t("cartoons")}
       </h2>
 
-      <div className="row g-3 g-md-4">
-        {topCartoons.map((cartoon) => (
+      <div className="row g-3 g-md-4 px-2">
+        {topCartoons.map((cartoon) => ( 
           <div
             key={cartoon.id}
             className="col-6 col-md-4 col-lg-2 text-center movie-card"
@@ -45,6 +69,9 @@ const CartoonsSection = () => {
           >
             {cartoon.imdb_rating && (
               <div className="imdb-badge">⭐ {cartoon.imdb_rating}</div>
+            )}
+            {user && userReviews[cartoon.id] && (
+              <div className="user-badge"> ✭ {userReviews[cartoon.id]} </div>
             )}
             <ClickablePoster item={{ ...cartoon, media_type: "movie" }}/>
             <div className="movie-title-parent">
@@ -62,7 +89,7 @@ const CartoonsSection = () => {
           className="title-under mb-4"
           style={{ fontSize: "1.1rem", fontWeight: "600" }}
         >
-          Show more...
+          {t("show_more")}
         </Link>
       </div>
     </section>

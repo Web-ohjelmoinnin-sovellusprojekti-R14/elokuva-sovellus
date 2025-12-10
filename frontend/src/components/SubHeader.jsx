@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
+import { useTranslation } from "../hooks/useTranslation";
+ 
 function SubHeader() {
+    const { t, tg } = useTranslation();
     const [query, setQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
@@ -181,10 +183,10 @@ const goToFilteredSearch = () => {
         <section className="sub-header container">
             <div className="categories" ref={menuRef}>
                 {[
-                    { key: "films", label: "Films", path: "/type?category=movies" },
-                    { key: "series", label: "Series", path: "/type?category=series" },
-                    { key: "cartoons", label: "Cartoons", path: "/type?category=cartoons" },
-                    { key: "anime", label: "Anime", path: "/type?category=anime" }
+                    { key: "films", label: t("films"), path: "/type?category=movies" },
+                    { key: "series", label: t("series"), path: "/type?category=series" },
+                    { key: "cartoons", label: t("cartoons"), path: "/type?category=cartoons" },
+                    { key: "anime", label: t("anime"), path: "/type?category=anime" }
                 ].map(({ key, label, path }) => (
                     <div
                         key={key}
@@ -209,7 +211,7 @@ const goToFilteredSearch = () => {
                                     className="text-white-50 mb-4 fw-bold"
                                     style={{ fontSize: "1.1rem" }}
                                 >
-                                    {label} — Genres & Subgenres
+                                    {label} — {t("genres_subgenres")}
                                 </div>
 
                                 {/*{renderMenu(menus[key])}*/}
@@ -228,7 +230,7 @@ const goToFilteredSearch = () => {
                                                             : "btn-outline-light text-white-50 border-secondary"
                                                     }`}
                                                 >
-                                                    <span>{genre}</span>
+                                                    <span>{tg(genre)}</span>
                                                     {isActive && <strong className="ms-2">✓</strong>}
                                                 </button>
                                             </div>
@@ -238,19 +240,19 @@ const goToFilteredSearch = () => {
 
                                 {selectedGenres.length > 0 && (
                                     <div className="alert alert-dark py-2 mb-3 small" role="alert">
-                                        <strong>Selected:</strong> {selectedGenres.join(" + ")}
+                                        <strong>{t("selected")}:</strong> {selectedGenres.join(" + ")}
                                     </div>
                                 )}
 
                                 <div className="mt-4 p-3 rounded" style={{ background: "#1a1a1a", border: "1px solid #444" }}>
                                 <div className="text-white-50 fw-bold mb-3" style={{ fontSize: "1rem" }}>
-                                    Advanced Filters
+                                    {t("advanced_filters")}
                                 </div>
 
                                 <div className="row g-3">
 
                                     <div className="col-6">
-                                        <label className="text-white-50 small">Year (from)</label>
+                                        <label className="text-white-50 small">{t("year_from")}</label>
                                         <input
                                             type="number"
                                             className="form-control bg-dark text-white border-secondary"
@@ -259,7 +261,7 @@ const goToFilteredSearch = () => {
                                         />
                                     </div>
                                     <div className="col-6">
-                                        <label className="text-white-50 small">Year (to)</label>
+                                        <label className="text-white-50 small">{t("year_to")}</label>
                                         <input
                                             type="number"
                                             className="form-control bg-dark text-white border-secondary"
@@ -269,7 +271,7 @@ const goToFilteredSearch = () => {
                                     </div>
 
                                     <div className="col-6">
-                                        <label className="text-white-50 small">Min Rating</label>
+                                        <label className="text-white-50 small">{t("min_rating")}</label>
                                         <input
                                             type="number"
                                             min="0"
@@ -282,7 +284,7 @@ const goToFilteredSearch = () => {
                                     </div>
 
                                     <div className="col-6">
-                                        <label className="text-white-50 small">Max Rating</label>
+                                        <label className="text-white-50 small">{t("max_rating")}</label>
                                         <input
                                             type="number"
                                             min="0"
@@ -303,7 +305,7 @@ const goToFilteredSearch = () => {
                                             onChange={() => setInclude18(!include18)}
                                         />
                                         <label htmlFor="adultToggle" className="text-white-50 small">
-                                            Include 18+ content
+                                            {t("include_18")}
                                         </label>
                                     </div>
 
@@ -312,7 +314,7 @@ const goToFilteredSearch = () => {
                                             className="btn btn-primary w-100 mt-2"
                                             onClick={goToFilteredSearch}
                                         >
-                                            Apply Filters
+                                            {t("apply_filters")}
                                         </button>
                                     </div>
                                 </div>
@@ -327,16 +329,16 @@ const goToFilteredSearch = () => {
                     className="category text-white text-decoration-none"
                     onMouseEnter={() => setOpenMenu(null)}
                 >
-                    In cinemas
+                    {t("in_cinemas")}
                 </Link>
             </div>
 
             <div className="search-box position-relative" ref={searchRef}>
-                <img src="images/searchMain.png" alt="Search" className={`search-icon ${searchLoading ? "searching" : ""}`} />
+                <img src={`${process.env.PUBLIC_URL}/images/searchMain.png`} alt="Search" className={`search-icon ${searchLoading ? "searching" : ""}`} />
 
                 <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder={t("search")}
                     className="search-input"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
@@ -364,7 +366,7 @@ const goToFilteredSearch = () => {
                             padding: "4px"
                         }}
                     >
-                        {searchLoading && <div className="p-2">Loading...</div>}
+                        {searchLoading && <div className="p-2">{t("loading")}</div>}
 
                         {!searchLoading &&
                             searchResults.length > 0 &&
@@ -402,12 +404,12 @@ const goToFilteredSearch = () => {
                                 className="btn btn-primary w-100 mt-2"
                                 onClick={goToSearch}
                             >
-                                Show All Results
+                                {t("show_all_results")}
                             </button>
                         )}
 
                         {!searchLoading && searchResults.length === 0 && (
-                            <div className="p-2">No results</div>
+                            <div className="p-2">{t("no_results")}</div>
                         )}
                     </div>
                 )}
