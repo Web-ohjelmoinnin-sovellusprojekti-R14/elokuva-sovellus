@@ -3,8 +3,8 @@ const router = Router()
 import { getImdbRating } from '../controllers/imdbRatingController.js'
 import pLimit from 'p-limit'
 
-const limit = pLimit(4); 
-const TMDB_KEY = process.env.TMDB_API_KEY;
+const limit = pLimit(4)
+const TMDB_KEY = process.env.TMDB_API_KEY
 
 const PAGES_PER_BATCH = 6
 const ITEMS_PER_BATCH = 110
@@ -15,7 +15,7 @@ async function fetchTMDBPages(baseUrl, startPage = 1) {
   for (let i = 0; i < PAGES_PER_BATCH; i++) {
     const page = startPage + i
     try {
-      const res = await fetch(`${baseUrl}&api_key=${TMDB_KEY}&page=${page}&language=en-US`)
+      const res = await fetch(`${baseUrl}&api_key=${TMDB_KEY}&page=${page}`)
       const data = await res.json()
       if (!data.results?.length) break
       results.push(...data.results)
@@ -82,12 +82,14 @@ async function getBatch(category, batchNum = 1, filters = {}) {
     }
   }
 
+  if (filters.language) {
+    url += `&language=${filters.language}`
+  }
+
   const rawItems = await fetchTMDBPages(url, startPage)
 
   const enriched = await Promise.all(
-    rawItems.map(item =>
-      limit(() => getImdbRating({ ...item, media_type: baseType }, baseType))
-    )
+    rawItems.map(item => limit(() => getImdbRating({ ...item, media_type: baseType }, baseType)))
   )
 
   const filtered = enriched
@@ -119,13 +121,14 @@ async function getBatch(category, batchNum = 1, filters = {}) {
 
 router.get('/trending', async (req, res) => {
   try {
-    const resTrend = await fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}`)
+    const language = req.query.language || 'en-US'
+    const resTrend = await fetch(
+      `https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}&language=${language}`
+    )
     const data = await resTrend.json()
 
     const withImdb = await Promise.all(
-      data.results.slice(0, 20).map(item =>
-        limit(() => getImdbRating(item, item.media_type))
-      )
+      data.results.slice(0, 20).map(item => limit(() => getImdbRating(item, item.media_type)))
     )
 
     const results = withImdb.filter(i => i?.imdb_rating)
