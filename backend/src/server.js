@@ -15,10 +15,20 @@ import authMeRouter from './routers/authMe.js'
 import logoutRouter from './routers/logout.js'
 import getReviewsRouter from './routers/getReviews.js'
 import deleteReviewRouter from './routers/deleteReview.js'
-
+import createGroupRouter from './routers/createGroup.js'
+import deleteGroupRouter from './routers/deleteGroup.js'
+import getGroupDetails from './routers/getGroupDetails.js'
+import editGroupRouter from './routers/editGroup.js'
+import sendInvitationRouter from './routers/sendInvitation.js'
+import getUserInvitationsRouter from './routers/getUserInvitations.js'
+import acceptInvitationRouter from './routers/acceptInvitation.js'
+import rejectInvitationRouter from './routers/rejectInvitation.js'
+import getUserGroupsRouter from './routers/getUserGroups.js'
+import removeMemberRouter from './routers/removeMember.js'
 import cookieParser from 'cookie-parser'
-
-import { getCurrentUser } from './controllers/authMeController.js';
+import removeFilmRouter from './routers/removeFilm.js'
+import addFilmRouter from './routers/addFilm.js'
+import getGroupFilmsRouter from './routers/getGroupFilms.js'
 
 const app = express()
 
@@ -38,40 +48,27 @@ app.use('/api', registrationRouter)
 app.use('/api', loginRouter)
 app.use('/api', categoriesRouter)
 app.use('/api', titleDataRouter)
-
 app.use('/api', getReviewsRouter)
 app.use('/api', saveReviewRouter)
 app.use('/api', deleteReviewRouter)
-
-app.get('/api/me', getCurrentUser)
-
-app.get('/api/me', (req, res) => {
-  const token = req.cookies.token
-
-  if (!token) {
-    return res.status(401).json({ user: null })
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    return res.json({
-      user: {
-        user_id: decoded.user_id,
-        username: decoded.username,
-      },
-    })
-  } catch (err) {
-    return res.status(401).json({ user: null })
-  }
-})
-
-app.post('/api/logout', (req, res) => {
-  res.clearCookie('token')
-  res.status(200).json({ message: 'Logged out' })
-})
+app.use('/api', createGroupRouter)
+app.use('/api', logoutRouter)
+app.use('/api', authMeRouter)
+app.use('/api', deleteGroupRouter)
+app.use('/api', getGroupDetails)
+app.use('/api', editGroupRouter)
+app.use('/api', sendInvitationRouter)
+app.use('/api', getUserInvitationsRouter)
+app.use('/api', acceptInvitationRouter)
+app.use('/api', rejectInvitationRouter)
+app.use('/api', getUserGroupsRouter)
+app.use('/api', removeMemberRouter)
+app.use('/api', addFilmRouter)
+app.use('/api', removeFilmRouter)
+app.use('/api', getGroupFilmsRouter)
 
 const PORT = process.env.PORT || 5000
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
- 
