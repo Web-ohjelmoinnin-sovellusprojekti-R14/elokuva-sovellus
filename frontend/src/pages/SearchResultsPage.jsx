@@ -6,6 +6,10 @@ import { useAuth } from "../context/AuthContext";
 const ITEMS_PER_PAGE = 18;
  
 export default function SearchResultsPage() {
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const query = params.get("q") || "";
@@ -30,7 +34,7 @@ export default function SearchResultsPage() {
 
         while (hasMore && page <= 2) {
           const res = await fetch(
-            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}`
+            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -55,7 +59,7 @@ export default function SearchResultsPage() {
 
     if (query) { loadPages(); }
     else { setAllItems([]); }
-  }, [query]);
+  }, [query, getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
   

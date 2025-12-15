@@ -3,9 +3,16 @@ import { getMovieImdbRating } from './imdbRatingController.js'
 
 async function nowInCinemaController(req) {
   const page = req.query.page || 1
-  const region = req.query.region || 'FI'
+  //const region = req.query.region || 'FI'
+  const language = typeof req.query.language === "string"
+    ? req.query.language
+    : "en-US"
 
-  const data = await nowInCinema(page, region)
+  const region = language.match(/^[a-z]{2}-([A-Z]{2})$/)
+    ? language.split("-")[1]
+    : "US"
+
+  const data = await nowInCinema(page, region, language)
 
   const detailedResults = await Promise.all( 
     data.results.map(async item => {

@@ -4,12 +4,16 @@ import ClickablePoster from "./ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 
 const MoviesSection = () => {
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const [topMovies, setTopMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/category/movies?batch=1")
+    fetch(`http://localhost:5000/api/category/movies?batch=1&language=${getTmdbLanguage()}`)
       .then(res => res.json())
       .then(data => {
         setTopMovies(data.results.slice(0, 12));
@@ -19,7 +23,7 @@ const MoviesSection = () => {
         console.error("Failed to load movies:", err);
         setLoading(false);
       });
-  }, []);
+  }, [getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
   

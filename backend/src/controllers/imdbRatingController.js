@@ -3,7 +3,7 @@ import { getMovieDetails, getTvDetails, getMovieExtrenalIds, getTvExtrenalIds, g
 import { getTitleDetails } from '../omdbClient.js'
 import pLimit from 'p-limit'
 
-const limit = pLimit(5)
+const limit = pLimit(4)
 const ratingCache = new Map()
 
 async function getImdbRating(item, mediaType = 'movie') {

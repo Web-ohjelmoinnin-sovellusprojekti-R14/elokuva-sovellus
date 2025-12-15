@@ -4,12 +4,16 @@ import ClickablePoster from "./ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 
 const CartoonsSection = () => {
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const [topCartoons, setTopCartoons] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/category/cartoons?batch=1")
+    fetch(`http://localhost:5000/api/category/cartoons?batch=1&language=${getTmdbLanguage()}`)
       .then(res => res.json())
       .then(data => {
         setTopCartoons(data.results.slice(0, 12));
@@ -19,7 +23,7 @@ const CartoonsSection = () => {
         console.error("Failed to load cartoons:", err);
         setLoading(false);
       });
-  }, []);
+  }, [getTmdbLanguage]);
 
     const [userReviews, setUserReviews] = useState({});
   

@@ -6,6 +6,11 @@ import StarRaiting from "../components/StarRaiting";
 const IMG = "https://image.tmdb.org/t/p";
 
 export default function TitleDetails() {
+<<<<<<< Updated upstream
+=======
+  const { t } = useTranslation();
+  const { getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const { id, mediaType } = useParams();
   const [title, setTitle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,12 +24,12 @@ export default function TitleDetails() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}`)
+    fetch(`http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`)
       .then(res => res.json())
       .then(data => setTitle(data))
       .catch(() => setTitle(null))
       .finally(() => setLoading(false));
-  }, [id, mediaType]);
+  }, [id, mediaType, getTmdbLanguage]);
 
   useEffect(() => {
     setLoadingReviews(true);
@@ -138,7 +143,7 @@ export default function TitleDetails() {
   const name = isMovie ? title.title : title.name;
   const year = (isMovie ? title.release_date : title.first_air_date || "").split("-")[0];
   const trailerId = title.trailerUrl ? title.trailerUrl.split("v=")[1]?.split("&")[0] : null;
-
+  
   return (
     <>
       <div
@@ -385,6 +390,7 @@ export default function TitleDetails() {
             </button>
           </form>
         )}
+        
         {loadingReviews ? (
           <p className="text-center py-3">Loading reviews...</p>
         ) : reviews.length === 0 ? (

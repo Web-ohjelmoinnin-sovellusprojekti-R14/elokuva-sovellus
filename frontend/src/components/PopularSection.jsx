@@ -3,6 +3,10 @@ import ClickablePoster from "./ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 
 const PopularSection = () => {
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -10,7 +14,7 @@ const PopularSection = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/trending");
+        const res = await fetch(`http://localhost:5000/api/trending?language=${getTmdbLanguage()}`);
         const data = await res.json();
         setTrending(data.results || []);
       } catch (err) {
@@ -21,7 +25,7 @@ const PopularSection = () => {
     };
 
     fetchTrending();
-  }, []);
+  }, [getTmdbLanguage]);
 
 const [userReviews, setUserReviews] = useState({});
 

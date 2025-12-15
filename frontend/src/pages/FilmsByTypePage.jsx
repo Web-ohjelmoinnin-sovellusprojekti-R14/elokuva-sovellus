@@ -6,6 +6,10 @@ import { useAuth } from "../context/AuthContext";
 const ITEMS_PER_PAGE = 18;
 
 export default function SearchResultsPage() {
+<<<<<<< Updated upstream
+=======
+    const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
     const location = useLocation();
     const params = new URLSearchParams(location.search);
 
@@ -28,9 +32,9 @@ export default function SearchResultsPage() {
             let url = "";
 
             if (q) {
-                url = `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}`;
+                url = `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}&language=${getTmdbLanguage()}`;
             } else if (category) {
-                url = `http://localhost:5000/api/category/${category}?batch=${batch}`;
+                url = `http://localhost:5000/api/category/${category}?batch=${batch}&language=${getTmdbLanguage()}`;
             }
 
             const res = await fetch(url);
@@ -59,7 +63,7 @@ export default function SearchResultsPage() {
         setError(null);
         fetchBatch(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.search]);
+    }, [location.search, getTmdbLanguage]);
 
     const [userReviews, setUserReviews] = useState({});
     
