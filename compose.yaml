@@ -1,16 +1,33 @@
-version: "3.8"
 services:
   backend:
     build: ./backend
+    container_name: backend
     ports:
       - "5000:5000"
     env_file:
       - ./backend/.env
-    # no postgres service here
+    depends_on:
+      - db
 
   frontend:
     build: ./frontend
+    container_name: frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
+
+  db:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 10032005
+      POSTGRES_DB: kinodroch_db
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  db-data:

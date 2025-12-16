@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "../hooks/useTranslation";
- 
+
 export default function SignUpPage() {
   const { t } = useTranslation();
   const [username, setUsername] = useState("");

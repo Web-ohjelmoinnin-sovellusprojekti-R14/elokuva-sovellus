@@ -23,73 +23,74 @@ function Header() {
   return (
     <>
       <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
-      <RegisterModal isOpen={openRegister} onClose={() => setOpenRegister(false)} />
+      <RegisterModal
+        isOpen={openRegister}
+        onClose={() => setOpenRegister(false)}
+      />
 
-    <header className="site-header bg-dark">
-      <div className="container header-inner">
+      <header className="site-header bg-dark">
+        <div className="container header-inner">
+          <div className="header-left">
+            <Link to="/">
+              <img
+                src={`${process.env.PUBLIC_URL}/images/logoMain.png`}
+                className="site-logo"
+                alt="Logo"
+                loading="lazy"
+                onMouseOver={spinImage}
+                onMouseOut={resetSpin}
+              />
+            </Link>
+            <span className="logo-text">{t("best_films")}</span>
+          </div>
 
-        <div className="header-left">
-          <Link to="/">
+          <div className="header-center">
             <img
-              src={`${process.env.PUBLIC_URL}/images/logoMain.png`}
-              className="site-logo"
-              alt="Logo"
-              loading="lazy"
-              onMouseOver={spinImage}
-              onMouseOut={resetSpin}
+              src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
+              className="site-title-img"
+              alt="Site Title"
             />
-          </Link>
-          <span className="logo-text">{t("best_films")}</span>
-        </div>
+          </div>
 
-        <div className="header-center">
-          <img
-            src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
-            className="site-title-img"
-            alt="Site Title"
-          />
-        </div>
-
-        <div className="header-right">
-          {!user ? (
-            <>
-              <button
-                onClick={() => setOpenLogin(true)}
-                className="btn btn-outline-light btn-sm"
-              >
-                {t("sign_in")}
-              </button>
-              <button
-                onClick={() => setOpenRegister(true)}
-                className="btn btn-light btn-sm"
-              >
-                {t("sign_up")}
-              </button>
-            </>
-          ) : (
-            <>
-            {user && (
-              <Link to="/my-reviews" className="hello-user-link text-white me-2 noBack">
-                {t("hello")} {user.username}
-              </Link>
+          <div className="header-right">
+            {!user ? (
+              <>
+                <button
+                  onClick={() => setOpenLogin(true)}
+                  className="btn btn-outline-light btn-sm"
+                >
+                  {t("sign_in")}
+                </button>
+                <button
+                  onClick={() => setOpenRegister(true)}
+                  className="btn btn-light btn-sm"
+                >
+                  {t("sign_up")}
+                </button>
+              </>
+            ) : (
+              <>
+                {user && (
+                  <Link
+                    to="/my-reviews"
+                    className="hello-user-link text-white me-2 noBack"
+                  >
+                    {t("hello")} {user.username}
+                  </Link>
+                )}
+                <button onClick={logout} className="btn btn-danger btn-sm">
+                  {t("log_out")}
+                </button>
+              </>
             )}
-              <button
-                onClick={logout}
-                className="btn btn-danger btn-sm"
-              >
-                {t("log_out")}
-              </button>
-            </>
-          )}
-          <a href="#groups" className="btn btn-outline-light btn-sm">
-            {t("groups")}
-          </a>
+            <Link to="/my-groups" className="btn btn-outline-light btn-sm">
+              {t("groups")}
+            </Link>
+          </div>
         </div>
-
-      </div>
-    </header>
+      </header>
     </>
   );
 }
 
-export default Header; 
+export default Header;

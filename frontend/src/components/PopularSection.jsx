@@ -4,7 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const PopularSection = () => {
-  const { t } = useTranslation();
+  const { t, getTmdbLanguage } = useTranslation();
+
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -12,7 +13,9 @@ const PopularSection = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/trending");
+        const res = await fetch(
+          `http://localhost:5000/api/trending?language=${getTmdbLanguage()}`
+        );
         const data = await res.json();
         setTrending(data.results || []);
       } catch (err) {
@@ -23,27 +26,30 @@ const PopularSection = () => {
     };
 
     fetchTrending();
-  }, []);
+  }, [getTmdbLanguage]);
 
-const [userReviews, setUserReviews] = useState({});
+  const [userReviews, setUserReviews] = useState({});
 
-useEffect(() => {
-  if (!user) return;
+  useEffect(() => {
+    if (!user) return;
 
-  fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-    credentials: "include",
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (!Array.isArray(data)) return;
-      const reviewMap = {};
-      data.forEach(r => {
-        reviewMap[`${r.movie_id}`] = r.rating;
-      });
-      setUserReviews(reviewMap);
-    })
-    .catch(err => console.error(err));
-}, [user]);
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (!Array.isArray(data)) return;
+        const reviewMap = {};
+        data.forEach((r) => {
+          reviewMap[`${r.movie_id}`] = r.rating;
+        });
+        setUserReviews(reviewMap);
+      })
+      .catch((err) => console.error(err));
+  }, [user]);
 
   if (loading) {
     return (
@@ -55,7 +61,7 @@ useEffect(() => {
       </section>
     );
   }
- 
+
   return (
     <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">
@@ -74,10 +80,13 @@ useEffect(() => {
             {user && userReviews[item.id] && (
               <div className="user-badge"> ✭ {userReviews[item.id]} </div>
             )}
-            <ClickablePoster item={item}/>
+            <ClickablePoster item={item} />
             <div className="movie-title-parent">
-              <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                  {item.title || item.name}
+              <p
+                className="movie-title text-white"
+                style={{ fontSize: "0.9rem" }}
+              >
+                {item.title || item.name}
               </p>
             </div>
           </div>

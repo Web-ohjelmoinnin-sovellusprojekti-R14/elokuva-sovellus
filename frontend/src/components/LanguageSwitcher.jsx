@@ -12,7 +12,7 @@ export default function LanguageSwitcher() {
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  const current = languages.find(l => l.code === currentLang);
+  const current = languages.find((l) => l.code === currentLang);
   const wrapperRef = useRef(null);
 
   const handleChange = (code) => {
@@ -20,10 +20,8 @@ export default function LanguageSwitcher() {
     localStorage.setItem("language", code);
     document.documentElement.lang = code;
     setOpen(false);
-
-    window.dispatchEvent(new Event("languageChanged"));
   };
- 
+
   return (
     <div
       ref={wrapperRef}
@@ -46,7 +44,10 @@ export default function LanguageSwitcher() {
           position: "relative",
         }}
         onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => { setHovered(false); setOpen(false) }}
+        onMouseLeave={() => {
+          setHovered(false);
+          setOpen(false);
+        }}
       >
         <button
           onClick={() => setOpen(!open)}
@@ -57,7 +58,9 @@ export default function LanguageSwitcher() {
             fontSize: "26px",
             color: "white",
             transition: "transform 0.3s ease, color 0.3s ease",
-            transform: hovered ? "scale(1.2) rotate(10deg)" : "scale(1) rotate(0deg)",
+            transform: hovered
+              ? "scale(1.2) rotate(10deg)"
+              : "scale(1) rotate(0deg)",
             color: hovered ? "#FFD700" : "white",
           }}
         >
@@ -82,11 +85,15 @@ export default function LanguageSwitcher() {
             }}
           >
             {languages
-              .filter(l => l.code !== currentLang)
-              .map(lang => (
+              .filter((l) => l.code !== currentLang)
+              .map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() =>{ handleChange(lang.code); setHovered(false); setOpen(false)}}
+                  onClick={() => {
+                    handleChange(lang.code);
+                    setHovered(false);
+                    setOpen(false);
+                  }}
                   style={{
                     display: "block",
                     width: "100%",

@@ -1,7 +1,7 @@
 import { getMovieImdbRating, getTvSeriesImdbRating, getImdbRating } from './imdbRatingController.js'
 import { getMovies, getTvSeries } from '../tmdbClient.js'
 
-async function titleSearchController(req) {
+async function titleSearchController(req) { 
   const query = req.query.q || ''
   const page = req.query.page || 1
   const language = req.query.language || 'en-US'

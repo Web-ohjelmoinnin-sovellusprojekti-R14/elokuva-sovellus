@@ -5,9 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const ITEMS_PER_PAGE = 18;
- 
+
 export default function SearchResultsPage() {
-  const { t } = useTranslation();
+  const { t, getTmdbLanguage } = useTranslation();
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const query = params.get("q") || "";
@@ -32,7 +33,7 @@ export default function SearchResultsPage() {
 
         while (hasMore && page <= 2) {
           const res = await fetch(
-            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}`
+            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -55,28 +56,34 @@ export default function SearchResultsPage() {
       }
     };
 
-    if (query) { loadPages(); }
-    else { setAllItems([]); }
-  }, [query]);
+    if (query) {
+      loadPages();
+    } else {
+      setAllItems([]);
+    }
+  }, [query, getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
-  
+
   useEffect(() => {
     if (!user) return;
-  
-    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
+
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
-        data.forEach(r => {
+        data.forEach((r) => {
           reviewMap[`${r.movie_id}`] = r.rating;
         });
         setUserReviews(reviewMap);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [user]);
 
   const totalItems = allItems.length;

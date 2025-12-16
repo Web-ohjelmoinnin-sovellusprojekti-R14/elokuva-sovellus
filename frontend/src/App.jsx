@@ -15,7 +15,9 @@ import MusicPlayer from "./components/MusicPlayer";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import Footer from "./components/Footer";
 import UserReviewsPage from "./pages/UserReviewsPage";
- 
+import MyGroupsPage from "./pages/MyGroupsPage";
+import GroupDetailsPage from "./pages/GroupDetailsPage";
+
 function App() {
   return (
     <div className="app-wrapper">
@@ -53,9 +55,14 @@ function App() {
             <Route path="/now-in-cinema" element={<NowInCinemaPage />} />
             <Route path="/search" element={<SearchResultsPage />} />
             <Route path="/type" element={<FilmsByTypePages />} />
-            <Route path="/advanced-search" element={<AdvancedSearchResultsPage />} />
+            <Route
+              path="/advanced-search"
+              element={<AdvancedSearchResultsPage />}
+            />
             <Route path="/title/:id/:mediaType" element={<TitleDetails />} />
             <Route path="/my-reviews" element={<UserReviewsPage />} />
+            <Route path="/my-groups" element={<MyGroupsPage />} />
+            <Route path="/group/:id" element={<GroupDetailsPage />} />
           </Routes>
         </main>
 

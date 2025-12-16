@@ -1,10 +1,10 @@
 import pool from '../db.js'
 
-async function removeFilmFromGroupController(user_id, group_id, movie_id) {
-  const filmCheck = await pool.query('SELECT added_by_id FROM films_in_group WHERE group_id=$1 AND movie_id=$2', [
-    group_id,
-    movie_id,
-  ])
+async function removeFilmFromGroupController(user_id, group_id, movie_id, media_type = 'movie') {
+  const filmCheck = await pool.query(
+    'SELECT added_by_id FROM films_in_group WHERE group_id=$1 AND movie_id=$2 AND media_type=$3',
+    [group_id, movie_id, media_type]
+  )
 
   if (filmCheck.rows.length === 0) {
     return { success: false, message: 'Movie not found in this group' }
@@ -24,7 +24,11 @@ async function removeFilmFromGroupController(user_id, group_id, movie_id) {
     return { success: false, message: 'You have no rights to remove this movie' }
   }
 
-  await pool.query('DELETE FROM films_in_group WHERE group_id=$1 AND movie_id=$2', [group_id, movie_id])
+  await pool.query('DELETE FROM films_in_group WHERE group_id=$1 AND movie_id=$2 AND media_type=$3', [
+    group_id,
+    movie_id,
+    media_type,
+  ])
 
   return { success: true, message: 'Movie removed from group' }
 }

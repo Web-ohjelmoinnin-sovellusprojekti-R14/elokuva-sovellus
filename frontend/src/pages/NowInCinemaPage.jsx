@@ -1,24 +1,21 @@
-import React, { useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const MOVIES_PER_PAGE = 18;
- 
+
 export default function NowInCinemaPage() {
-  const { t } = useTranslation();
+  const { t, getTmdbLanguage } = useTranslation();
+
   const [allMovies, setAllMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const hasFetched = useRef(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
-
     const fetchAllPages = async () => {
       setLoading(true);
       setError(null);
@@ -30,7 +27,7 @@ export default function NowInCinemaPage() {
 
         while (hasMore) {
           const res = await fetch(
-            `http://localhost:5000/api/now_in_cinema?page=${page}`
+            `http://localhost:5000/api/now_in_cinema?page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -53,26 +50,29 @@ export default function NowInCinemaPage() {
     };
 
     fetchAllPages();
-  }, []);
+  }, [getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
-  
+
   useEffect(() => {
     if (!user) return;
-  
-    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
+
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
-        data.forEach(r => {
+        data.forEach((r) => {
           reviewMap[`${r.movie_id}`] = r.rating;
         });
         setUserReviews(reviewMap);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [user]);
 
   const totalMovies = allMovies.length;
@@ -93,7 +93,9 @@ export default function NowInCinemaPage() {
     );
   }
 
-  if (error) { return <p className="text-danger text-center">{error}</p>; }
+  if (error) {
+    return <p className="text-danger text-center">{error}</p>;
+  }
 
   return (
     <section className="popular container-md py-5">
@@ -115,12 +117,17 @@ export default function NowInCinemaPage() {
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
                   style={{ position: "relative" }}
                 >
-                  {movie.imdb_rating && (<div className="imdb-badge">⭐ {movie.imdb_rating}</div>)}
+                  {movie.imdb_rating && (
+                    <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
+                  )}
                   {user && userReviews[movie.id] && (
-                    <div className="user-badge"> ✭ {userReviews[movie.id]} </div>
+                    <div className="user-badge">
+                      {" "}
+                      ✭ {userReviews[movie.id]}{" "}
+                    </div>
                   )}
                   <ClickablePoster item={movie} />
-                {/*
+                  {/*
                   <img
                     src={poster}
                     alt={movie.title}
@@ -133,8 +140,11 @@ export default function NowInCinemaPage() {
                     }}
                   />
                 */}
-                  <div class = "movie-title-parent">
-                  <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  <div class="movie-title-parent">
+                    <p
+                      className="movie-title text-white"
+                      style={{ fontSize: "0.9rem" }}
+                    >
                       {movie.title}
                     </p>
                   </div>
@@ -172,9 +182,7 @@ export default function NowInCinemaPage() {
           )}
         </>
       ) : (
-        <p className="text-white text-center">
-          {t("no_current_films")}
-        </p>
+        <p className="text-white text-center">{t("no_current_films")}</p>
       )}
     </section>
   );

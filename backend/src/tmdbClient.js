@@ -29,9 +29,9 @@ axiosRetry(tmdb, {
   },
 })
 
-async function nowInCinema(page, region) {
+async function nowInCinema(page, region, language) {
   const res = await tmdb.get('/movie/now_playing', {
-    params: { page, region },
+    params: { page, region, language },
   })
   //console.log("Imdb Results:", res.data)
   return res.data

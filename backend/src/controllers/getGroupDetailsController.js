@@ -17,28 +17,25 @@ const groupMembersQuery = `
   WHERE gm.group_id = $1
 `
 
-async function getGroupDetailsController(group_id, res) {
+async function getGroupDetailsController(group_id) {
   try {
     // 1. Получаем саму группу
     const groupDetails = await pool.query(groupDetailsQuery, [group_id])
     if (groupDetails.rows.length === 0) {
-      return res.status(404).json({ error: 'Group not found' })
+      throw new Error('Group not found')
     }
 
     // 2. Получаем участников
     const groupMembers = await pool.query(groupMembersQuery, [group_id])
 
     // 3. Добавляем участников в объект group
-    const result = {
+    return {
       ...groupDetails.rows[0],
       members: groupMembers.rows,
     }
-
-    // 4. Отправляем ответ
-    return res.json(result)
   } catch (e) {
     console.error(e)
-    return res.status(500).json({ error: 'Internal server error' })
+    throw e
   }
 }
 

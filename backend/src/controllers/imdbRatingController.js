@@ -3,7 +3,7 @@ import { getMovieDetails, getTvDetails, getMovieExtrenalIds, getTvExtrenalIds, g
 import { getTitleDetails } from '../omdbClient.js'
 import pLimit from 'p-limit'
 
-const limit = pLimit(5)
+const limit = pLimit(4)
 const ratingCache = new Map()
 
 async function getImdbRating(item, mediaType = 'movie') {
@@ -78,7 +78,7 @@ async function getMovieImdbRating(item, forTitlePage) {
     return null
   }
 
-  let imdb_rating = null
+  let imdb_rating = null 
   try {
     //console.log('Time before getTitleDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
     const omdbDetails = await getTitleDetails(imdb_id)
