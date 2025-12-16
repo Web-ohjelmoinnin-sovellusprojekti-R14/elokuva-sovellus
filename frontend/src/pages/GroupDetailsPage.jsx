@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 import ClickablePoster from "../components/ClickablePoster";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 export default function GroupDetailsPage() {
@@ -34,17 +36,21 @@ export default function GroupDetailsPage() {
     setForbidden(false);
     try {
       const [groupRes, filmsRes] = await Promise.all([
-        fetch(`http://localhost:5000/api/get_group_details?group_id=${id}`, { credentials: "include" }),
-        fetch(`http://localhost:5000/api/get_group_films?group_id=${id}`, { credentials: "include" }),
+        fetch(`${API_URL}/api/get_group_details?group_id=${id}`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/api/get_group_films?group_id=${id}`, {
+          credentials: "include",
+        }),
       ]);
 
-      if (groupRes.status === 403 || filmsRes.status === 403) 
-      { 
-        setForbidden(true); setGroup(null);
+      if (groupRes.status === 403 || filmsRes.status === 403) {
+        setForbidden(true);
+        setGroup(null);
         setMembers([]);
         setFilms([]);
         setFilmsRaw([]);
-        return; 
+        return;
       }
 
       if (!groupRes.ok || !filmsRes.ok) throw new Error(t("loadErr"));
@@ -74,7 +80,7 @@ export default function GroupDetailsPage() {
 
         try {
           const res = await fetch(
-            `http://localhost:5000/api/get_title_details?id=${film.movie_id}&media_type=${typeToUse}&language=${getTmdbLanguage()}`
+            `${API_URL}/api/get_title_details?id=${film.movie_id}&media_type=${typeToUse}&language=${getTmdbLanguage()}`
           );
 
           if (!res.ok) throw new Error("Not found");
@@ -111,13 +117,13 @@ export default function GroupDetailsPage() {
 
   useEffect(() => {
     if (!user) {
-        setGroup(null);
-        setMembers([]);
-        setFilms([]);
-        setFilmsRaw([]);
-        setForbidden(false);
-        setLoading(false);
-        return;
+      setGroup(null);
+      setMembers([]);
+      setFilms([]);
+      setFilmsRaw([]);
+      setForbidden(false);
+      setLoading(false);
+      return;
     }
     fetchGroupData();
   }, [id, user]);
@@ -137,7 +143,9 @@ export default function GroupDetailsPage() {
     const timer = setTimeout(async () => {
       setSearchLoading(true);
       try {
-        const res = await fetch(`http://localhost:5000/api/titlesearch?q=${encodeURIComponent(searchQuery)}&language=${getTmdbLanguage()}`);
+        const res = await fetch(
+          `${API_URL}/api/titlesearch?q=${encodeURIComponent(searchQuery)}&language=${getTmdbLanguage()}`
+        );
         const data = await res.json();
         setSearchResults(data.results?.slice(0, 5) || []);
       } catch (err) {
@@ -156,7 +164,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/add_film?group_id=${id}&movie_id=${titleId}&media_type=${titleMediaType}`,
+        `${API_URL}/api/add_film?group_id=${id}&movie_id=${titleId}&media_type=${titleMediaType}`,
         { method: "POST", credentials: "include" }
       );
 
@@ -190,7 +198,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/remove_film?group_id=${id}&movie_id=${movie_id}&media_type=${typeToUse}`,
+        `${API_URL}/api/remove_film?group_id=${id}&movie_id=${movie_id}&media_type=${typeToUse}`,
         { method: "DELETE", credentials: "include" }
       );
 
@@ -214,7 +222,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/send_invitation?username=${encodeURIComponent(inviteUsername.trim())}&group_id=${id}`,
+        `${API_URL}/api/send_invitation?username=${encodeURIComponent(inviteUsername.trim())}&group_id=${id}`,
         { method: "POST", credentials: "include" }
       );
 
@@ -242,9 +250,7 @@ export default function GroupDetailsPage() {
           style={{ maxWidth: "420px" }}
         >
           <h2 className="text-white fw-bold mb-3 noBack">{t("not_log")}</h2>
-          <p className="text-white-50 mb-0">
-            {t("logToV")}
-          </p>
+          <p className="text-white-50 mb-0">{t("logToV")}</p>
         </div>
       </div>
     );
@@ -253,42 +259,48 @@ export default function GroupDetailsPage() {
   if (loading) {
     return (
       <div className="container py-5 text-center">
-        <div className="spinner-border text-light" style={{ width: "4rem", height: "4rem" }}></div>
+        <div
+          className="spinner-border text-light"
+          style={{ width: "4rem", height: "4rem" }}
+        ></div>
         <p className="text-white mt-4 noBack">{t("load_group")}</p>
       </div>
     );
   }
 
   if (forbidden) {
-  return (
-    <div className="container py-5 d-flex justify-content-center">
-      <div
-        className="bg-dark bg-opacity-90 p-5 rounded-4 text-center border border-danger auth-card"
-        style={{ maxWidth: "520px" }}
-      >
-        <div className="fs-1 mb-3">🚫</div>
-        <h2 className="text-danger fw-bold mb-3">{t("ad")}</h2>
-        <p className="text-white-50 mb-4">
-          {t("not_a_member")}
-        </p>
-        <Link to="/my-groups" className="btn btn-warning btn-lg px-4">
-          ← {t("to_group")}
-        </Link>
+    return (
+      <div className="container py-5 d-flex justify-content-center">
+        <div
+          className="bg-dark bg-opacity-90 p-5 rounded-4 text-center border border-danger auth-card"
+          style={{ maxWidth: "520px" }}
+        >
+          <div className="fs-1 mb-3">🚫</div>
+          <h2 className="text-danger fw-bold mb-3">{t("ad")}</h2>
+          <p className="text-white-50 mb-4">{t("not_a_member")}</p>
+          <Link to="/my-groups" className="btn btn-warning btn-lg px-4">
+            ← {t("to_group")}
+          </Link>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   if (!group) {
     return (
       <div className="container py-5 text-center">
         <h2 className="text-white noBack">{t("no_gro")}</h2>
-        <Link to="/my-groups" className="btn btn-outline-warning d-flex align-items-center gap-2 me-3"
-            style={{
-              borderRadius: "999px",
-              padding: "0.4rem 1rem",
-              fontWeight: "600"}}>
-            ← {t("back_to_groups")}</Link>
+        <Link
+          to="/my-groups"
+          className="btn btn-outline-warning d-flex align-items-center gap-2 me-3"
+          style={{
+            borderRadius: "999px",
+            padding: "0.4rem 1rem",
+            fontWeight: "600",
+          }}
+        >
+          ← {t("back_to_groups")}
+        </Link>
       </div>
     );
   }
@@ -296,37 +308,45 @@ export default function GroupDetailsPage() {
   return (
     <div className="container py-5">
       <div className="d-flex align-items-center mb-4">
-      <Link
-        to="/my-groups"
-        className="btn btn-warning d-flex align-items-center gap-2 me-3 px-4 btn-sm"
-        style={{
-          borderRadius: "999px",
-          padding: "0.4rem 1rem",
-          fontWeight: "600",
-          transition: "transform 0.2s ease",
-        }}
-        onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.08)")}
-        onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
-      >
-        ← {t("back_to")}
-      </Link>
+        <Link
+          to="/my-groups"
+          className="btn btn-warning d-flex align-items-center gap-2 me-3 px-4 btn-sm"
+          style={{
+            borderRadius: "999px",
+            padding: "0.4rem 1rem",
+            fontWeight: "600",
+            transition: "transform 0.2s ease",
+          }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.08)")
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
+          ← {t("back_to")}
+        </Link>
         {isOwner && (
-          <span className="badge ms-auto d-flex align-items-center gap-2 px-3 py-2"
+          <span
+            className="badge ms-auto d-flex align-items-center gap-2 px-3 py-2"
             style={{
-                    background: "linear-gradient(135deg, #ffcc00, #ff9500)",
-                    color: "#000000ff",
-                    fontWeight: "700",
-                    boxShadow: "0 0 10px rgba(255,193,7,0.6)",
-              }}>
+              background: "linear-gradient(135deg, #ffcc00, #ff9500)",
+              color: "#000000ff",
+              fontWeight: "700",
+              boxShadow: "0 0 10px rgba(255,193,7,0.6)",
+            }}
+          >
             👑 {t("owner_txt")}
           </span>
         )}
       </div>
 
       <h1 className="group-title">{group.name}</h1>
-      {group.description && <div className="group-description">{group.description}</div>}
+      {group.description && (
+        <div className="group-description">{group.description}</div>
+      )}
 
-      <h3 className="text-warning mt-5 mb-3">{t("members")} ({members.length})</h3>
+      <h3 className="text-warning mt-5 mb-3">
+        {t("members")} ({members.length})
+      </h3>
       <div className="d-flex flex-wrap gap-2 mb-5">
         {members.map((m) => {
           const isGroupOwner = m.user_id === group.owner_id;
@@ -345,7 +365,8 @@ export default function GroupDetailsPage() {
                         boxShadow: "0 0 10px rgba(255,193,7,0.6)",
                       }
                     : {
-                        background: "linear-gradient(135deg, #6c757d, #4d4c4cff)",
+                        background:
+                          "linear-gradient(135deg, #6c757d, #4d4c4cff)",
                         color: "#000",
                         fontWeight: "700",
                       }
@@ -359,20 +380,27 @@ export default function GroupDetailsPage() {
                 <button
                   className="btn btn-sm btn-danger badge px-3 py-2"
                   style={{ transition: "transform 0.2s ease" }}
-                  onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.07)")}
-                  onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.07)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
                   onClick={async () => {
-                    if (!window.confirm(`${m.username},` + t("remove_user_gr"))) return;
+                    if (!window.confirm(`${m.username},` + t("remove_user_gr")))
+                      return;
 
                     try {
                       const res = await fetch(
-                        `http://localhost:5000/api/remove_member?group_id=${group.group_id}&member_id=${m.user_id}`,
+                        `${API_URL}/api/remove_member?group_id=${group.group_id}&member_id=${m.user_id}`,
                         { method: "DELETE", credentials: "include" }
                       );
                       const data = await res.json();
 
                       if (res.ok) {
-                        setMembers(prev => prev.filter(mem => mem.user_id !== m.user_id));
+                        setMembers((prev) =>
+                          prev.filter((mem) => mem.user_id !== m.user_id)
+                        );
                       } else {
                         alert(data.message || t("failed_remove_member"));
                       }
@@ -403,8 +431,13 @@ export default function GroupDetailsPage() {
           />
 
           {(searchLoading || searchResults.length > 0) && (
-            <div className="position-absolute w-100 bg-dark border border-secondary rounded-bottom shadow-lg" style={{ top: "100%", zIndex: 100 }}>
-              {searchLoading && <div className="p-3 text-white-50">{t("searchingFilm")}</div>}
+            <div
+              className="position-absolute w-100 bg-dark border border-secondary rounded-bottom shadow-lg"
+              style={{ top: "100%", zIndex: 100 }}
+            >
+              {searchLoading && (
+                <div className="p-3 text-white-50">{t("searchingFilm")}</div>
+              )}
               {!searchLoading && searchResults.length === 0 && searchQuery && (
                 <div className="p-3 text-white-50">{t("nothF")}</div>
               )}
@@ -417,13 +450,22 @@ export default function GroupDetailsPage() {
                 >
                   <div className="d-flex justify-content-between align-items-center">
                     <strong className="text-white noBack">
-                      {item.title || item.name} ({(item.release_date || item.first_air_date || "").slice(0, 4)})
+                      {item.title || item.name} (
+                      {(item.release_date || item.first_air_date || "").slice(
+                        0,
+                        4
+                      )}
+                      )
                     </strong>
                     <div>
                       <small className="text-white-50 me-3">
                         {item.media_type === "tv" ? t("series") : t("films")}
                       </small>
-                      {item.imdb_rating && <span className="text-warning">⭐ {item.imdb_rating}</span>}
+                      {item.imdb_rating && (
+                        <span className="text-warning">
+                          ⭐ {item.imdb_rating}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -432,8 +474,12 @@ export default function GroupDetailsPage() {
           )}
         </div>
 
-        {addSuccess && <div className="alert alert-success mt-3 shadow-sm">{addSuccess}</div>}
-        {addError && <div className="alert alert-danger mt-3 shadow-sm">{addError}</div>}
+        {addSuccess && (
+          <div className="alert alert-success mt-3 shadow-sm">{addSuccess}</div>
+        )}
+        {addError && (
+          <div className="alert alert-danger mt-3 shadow-sm">{addError}</div>
+        )}
       </div>
 
       {isOwner && (
@@ -448,24 +494,36 @@ export default function GroupDetailsPage() {
               onChange={(e) => setInviteUsername(e.target.value)}
               required
             />
-            <button type="submit" className="btn btn-success"
-              style={{ transition: "transform 0.2s ease", }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.06)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}>
-            {t("send")}</button>
+            <button
+              type="submit"
+              className="btn btn-success"
+              style={{ transition: "transform 0.2s ease" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "scale(1.06)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
+            >
+              {t("send")}
+            </button>
           </form>
-          {inviteSuccess && <div className="alert alert-success mt-3">{inviteSuccess}</div>}
-          {inviteError && <div className="alert alert-danger mt-3">{inviteError}</div>}
+          {inviteSuccess && (
+            <div className="alert alert-success mt-3">{inviteSuccess}</div>
+          )}
+          {inviteError && (
+            <div className="alert alert-danger mt-3">{inviteError}</div>
+          )}
         </div>
       )}
 
-      <h3 className="text-warning mb-4">{t("movies_in_group")} ({films.length})</h3>
+      <h3 className="text-warning mb-4">
+        {t("movies_in_group")} ({films.length})
+      </h3>
       {films.length === 0 ? (
         <div className="text-center text-white-50 py-4">
           <div className="fs-1 mb-2">🎬</div>
-          <p className="mb-0">
-            {t("no_movies_yet")}
-          </p>
+          <p className="mb-0">{t("no_movies_yet")}</p>
         </div>
       ) : (
         <div className="row g-3 g-md-4 px-2">
@@ -478,12 +536,17 @@ export default function GroupDetailsPage() {
                 className="col-6 col-md-4 col-lg-2 text-center movie-card"
                 style={{ position: "relative" }}
               >
-                {item.imdb_rating && <div className="imdb-badge">⭐ {item.imdb_rating}</div>}
+                {item.imdb_rating && (
+                  <div className="imdb-badge">⭐ {item.imdb_rating}</div>
+                )}
 
                 <ClickablePoster item={item} />
 
                 <div className="movie-title-parent">
-                  <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  <p
+                    className="movie-title text-white"
+                    style={{ fontSize: "0.9rem" }}
+                  >
                     {item.title || item.name}
                   </p>
                 </div>
@@ -500,9 +563,13 @@ export default function GroupDetailsPage() {
                       handleRemoveFilm(item.id, item.media_type);
                     }}
                     className="btn btn-danger w-100 mt-2"
-                    style={{ transition: "transform 0.2s ease", }}
-                    onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
-                    onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                    style={{ transition: "transform 0.2s ease" }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.05)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
                   >
                     {t("delete")}
                   </button>

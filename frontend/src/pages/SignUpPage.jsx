@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function SignUpPage() {
   const { t } = useTranslation();
   const [username, setUsername] = useState("");
@@ -9,7 +11,7 @@ export default function SignUpPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    await fetch("http://localhost:5000/api/register", {
+    await fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

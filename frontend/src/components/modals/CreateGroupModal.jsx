@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "../../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function CreateGroupModal({ isOpen, onClose, onSuccess }) {
   const { t } = useTranslation();
 
@@ -40,13 +42,13 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }) {
     setError("");
 
     try {
-        const res = await fetch(
-        `http://localhost:5000/api/create_group?name=${encodeURIComponent(name.trim())}&description=${encodeURIComponent(description.trim() || '')}`,
+      const res = await fetch(
+        `${API_URL}/api/create_group?name=${encodeURIComponent(name.trim())}&description=${encodeURIComponent(description.trim() || "")}`,
         {
-            method: "POST",
-            credentials: "include",
+          method: "POST",
+          credentials: "include",
         }
-    );
+      );
 
       const data = await res.json();
 
@@ -102,11 +104,20 @@ export default function CreateGroupModal({ isOpen, onClose, onSuccess }) {
             disabled={loading}
           />
 
-          <button type="submit" className="btn btn-success w-100 mb-2" disabled={loading}>
+          <button
+            type="submit"
+            className="btn btn-success w-100 mb-2"
+            disabled={loading}
+          >
             {loading ? t("creatingg") : t("ceate_group")}
           </button>
 
-          <button type="button" className="btn btn-danger w-100" onClick={handleClose} disabled={loading}>
+          <button
+            type="button"
+            className="btn btn-danger w-100"
+            onClick={handleClose}
+            disabled={loading}
+          >
             {t("cancelCr")}
           </button>
         </form>
