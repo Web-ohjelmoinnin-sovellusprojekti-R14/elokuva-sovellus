@@ -12,3 +12,4 @@ router.get('/now_in_cinema', async (req, res) => {
 })
 
 export default router
+ 

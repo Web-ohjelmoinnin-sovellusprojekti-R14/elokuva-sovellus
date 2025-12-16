@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function SignInPage() {
+  const { t } = useTranslation();
   const { setUser } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +30,7 @@ export default function SignInPage() {
     <form onSubmit={handleLogin}>
       <input value={username} onChange={(e) => setUsername(e.target.value)} />
       <input value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button>Log In</button>
+      <button>{t("log_in")}</button>
     </form>
   );
 }

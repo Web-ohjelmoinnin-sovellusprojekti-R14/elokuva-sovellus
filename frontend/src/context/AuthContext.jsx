@@ -52,6 +52,13 @@ export function AuthProvider({ children }) {
     });
 
     setUser(null);
+
+    localStorage.removeItem("user_reviews_cache_v3");
+    localStorage.removeItem("user_reviews_cache");
+    localStorage.removeItem("user_reviews_cache_v4");
+    localStorage.removeItem("user_reviews_cache_v5");
+    localStorage.removeItem("user_reviews_cache_v6");
+    localStorage.removeItem("user_reviews_cache_v7");
   }
 
   return (
@@ -63,4 +70,4 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   return useContext(AuthContext);
-}
+} 

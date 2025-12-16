@@ -1,9 +1,9 @@
-import { getMovieDetails, getTvDetails, getMovieExtrenalIds, getTvExtrenalIds} from '../tmdbClient.js';
+import { getMovieDetails, getTvDetails, getMovieExtrenalIds, getTvExtrenalIds, getTrailerUrl} from '../tmdbClient.js';
 
 import { getTitleDetails } from '../omdbClient.js'
 import pLimit from 'p-limit'
 
-const limit = pLimit(5)
+const limit = pLimit(4)
 const ratingCache = new Map()
 
 async function getImdbRating(item, mediaType = 'movie') {
@@ -64,12 +64,12 @@ function fallbackRating(item) {
   return { ...item, imdb_rating: null };
 }
 
-async function getMovieImdbRating(item) {
+async function getMovieImdbRating(item, forTitlePage) {
   let imdb_id = null
-  console.log('Title: ' + item.title)
-  //console.log('Time before getMovieDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
+  //console.log('Title: ' + item.title)
+  //console.log('Time before getMovieDetails in getMovieImdbRating for ' + item.title + ' : ' + new Date().toISOString())
   const details = await getMovieExtrenalIds(item.id)
-  //console.log('Time after getMovieDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
+  //console.log('Time after getMovieDetails in getMovieImdbRating for ' + item.title + ' : ' + new Date().toISOString())
   imdb_id = details.imdb_id
   //console.log('IMDb id of ' + item.title + ': ' + imdb_id)
   const media_type = 'movie'
@@ -78,12 +78,22 @@ async function getMovieImdbRating(item) {
     return null
   }
 
-  let imdb_rating = null
+  let imdb_rating = null 
   try {
     //console.log('Time before getTitleDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
     const omdbDetails = await getTitleDetails(imdb_id)
+    //console.log(JSON.stringify(omdbDetails))
     //console.log('Time after getTitleDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
     imdb_rating = omdbDetails.imdbRating
+
+    if (forTitlePage) {
+      const imdbVotes = omdbDetails.imdbVotes
+      const director = omdbDetails.Director
+      const writer = omdbDetails.Writer
+      const actors = omdbDetails.Actors
+      const trailerUrl = await getTrailerUrl(item.id, 'movie')
+      return { ...item, imdb_rating, media_type, imdbVotes, director, writer, actors, trailerUrl }
+    }
     //console.log('IMDb rating for ' + item.title + ': ' + imdb_rating)
   } catch (e) {
     console.log('Failed to get IMDb rating for: ' + item.title)
@@ -92,7 +102,7 @@ async function getMovieImdbRating(item) {
   return { ...item, imdb_rating, media_type }
 }
 
-async function getTvSeriesImdbRating(item) {
+async function getTvSeriesImdbRating(item, forTitlePage) {
   let imdb_id = null
   //console.log('Name: ' + item.name)
 
@@ -107,16 +117,22 @@ async function getTvSeriesImdbRating(item) {
     return null
   }
   let imdb_rating = null
-  try {
-    //console.log('Time before getTitleDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
-    const omdbDetails = await getTitleDetails(imdb_id)
-    //console.log('Time after getTitleDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
-    imdb_rating = omdbDetails.imdbRating
-    //console.log('IMDb rating for ' + item.title + ': ' + imdb_rating)
-  } catch (e) {
-    console.log('Failed to get IMDb rating for: ' + item.title)
-    return { ...item, media_type }
+
+  //console.log('Time before getTitleDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
+  const omdbDetails = await getTitleDetails(imdb_id)
+  //console.log(JSON.stringify(omdbDetails))
+  //console.log('Time after getTitleDetails in getTvSeriesImdbRating: ' + new Date().toISOString())
+  imdb_rating = omdbDetails.imdbRating
+  if (forTitlePage) {
+    const imdbVotes = omdbDetails.imdbVotes
+    const director = omdbDetails.Director
+    const writer = omdbDetails.Writer
+    const actors = omdbDetails.Actors
+    const trailerUrl = await getTrailerUrl(item.id, 'tv')
+    return { ...item, imdb_rating, media_type, imdbVotes, director, writer, actors, trailerUrl }
   }
+  //console.log('IMDb rating for ' + item.title + ': ' + imdb_rating)
+
   return { ...item, imdb_rating, media_type }
 }
 

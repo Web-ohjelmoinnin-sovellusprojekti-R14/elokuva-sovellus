@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import LoginModal from "./modals/LoginModal";
 import RegisterModal from "./modals/RegisterModal";
 import { Link } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 function Header() {
   const spinImage = (e) => {
@@ -14,6 +15,7 @@ function Header() {
     e.currentTarget.style.transform = "rotate(0deg)";
   };
 
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
@@ -21,67 +23,72 @@ function Header() {
   return (
     <>
       <LoginModal isOpen={openLogin} onClose={() => setOpenLogin(false)} />
-      <RegisterModal isOpen={openRegister} onClose={() => setOpenRegister(false)} />
+      <RegisterModal
+        isOpen={openRegister}
+        onClose={() => setOpenRegister(false)}
+      />
 
-    <header className="site-header bg-dark">
-      <div className="container header-inner">
+      <header className="site-header bg-dark">
+        <div className="container header-inner">
+          <div className="header-left">
+            <Link to="/">
+              <img
+                src={`${process.env.PUBLIC_URL}/images/logoMain.png`}
+                className="site-logo"
+                alt="Logo"
+                loading="lazy"
+                onMouseOver={spinImage}
+                onMouseOut={resetSpin}
+              />
+            </Link>
+            <span className="logo-text">{t("best_films")}</span>
+          </div>
 
-        <div className="header-left">
-          <Link to="/">
+          <div className="header-center">
             <img
-              src="images/logoMain.png"
-              className="site-logo"
-              alt="Logo"
-              loading="lazy"
-              onMouseOver={spinImage}
-              onMouseOut={resetSpin}
+              src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
+              className="site-title-img"
+              alt="Site Title"
             />
-          </Link>
-          <span className="logo-text">Best films are here</span>
-        </div>
+          </div>
 
-        <div className="header-center">
-          <img
-            src="images/mainTitle.png"
-            className="site-title-img"
-            alt="Site Title"
-          />
+          <div className="header-right">
+            {!user ? (
+              <>
+                <button
+                  onClick={() => setOpenLogin(true)}
+                  className="btn btn-outline-light btn-sm"
+                >
+                  {t("sign_in")}
+                </button>
+                <button
+                  onClick={() => setOpenRegister(true)}
+                  className="btn btn-light btn-sm"
+                >
+                  {t("sign_up")}
+                </button>
+              </>
+            ) : (
+              <>
+                {user && (
+                  <Link
+                    to="/my-reviews"
+                    className="hello-user-link text-white me-2 noBack"
+                  >
+                    {t("hello")} {user.username}
+                  </Link>
+                )}
+                <button onClick={logout} className="btn btn-danger btn-sm">
+                  {t("log_out")}
+                </button>
+              </>
+            )}
+            <Link to="/my-groups" className="btn btn-outline-light btn-sm">
+              {t("groups")}
+            </Link>
+          </div>
         </div>
-
-        <div className="header-right">
-          {!user ? (
-            <>
-              <button
-                onClick={() => setOpenLogin(true)}
-                className="btn btn-outline-light btn-sm"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => setOpenRegister(true)}
-                className="btn btn-light btn-sm"
-              >
-                Sign Up
-              </button>
-            </>
-          ) : (
-            <>
-              <span className="text-white me-2 noBack">Hello, {user.username}</span>
-              <button
-                onClick={logout}
-                className="btn btn-danger btn-sm"
-              >
-                Log Out
-              </button>
-            </>
-          )}
-          <a href="#groups" className="btn btn-outline-light btn-sm">
-            Groups
-          </a>
-        </div>
-
-      </div>
-    </header>
+      </header>
     </>
   );
 }

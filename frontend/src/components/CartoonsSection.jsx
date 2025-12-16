@@ -1,30 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ClickablePoster from "./ClickablePoster";
+import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 const CartoonsSection = () => {
+  const { t, getTmdbLanguage } = useTranslation();
   const [topCartoons, setTopCartoons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/category/cartoons?batch=1")
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `http://localhost:5000/api/category/cartoons?batch=1&language=${getTmdbLanguage()}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setTopCartoons(data.results.slice(0, 12));
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Failed to load cartoons:", err);
         setLoading(false);
       });
-  }, []);
+  }, [getTmdbLanguage]);
+
+  const [userReviews, setUserReviews] = useState({});
+
+  useEffect(() => {
+    if (!user) return;
+
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (!Array.isArray(data)) return;
+        const reviewMap = {};
+        data.forEach((r) => {
+          reviewMap[`${r.movie_id}`] = r.rating;
+        });
+        setUserReviews(reviewMap);
+      })
+      .catch((err) => console.error(err));
+  }, [user]);
 
   if (loading) {
     return (
       <section className="popular container-md py-5 text-center">
-        <h2 className="title-bg mb-4 text-white">Cartoons</h2>
+        <h2 className="title-bg mb-4 text-white">{t("cartoons")}</h2>
         <div className="spinner-border text-light" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t("loading")}</span>
         </div>
       </section>
     );
@@ -32,11 +61,9 @@ const CartoonsSection = () => {
 
   return (
     <section className="movies container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
-        Cartoons
-      </h2>
+      <h2 className="title-bg mb-4 text-white noBack">{t("cartoons")}</h2>
 
-      <div className="row g-3 g-md-4">
+      <div className="row g-3 g-md-4 px-2">
         {topCartoons.map((cartoon) => (
           <div
             key={cartoon.id}
@@ -46,11 +73,17 @@ const CartoonsSection = () => {
             {cartoon.imdb_rating && (
               <div className="imdb-badge">⭐ {cartoon.imdb_rating}</div>
             )}
-            <ClickablePoster item={{ ...cartoon, media_type: "movie" }}/>
+            {user && userReviews[cartoon.id] && (
+              <div className="user-badge"> ✭ {userReviews[cartoon.id]} </div>
+            )}
+            <ClickablePoster item={{ ...cartoon, media_type: "movie" }} />
             <div className="movie-title-parent">
-                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                    {cartoon.title || cartoon.name}
-                </p>
+              <p
+                className="movie-title text-white"
+                style={{ fontSize: "0.9rem" }}
+              >
+                {cartoon.title || cartoon.name}
+              </p>
             </div>
           </div>
         ))}
@@ -62,7 +95,7 @@ const CartoonsSection = () => {
           className="title-under mb-4"
           style={{ fontSize: "1.1rem", fontWeight: "600" }}
         >
-          Show more...
+          {t("show_more")}
         </Link>
       </div>
     </section>

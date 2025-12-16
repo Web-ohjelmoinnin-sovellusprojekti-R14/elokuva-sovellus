@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function SignUpPage() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,7 +22,7 @@ export default function SignUpPage() {
     <form onSubmit={handleRegister}>
       <input value={username} onChange={(e) => setUsername(e.target.value)} />
       <input value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button>Sign Up</button>
+      <button>{t("sign_up")}</button>
     </form>
   );
 }
