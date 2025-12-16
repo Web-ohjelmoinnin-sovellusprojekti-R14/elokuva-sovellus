@@ -4,6 +4,8 @@ import ClickablePoster from "./ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const MoviesSection = () => {
   const { t, getTmdbLanguage } = useTranslation();
 
@@ -13,7 +15,7 @@ const MoviesSection = () => {
 
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/category/movies?batch=1&language=${getTmdbLanguage()}`
+      `${API_URL}/api/category/movies?batch=1&language=${getTmdbLanguage()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -31,12 +33,9 @@ const MoviesSection = () => {
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
-      {
-        credentials: "include",
-      }
-    )
+    fetch(`${API_URL}/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) return;

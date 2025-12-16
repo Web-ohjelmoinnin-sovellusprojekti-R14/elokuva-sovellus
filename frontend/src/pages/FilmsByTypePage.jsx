@@ -4,6 +4,8 @@ import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const ITEMS_PER_PAGE = 18;
 
 export default function SearchResultsPage() {
@@ -31,9 +33,9 @@ export default function SearchResultsPage() {
       let url = "";
 
       if (q) {
-        url = `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}&language=${getTmdbLanguage()}`;
+        url = `${API_URL}/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}&language=${getTmdbLanguage()}`;
       } else if (category) {
-        url = `http://localhost:5000/api/category/${category}?batch=${batch}&language=${getTmdbLanguage()}`;
+        url = `${API_URL}/api/category/${category}?batch=${batch}&language=${getTmdbLanguage()}`;
       }
 
       const res = await fetch(url);
@@ -68,12 +70,9 @@ export default function SearchResultsPage() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
-      {
-        credentials: "include",
-      }
-    )
+    fetch(`${API_URL}/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) return;

@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 /* ======================= utils ======================= */
@@ -129,10 +131,9 @@ export default function UserReviewPage() {
 
     const load = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:5000/api/get_reviews_by_user_id",
-          { credentials: "include" }
-        );
+        const res = await fetch(`${API_URL}/api/get_reviews_by_user_id`, {
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to load reviews");
 
         const base = await res.json();
@@ -140,7 +141,7 @@ export default function UserReviewPage() {
         const enriched = await Promise.all(
           base.map(async (r) => {
             const titleRes = await fetch(
-              `http://localhost:5000/api/get_title_details?id=${r.movie_id}&media_type=${r.media_type}&language=${getTmdbLanguage()}`
+              `${API_URL}/api/get_title_details?id=${r.movie_id}&media_type=${r.media_type}&language=${getTmdbLanguage()}`
             );
             if (!titleRes.ok) return null;
             return { ...r, title: await titleRes.json() };

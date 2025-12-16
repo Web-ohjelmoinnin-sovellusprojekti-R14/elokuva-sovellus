@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 import CreateGroupModal from "../components/modals/CreateGroupModal";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 export default function MyGroupsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -16,8 +18,12 @@ export default function MyGroupsPage() {
     setLoading(true);
     try {
       const [groupsRes, invitesRes] = await Promise.all([
-        fetch("http://localhost:5000/api/get_user_groups", { credentials: "include" }),
-        fetch("http://localhost:5000/api/get_invitations", { credentials: "include" }),
+        fetch(`${API_URL}/api/get_user_groups`, {
+          credentials: "include",
+        }),
+        fetch(`${API_URL}/api/get_invitations`, {
+          credentials: "include",
+        }),
       ]);
 
       if (!groupsRes.ok || !invitesRes.ok) throw new Error(t("f_fetch_data"));
@@ -41,20 +47,30 @@ export default function MyGroupsPage() {
   }, [user]);
 
   const handleAccept = async (group_request_id) => {
-    await fetch(`http://localhost:5000/api/accept_invitation?group_request_id=${group_request_id}`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setInvitations((invites) => invites.filter((i) => i.group_request_id !== group_request_id));
+    await fetch(
+      `${API_URL}/api/accept_invitation?group_request_id=${group_request_id}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+    setInvitations((invites) =>
+      invites.filter((i) => i.group_request_id !== group_request_id)
+    );
     fetchData();
   };
 
   const handleReject = async (group_request_id) => {
-    await fetch(`http://localhost:5000/api/reject_invitation?group_request_id=${group_request_id}`, {
-      method: "POST",
-      credentials: "include",
-    });
-    setInvitations((invites) => invites.filter((i) => i.group_request_id !== group_request_id));
+    await fetch(
+      `${API_URL}/api/reject_invitation?group_request_id=${group_request_id}`,
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+    setInvitations((invites) =>
+      invites.filter((i) => i.group_request_id !== group_request_id)
+    );
   };
 
   const handleDeleteGroup = async (group_id) => {
@@ -63,10 +79,13 @@ export default function MyGroupsPage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/delete_group?group_id=${group_id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${API_URL}/api/delete_group?group_id=${group_id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
 
       if (res.ok) {
         fetchData();
@@ -100,8 +119,12 @@ export default function MyGroupsPage() {
                 textAlign: "center",
                 transition: "transform 0.2s ease",
               }}
-              onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-              onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "scale(1.04)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
             >
               ← {t("ret_home")}
             </Link>
@@ -114,7 +137,10 @@ export default function MyGroupsPage() {
   if (loading) {
     return (
       <div className="container py-5 text-center">
-        <div className="spinner-border text-light" style={{ width: "4rem", height: "4rem" }}></div>
+        <div
+          className="spinner-border text-light"
+          style={{ width: "4rem", height: "4rem" }}
+        ></div>
         <p className="text-white mt-4 noBack">{t("load_gr")}</p>
       </div>
     );
@@ -122,14 +148,20 @@ export default function MyGroupsPage() {
 
   return (
     <div className="container py-5">
-      <h1 className="display-5 text-white mb-5 text-center noBack">{t("my_groups")}</h1>
+      <h1 className="display-5 text-white mb-5 text-center noBack">
+        {t("my_groups")}
+      </h1>
 
       <div className="text-center mb-5">
-        <button onClick={() => setIsCreateModalOpen(true)} 
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
           className="btn btn-success btn-lg"
-          style={{ transition: "transform 0.2s ease",}}
-          onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.06)")}
-          onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}>
+          style={{ transition: "transform 0.2s ease" }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.06)")
+          }
+          onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        >
           {t("cr_new_group")}
         </button>
       </div>
@@ -146,17 +178,23 @@ export default function MyGroupsPage() {
                     background: "rgba(30,30,30,0.9)",
                     borderColor: "#6c757d",
                     boxShadow: "0 0 15px rgba(0,0,0,0.3)",
-                    maxWidth: "400px"
+                    maxWidth: "400px",
                   }}
                 >
-                  <h5 className="text-white noBack text-center">{inv.group_name}</h5>
+                  <h5 className="text-white noBack text-center">
+                    {inv.group_name}
+                  </h5>
                   <div className="d-flex justify-content-center gap-3 mt-3">
                     <button
                       onClick={() => handleAccept(inv.group_request_id)}
                       className="btn btn-success flex-1"
                       style={{ transition: "transform 0.2s ease" }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
-                      onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.05)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
                     >
                       {t("acc")}
                     </button>
@@ -164,8 +202,12 @@ export default function MyGroupsPage() {
                       onClick={() => handleReject(inv.group_request_id)}
                       className="btn btn-danger flex-1"
                       style={{ transition: "transform 0.2s ease" }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.05)")}
-                      onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.05)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
                     >
                       {t("rej")}
                     </button>
@@ -187,14 +229,22 @@ export default function MyGroupsPage() {
         <div className="row g-4">
           {groups.map((group) => (
             <div key={group.group_id} className="col-md-6 col-lg-4">
-              <div className="bg-dark bg-opacity-90 p-4 rounded-4 border border-secondary h-100 d-flex flex-column"
+              <div
+                className="bg-dark bg-opacity-90 p-4 rounded-4 border border-secondary h-100 d-flex flex-column"
                 style={{
-                background: "rgba(20,20,20,0.9)",
-                border: "1px solid #6c757d",
-                boxShadow: "0 0 20px rgba(0,0,0,0.3)",
-              }}>
-                <h5 className="text-white text-center fw-bold noBack">{group.name}</h5>
-                {group.description && <p className="text-white-50 small group-description">{group.description}</p>}
+                  background: "rgba(20,20,20,0.9)",
+                  border: "1px solid #6c757d",
+                  boxShadow: "0 0 20px rgba(0,0,0,0.3)",
+                }}
+              >
+                <h5 className="text-white text-center fw-bold noBack">
+                  {group.name}
+                </h5>
+                {group.description && (
+                  <p className="text-white-50 small group-description">
+                    {group.description}
+                  </p>
+                )}
                 <div className="mt-2">
                   <span
                     className="badge"
@@ -204,7 +254,9 @@ export default function MyGroupsPage() {
                         : "linear-gradient(135deg, #6c757d, #4d4c4c)",
                       color: "#000",
                       fontWeight: 700,
-                      boxShadow: group.is_owner ? "0 0 10px rgba(255,193,7,0.6)" : "none",
+                      boxShadow: group.is_owner
+                        ? "0 0 10px rgba(255,193,7,0.6)"
+                        : "none",
                     }}
                   >
                     {group.is_owner ? t("owner") : t("memb")}
@@ -216,8 +268,12 @@ export default function MyGroupsPage() {
                     to={`/group/${group.group_id}`}
                     className="btn btn-outline-light"
                     style={{ transition: "transform 0.2s ease" }}
-                    onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-                    onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(1.04)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
                   >
                     {t("go_to_gr")}
                   </Link>
@@ -227,8 +283,12 @@ export default function MyGroupsPage() {
                       onClick={() => handleDeleteGroup(group.group_id)}
                       className="btn btn-danger"
                       style={{ transition: "transform 0.2s ease" }}
-                      onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.04)")}
-                      onMouseLeave={e => (e.currentTarget.style.transform = "scale(1)")}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.transform = "scale(1.04)")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.transform = "scale(1)")
+                      }
                     >
                       {t("del_gr")}
                     </button>
