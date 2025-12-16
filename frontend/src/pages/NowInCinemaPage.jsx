@@ -6,18 +6,22 @@ import { useTranslation } from "../hooks/useTranslation";
 const MOVIES_PER_PAGE = 18;
  
 export default function NowInCinemaPage() {
+<<<<<<< HEAD
   const { t } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   const [allMovies, setAllMovies] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const hasFetched = useRef(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (hasFetched.current) return;
-    hasFetched.current = true;
 
     const fetchAllPages = async () => {
       setLoading(true);
@@ -30,7 +34,7 @@ export default function NowInCinemaPage() {
 
         while (hasMore) {
           const res = await fetch(
-            `http://localhost:5000/api/now_in_cinema?page=${page}`
+            `http://localhost:5000/api/now_in_cinema?page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -53,7 +57,7 @@ export default function NowInCinemaPage() {
     };
 
     fetchAllPages();
-  }, []);
+  }, [getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
   

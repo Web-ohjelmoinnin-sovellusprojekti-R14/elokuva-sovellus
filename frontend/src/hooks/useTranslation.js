@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
+=======
+import { useEffect, useState, useCallback } from "react";
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 import { translations } from "../translations";
 
 export const genreMap = {
@@ -56,5 +60,19 @@ export function useTranslation() {
 
   const getGenreId = (englishName) => genreMap[englishName];
 
+<<<<<<< HEAD
   return { t, tg, getGenreId, lang };
+=======
+const languageMap = {
+  "ru": "ru-RU",
+  "en": "en-US",
+  "fi": "fi-FI",
+};
+
+const getTmdbLanguage = useCallback(() => {
+  return languageMap[lang] || "en-US";
+}, [lang]);
+
+  return { t, tg, getGenreId, lang, getTmdbLanguage };
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 }

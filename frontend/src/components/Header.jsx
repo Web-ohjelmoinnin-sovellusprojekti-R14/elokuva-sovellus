@@ -81,9 +81,15 @@ function Header() {
               </button>
             </>
           )}
+<<<<<<< Updated upstream
           <a href="#groups" className="btn btn-outline-light btn-sm">
             {t("groups")}
           </a>
+=======
+          <Link to="/my-groups" className="btn btn-outline-light btn-sm">
+            {t("groups")}
+          </Link>
+>>>>>>> Stashed changes
         </div>
 
       </div>

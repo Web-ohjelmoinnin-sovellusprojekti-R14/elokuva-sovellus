@@ -3,8 +3,13 @@ const router = Router()
 import { getImdbRating } from '../controllers/imdbRatingController.js'
 import pLimit from 'p-limit'
 
+<<<<<<< HEAD
 const limit = pLimit(4)
 const TMDB_KEY = process.env.TMDB_API_KEY
+=======
+const limit = pLimit(5); 
+const TMDB_KEY = process.env.TMDB_API_KEY;
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 
 const PAGES_PER_BATCH = 6
 const ITEMS_PER_BATCH = 110

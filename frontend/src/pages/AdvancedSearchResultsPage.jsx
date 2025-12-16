@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
@@ -29,7 +29,14 @@ const GENRE_MAP = {
 };
 
 export default function AdvancedSearchResultsPage() {
+<<<<<<< HEAD
   const { t, tg } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+  const { t, tg, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
@@ -53,6 +60,7 @@ export default function AdvancedSearchResultsPage() {
     try {
       const url = new URL(`http://localhost:5000/api/category/${category}`);
       url.searchParams.set("batch", batch);
+      url.searchParams.set("language", getTmdbLanguage());
       
       for (const [key, value] of params.entries()) {
         if (key !== "category" && value && !key.includes("rating")) {
@@ -110,7 +118,7 @@ export default function AdvancedSearchResultsPage() {
     setHasMore(true);
     setError(null);
     fetchBatch(1);
-  }, [location.search]);
+  }, [location.search, getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
   

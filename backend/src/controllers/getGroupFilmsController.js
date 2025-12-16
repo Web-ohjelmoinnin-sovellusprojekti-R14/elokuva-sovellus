@@ -19,6 +19,10 @@ async function getGroupFilmsController(user_id, group_id) {
   const films = await pool.query(
     `SELECT
         f.movie_id,
+<<<<<<< HEAD
+=======
+        f.media_type,
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
         f.added_by_id,
         u.username AS added_by_username
      FROM films_in_group f

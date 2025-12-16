@@ -15,6 +15,11 @@ import MusicPlayer from "./components/MusicPlayer";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import Footer from "./components/Footer";
 import UserReviewsPage from "./pages/UserReviewsPage";
+<<<<<<< HEAD
+=======
+import MyGroupsPage from "./pages/MyGroupsPage";
+import GroupDetailsPage from "./pages/GroupDetailsPage";
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
  
 function App() {
   return (
@@ -56,6 +61,8 @@ function App() {
             <Route path="/advanced-search" element={<AdvancedSearchResultsPage />} />
             <Route path="/title/:id/:mediaType" element={<TitleDetails />} />
             <Route path="/my-reviews" element={<UserReviewsPage />} />
+            <Route path="/my-groups" element={<MyGroupsPage />} />
+            <Route path="/group/:id" element={<GroupDetailsPage />} />
           </Routes>
         </main>
 

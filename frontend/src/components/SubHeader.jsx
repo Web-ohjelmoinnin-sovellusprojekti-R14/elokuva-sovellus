@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+<<<<<<< HEAD
 import { useTranslation } from "../hooks/useTranslation";
  
 function SubHeader() {
     const { t, tg } = useTranslation();
+=======
+ 
+function SubHeader() {
+<<<<<<< Updated upstream
+=======
+    const { t, tg, lang } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
     const [query, setQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [searchLoading, setSearchLoading] = useState(false);
@@ -96,7 +105,7 @@ function SubHeader() {
         const timer = setTimeout(async () => {
             setSearchLoading(true);
             try {
-                const res = await fetch(`http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}`);
+                const res = await fetch(`http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&language=${lang === "ru" ? "ru-RU" : lang === "fi" ? "fi-FI" : "en-US"}`);
                 const data = await res.json();
                 setSearchResults(data.results || []);
             } catch (err) {
@@ -349,69 +358,98 @@ const goToFilteredSearch = () => {
                 />
 
                 {query && (
-                    <div
-                        className="search-dropdown shadow-lg"
+                <div
+                    className="search-dropdown shadow-lg"
+                    style={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    width: "100%",
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    zIndex: 10,
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                    marginTop: "4px",
+                    padding: "4px"
+                    }}
+                >
+                    {searchLoading && <div className="p-2">{t("loading")}</div>}
+
+                    {!searchLoading &&
+                    searchResults.length > 0 &&
+                    searchResults.slice(0, 5).map((item) => (
+                        <div
+                        key={item.id}
+                        className="search-item p-2 d-flex justify-content-between align-items-center"
                         style={{
-                            position: "absolute",
-                            top: "100%",
-                            left: 0,
-                            width: "100%",
-                            background: "#fff",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            zIndex: 10,
-                            maxHeight: "300px",
-                            overflowY: "auto",
-                            marginTop: "4px",
-                            padding: "4px"
+                            cursor: "pointer",
+                            borderBottom: "1px solid #eee"
                         }}
+<<<<<<< Updated upstream
                     >
+<<<<<<< HEAD
                         {searchLoading && <div className="p-2">{t("loading")}</div>}
+=======
+                        {searchLoading && <div className="p-2">Loading...</div>}
+=======
+                        onClick={() => {
+                            navigate(`/title/${item.id}/${item.media_type}`);
+                            setQuery("");
+                            setSearchResults([]);
+                        }}
+                        >
+                        <span style={{ flex: 1 }}>
+                            {item.title || item.name} ({item.media_type})
+                        </span>
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 
-                        {!searchLoading &&
-                            searchResults.length > 0 &&
-                            searchResults.slice(0, 5).map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="search-item p-2 d-flex justify-content-between align-items-center"
-                                    style={{
-                                        cursor: "pointer",
-                                        borderBottom: "1px solid #eee"
-                                    }}
-                                    onClick={goToSearch}
-                                >
-                                    <span style={{ flex: 1 }}>
-                                        {item.title || item.name} ({item.media_type})
-                                    </span>
-
-                                    {item.imdb_rating && (
-                                        <span
-                                            style={{
-                                                color: "#2a2a49",
-                                                fontWeight: "bold",
-                                                marginLeft: "8px",
-                                                flexShrink: 0
-                                            }}
-                                        >
-                                            ⭐ {item.imdb_rating}
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
-
-                        {!searchLoading && searchResults.length > 5 && (
-                            <button
-                                className="btn btn-primary w-100 mt-2"
-                                onClick={goToSearch}
+                        {item.imdb_rating && (
+                            <span
+                            style={{
+                                color: "#2a2a49",
+                                fontWeight: "bold",
+                                marginLeft: "8px",
+                                flexShrink: 0
+                            }}
                             >
+<<<<<<< HEAD
                                 {t("show_all_results")}
+=======
+<<<<<<< Updated upstream
+                                Show All Results
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
                             </button>
+=======
+                            ⭐ {item.imdb_rating}
+                            </span>
+>>>>>>> Stashed changes
                         )}
+                        </div>
+                    ))}
 
+<<<<<<< Updated upstream
                         {!searchLoading && searchResults.length === 0 && (
                             <div className="p-2">{t("no_results")}</div>
                         )}
                     </div>
+=======
+                    {!searchLoading && searchResults.length > 5 && (
+                    <button
+                        className="btn btn-primary w-100 mt-2"
+                        onClick={goToSearch}
+                    >
+                        {t("show_all_results")}
+                    </button>
+                    )}
+
+                    {!searchLoading && searchResults.length === 0 && (
+                    <div className="p-2">{t("no_results")}</div>
+                    )}
+                </div>
+>>>>>>> Stashed changes
                 )}
             </div>
         </section>

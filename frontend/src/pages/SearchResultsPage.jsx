@@ -7,7 +7,14 @@ import { useTranslation } from "../hooks/useTranslation";
 const ITEMS_PER_PAGE = 18;
  
 export default function SearchResultsPage() {
+<<<<<<< HEAD
   const { t } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const query = params.get("q") || "";
@@ -32,7 +39,7 @@ export default function SearchResultsPage() {
 
         while (hasMore && page <= 2) {
           const res = await fetch(
-            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}`
+            `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -57,7 +64,7 @@ export default function SearchResultsPage() {
 
     if (query) { loadPages(); }
     else { setAllItems([]); }
-  }, [query]);
+  }, [query, getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
   

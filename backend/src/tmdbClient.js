@@ -29,9 +29,9 @@ axiosRetry(tmdb, {
   },
 })
 
-async function nowInCinema(page, region) {
+async function nowInCinema(page, region, language) {
   const res = await tmdb.get('/movie/now_playing', {
-    params: { page, region },
+    params: { page, region, language},
   })
   //console.log("Imdb Results:", res.data)
   return res.data
@@ -166,6 +166,7 @@ async function getTrailerUrl(tmdbId, mediaType) {
   return `https://www.youtube.com/watch?v=${trailer.key}`
 }
 
+<<<<<<< HEAD
 export {
   nowInCinema,
   getMovieDetails,
@@ -178,3 +179,8 @@ export {
   getTvExtrenalIds,
   getTrailerUrl,
 }
+=======
+export { nowInCinema, getTitles, getMovieDetails, getTvDetails, getMovies, 
+  getTvSeries, discoverTvSeries, discoverMovies, getMovieExtrenalIds, getTvExtrenalIds, getTrailerUrl}
+ 
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26

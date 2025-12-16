@@ -5,20 +5,23 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const AnimeSection = () => {
-  const { t } = useTranslation();
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
   const [topAnime, setTopAnime] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/category/anime?batch=1")
+    fetch(`http://localhost:5000/api/category/anime?batch=1&language=${getTmdbLanguage()}`)
       .then(res => res.json())
       .then(data => {
         setTopAnime(data.results.slice(0, 12));
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, []);
+  }, [getTmdbLanguage]);
 
 const [userReviews, setUserReviews] = useState({});
 

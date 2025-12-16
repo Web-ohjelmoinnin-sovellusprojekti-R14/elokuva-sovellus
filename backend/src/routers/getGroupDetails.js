@@ -11,7 +11,11 @@ router.get('/get_group_details', authMe, async (req, res) => {
   }
 
   try {
+<<<<<<< HEAD
     const response = await getGroupDetailsController(group_id, res)
+=======
+    const response = await getGroupDetailsController(group_id)
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
     return res.status(200).json(response)
   } catch (e) {
     return res.status(400).json({ error: e.message || 'Failed to create group' })

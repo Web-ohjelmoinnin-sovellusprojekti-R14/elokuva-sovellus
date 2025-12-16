@@ -4,7 +4,14 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const PopularSection = () => {
+<<<<<<< HEAD
   const { t } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+  const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   const [trending, setTrending] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -12,7 +19,7 @@ const PopularSection = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/trending");
+        const res = await fetch(`http://localhost:5000/api/trending?language=${getTmdbLanguage()}`);
         const data = await res.json();
         setTrending(data.results || []);
       } catch (err) {
@@ -23,7 +30,7 @@ const PopularSection = () => {
     };
 
     fetchTrending();
-  }, []);
+  }, [getTmdbLanguage]);
 
 const [userReviews, setUserReviews] = useState({});
 

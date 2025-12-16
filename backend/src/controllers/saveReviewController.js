@@ -3,6 +3,7 @@ import pool from '../db.js'
 async function saveReviewController(rating, user_id, movie_id, comment, media_type) {
   const filmCheck = await pool.query('SELECT * FROM Film WHERE film_id=$1', [movie_id])
 
+<<<<<<< HEAD
   if (filmCheck.rows.length === 0) {
     await pool.query('INSERT INTO Film(film_id, name, description, release_date) VALUES ($1, $2, $3, $4)', [
       movie_id,
@@ -10,6 +11,13 @@ async function saveReviewController(rating, user_id, movie_id, comment, media_ty
       '',
       null,
     ])
+=======
+  if (filmCheck.rows.length === 0) { 
+    await pool.query(
+      'INSERT INTO Film(film_id, name, description, release_date) VALUES ($1, $2, $3, $4)',
+      [movie_id, 'Unknown title', '', null]
+    );
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   }
 
   const review = await pool.query('SELECT * FROM Review WHERE user_id=$1 AND movie_id=$2 AND media_type=$3', [

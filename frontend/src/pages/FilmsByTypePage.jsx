@@ -2,12 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
+<<<<<<< HEAD
 import { useTranslation } from "../hooks/useTranslation";
+=======
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
  
 const ITEMS_PER_PAGE = 18;
 
 export default function SearchResultsPage() {
+<<<<<<< HEAD
     const { t } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+    const { t, getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
     const location = useLocation();
     const params = new URLSearchParams(location.search);
 
@@ -30,9 +40,9 @@ export default function SearchResultsPage() {
             let url = "";
 
             if (q) {
-                url = `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}`;
+                url = `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(q)}&page=${batch}&language=${getTmdbLanguage()}`;
             } else if (category) {
-                url = `http://localhost:5000/api/category/${category}?batch=${batch}`;
+                url = `http://localhost:5000/api/category/${category}?batch=${batch}&language=${getTmdbLanguage()}`;
             }
 
             const res = await fetch(url);
@@ -61,7 +71,7 @@ export default function SearchResultsPage() {
         setError(null);
         fetchBatch(1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.search]);
+    }, [location.search, getTmdbLanguage]);
 
     const [userReviews, setUserReviews] = useState({});
     

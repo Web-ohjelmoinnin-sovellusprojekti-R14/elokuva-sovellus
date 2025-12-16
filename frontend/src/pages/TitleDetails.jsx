@@ -2,12 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import StarRaiting from "../components/StarRaiting";
+<<<<<<< HEAD
 import { useTranslation } from "../hooks/useTranslation";
+=======
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
  
 const IMG = "https://image.tmdb.org/t/p";
 
 export default function TitleDetails() {
+<<<<<<< HEAD
   const { t } = useTranslation();
+=======
+<<<<<<< Updated upstream
+=======
+  const { t } = useTranslation();
+  const { getTmdbLanguage } = useTranslation();
+>>>>>>> Stashed changes
+>>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
   const { id, mediaType } = useParams();
   const [title, setTitle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,12 +32,12 @@ export default function TitleDetails() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}`)
+    fetch(`http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`)
       .then(res => res.json())
       .then(data => setTitle(data))
       .catch(() => setTitle(null))
       .finally(() => setLoading(false));
-  }, [id, mediaType]);
+  }, [id, mediaType, getTmdbLanguage]);
 
   useEffect(() => {
     setLoadingReviews(true);
@@ -140,7 +151,7 @@ export default function TitleDetails() {
   const name = isMovie ? title.title : title.name;
   const year = (isMovie ? title.release_date : title.first_air_date || "").split("-")[0];
   const trailerId = title.trailerUrl ? title.trailerUrl.split("v=")[1]?.split("&")[0] : null;
-
+  
   return (
     <>
       <div
@@ -387,6 +398,7 @@ export default function TitleDetails() {
             </button>
           </form>
         )}
+        
         {loadingReviews ? (
           <p className="text-center py-3">{t("loading_reviews")}</p>
         ) : reviews.length === 0 ? (
