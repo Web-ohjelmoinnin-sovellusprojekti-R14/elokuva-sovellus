@@ -2,15 +2,9 @@ import { Router } from 'express'
 const router = Router()
 import { buildCacheKey, buildCombinedResults } from '../controllers/advancedSearchController.js'
 
-<<<<<<< HEAD
 const ITEMS_PER_PAGE = 18
 const BATCH_SIZE = 110
 const cache = {}
-=======
-const ITEMS_PER_PAGE = 18;
-const BATCH_SIZE = 110;
-const cache = {}; 
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 
 router.get('/advanced_search', async (req, res) => {
   try {

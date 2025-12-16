@@ -5,26 +5,22 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
 const SeriesSection = () => {
-<<<<<<< HEAD
-  const { t } = useTranslation();
-=======
-<<<<<<< Updated upstream
-=======
   const { t, getTmdbLanguage } = useTranslation();
->>>>>>> Stashed changes
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
+
   const [topSeries, setTopSeries] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/category/series?batch=1&language=${getTmdbLanguage()}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `http://localhost:5000/api/category/series?batch=1&language=${getTmdbLanguage()}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setTopSeries(data.results.slice(0, 12));
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Failed to load series:", err);
         setLoading(false);
       });
@@ -34,20 +30,23 @@ const SeriesSection = () => {
 
   useEffect(() => {
     if (!user) return;
-  
-    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
+
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
-        data.forEach(r => {
+        data.forEach((r) => {
           reviewMap[`${r.movie_id}`] = r.rating;
         });
         setUserReviews(reviewMap);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [user]);
 
   if (loading) {
@@ -60,12 +59,10 @@ const SeriesSection = () => {
       </section>
     );
   }
- 
+
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
-        {t("tv_series")}
-      </h2>
+      <h2 className="title-bg mb-4 text-white noBack">{t("tv_series")}</h2>
 
       <div className="row g-3 g-md-4 px-2">
         {topSeries.map((series) => (
@@ -80,11 +77,14 @@ const SeriesSection = () => {
             {user && userReviews[series.id] && (
               <div className="user-badge"> ✭ {userReviews[series.id]} </div>
             )}
-            <ClickablePoster item={{ ...series, media_type: "tv" }}/>
+            <ClickablePoster item={{ ...series, media_type: "tv" }} />
             <div className="movie-title-parent">
-                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                    {series.title || series.name}
-                </p>
+              <p
+                className="movie-title text-white"
+                style={{ fontSize: "0.9rem" }}
+              >
+                {series.title || series.name}
+              </p>
             </div>
           </div>
         ))}

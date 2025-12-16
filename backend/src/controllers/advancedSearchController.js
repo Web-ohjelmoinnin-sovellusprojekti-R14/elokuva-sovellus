@@ -1,15 +1,9 @@
 import { discoverMovies, discoverTvSeries } from '../tmdbClient.js'
 import { getMovieImdbRating, getTvSeriesImdbRating } from './imdbRatingController.js'
 
-<<<<<<< HEAD
 const MAX_TMDB_PAGES = 6
 const MAX_ITEMS = 110
 const cache = new Map()
-=======
-const MAX_TMDB_PAGES = 6;
-const MAX_ITEMS = 110;
-const cache = new Map(); 
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 
 function buildCacheKey(params) {
   const sortedKeys = Object.keys(params).sort()

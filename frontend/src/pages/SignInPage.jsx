@@ -1,10 +1,7 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-<<<<<<< HEAD
 import { useTranslation } from "../hooks/useTranslation";
-=======
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
- 
+
 export default function SignInPage() {
   const { t } = useTranslation();
   const { setUser } = useContext(AuthContext);

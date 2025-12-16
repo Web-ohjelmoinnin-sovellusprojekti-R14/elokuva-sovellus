@@ -25,18 +25,12 @@ const GENRE_MAP = {
   10770: "TV Movie",
   53: "Thriller",
   10752: "War",
-  37: "Western"
+  37: "Western",
 };
 
 export default function AdvancedSearchResultsPage() {
-<<<<<<< HEAD
-  const { t, tg } = useTranslation();
-=======
-<<<<<<< Updated upstream
-=======
   const { t, tg, getTmdbLanguage } = useTranslation();
->>>>>>> Stashed changes
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
+
   const location = useLocation();
   const params = new URLSearchParams(location.search);
 
@@ -54,18 +48,22 @@ export default function AdvancedSearchResultsPage() {
       setLoading(true);
       setAllItems([]);
       setCurrentPage(1);
+    } else {
+      setLoadingMore(true);
     }
-    else { setLoadingMore(true); }
 
     try {
       const url = new URL(`http://localhost:5000/api/category/${category}`);
       url.searchParams.set("batch", batch);
       url.searchParams.set("language", getTmdbLanguage());
-      
+
       for (const [key, value] of params.entries()) {
         if (key !== "category" && value && !key.includes("rating")) {
-          if (key === "country") { url.searchParams.set("with_origin_country", value); }
-          else { url.searchParams.set(key, value); }
+          if (key === "country") {
+            url.searchParams.set("with_origin_country", value);
+          } else {
+            url.searchParams.set(key, value);
+          }
         }
       }
 
@@ -80,7 +78,7 @@ export default function AdvancedSearchResultsPage() {
       const yearFrom = parseInt(params.get("year_from") || 0);
       const yearTo = parseInt(params.get("year_to") || 9999);
 
-      newItems = newItems.filter(item => {
+      newItems = newItems.filter((item) => {
         const rating = parseFloat(item.imdb_rating || 0);
         if (rating < ratingMin || rating > ratingMax) return false;
 
@@ -94,12 +92,13 @@ export default function AdvancedSearchResultsPage() {
       });
 
       if (ratingMin > 0 || ratingMax < 10) {
-        newItems.sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating));
+        newItems.sort(
+          (a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating)
+        );
       }
 
-      setAllItems(prev => batch === 1 ? newItems : [...prev, ...newItems]);
+      setAllItems((prev) => (batch === 1 ? newItems : [...prev, ...newItems]));
       setHasMore(data.hasMore !== false);
-
     } catch (err) {
       console.error(err);
       setError("Failed to load");
@@ -121,23 +120,26 @@ export default function AdvancedSearchResultsPage() {
   }, [location.search, getTmdbLanguage]);
 
   const [userReviews, setUserReviews] = useState({});
-  
+
   useEffect(() => {
     if (!user) return;
-  
-    fetch(`http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(data => {
+
+    fetch(
+      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
+      {
+        credentials: "include",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
-        data.forEach(r => {
+        data.forEach((r) => {
           reviewMap[`${r.movie_id}`] = r.rating;
         });
         setUserReviews(reviewMap);
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, [user]);
 
   const totalLoadedItems = allItems.length;
@@ -149,106 +151,133 @@ export default function AdvancedSearchResultsPage() {
       const nextBatch = Math.floor((totalLoadedItems - 1) / 110) + 2;
       fetchBatch(nextBatch);
     }
-    setCurrentPage(p => p + 1);
+    setCurrentPage((p) => p + 1);
   };
 
   const goPrev = () => {
-    if (currentPage > 1) setCurrentPage(p => p - 1);
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const pageItems = allItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-const getTitle = () => {
-  const baseTitle = t(category === "series" ? "series" : category === "anime" ? "anime" : category === "cartoons" ? "cartoons" : "films");
+  const getTitle = () => {
+    const baseTitle = t(
+      category === "series"
+        ? "series"
+        : category === "anime"
+          ? "anime"
+          : category === "cartoons"
+            ? "cartoons"
+            : "films"
+    );
 
-  const filters = [];
+    const filters = [];
 
-  const genreParam = params.get("with_genres");
-  if (genreParam) {
-    const genreNames = genreParam
-      .split(",")
-      .map(id => {
-        const eng = GENRE_MAP[id];
-        return eng ? (tg(eng) || eng) : `Genre ${id}`;
-      })
-      .filter(Boolean);
-    if (genreNames.length) filters.push(genreNames.join(" + "));
+    const genreParam = params.get("with_genres");
+    if (genreParam) {
+      const genreNames = genreParam
+        .split(",")
+        .map((id) => {
+          const eng = GENRE_MAP[id];
+          return eng ? tg(eng) || eng : `Genre ${id}`;
+        })
+        .filter(Boolean);
+      if (genreNames.length) filters.push(genreNames.join(" + "));
+    }
+
+    const from = params.get("year_from");
+    const to = params.get("year_to");
+    if (from || to) filters.push(`${from || "..."}–${to || "..."}`);
+
+    const ratingMin = params.get("rating_min");
+    const ratingMax = params.get("rating_max");
+    if (ratingMin || ratingMax) {
+      if (ratingMin && ratingMax)
+        filters.push(
+          t("rating_range")
+            .replace("{min}", ratingMin)
+            .replace("{max}", ratingMax)
+        );
+      else if (ratingMin)
+        filters.push(t("rating_from").replace("{min}", ratingMin));
+      else if (ratingMax)
+        filters.push(t("rating_up_to").replace("{max}", ratingMax));
+    }
+
+    if (params.get("adult") === "0") filters.push(t("under_18"));
+
+    const country = params.get("country");
+    if (country) filters.push(country);
+
+    return filters.length ? `${baseTitle} — ${filters.join(" + ")}` : baseTitle;
+  };
+
+  if (loading && allItems.length === 0) {
+    const baseTitle = t(
+      category === "series"
+        ? "series"
+        : category === "anime"
+          ? "anime"
+          : category === "cartoons"
+            ? "cartoons"
+            : "films"
+    );
+
+    const filters = [];
+
+    const genreParam = params.get("with_genres");
+    if (genreParam) {
+      const genreNames = genreParam
+        .split(",")
+        .map((id) => {
+          const eng = GENRE_MAP[id];
+          return eng ? tg(eng) || eng : `Genre ${id}`;
+        })
+        .filter(Boolean);
+      if (genreNames.length) filters.push(genreNames.join(" + "));
+    }
+
+    const from = params.get("year_from");
+    const to = params.get("year_to");
+    if (from || to) filters.push(`${from || "..."}–${to || "..."}`);
+
+    const ratingMin = params.get("rating_min");
+    const ratingMax = params.get("rating_max");
+    if (ratingMin || ratingMax) {
+      if (ratingMin && ratingMax)
+        filters.push(
+          t("rating_range")
+            .replace("{min}", ratingMin)
+            .replace("{max}", ratingMax)
+        );
+      else if (ratingMin)
+        filters.push(t("rating_from").replace("{min}", ratingMin));
+      else if (ratingMax)
+        filters.push(t("rating_up_to").replace("{max}", ratingMax));
+    }
+
+    if (params.get("adult") === "0") filters.push(t("under_18"));
+
+    const country = params.get("country");
+    if (country) filters.push(country);
+
+    const loadingText = [
+      t("def_loading"),
+      baseTitle.toLowerCase(),
+      filters.length ? "— " + filters.join(" + ") : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return (
+      <section className="popular container-md text-center py-5">
+        <p className="text-white" style={{ fontSize: "1.8rem" }}>
+          {loadingText}...
+        </p>
+      </section>
+    );
   }
-
-  const from = params.get("year_from");
-  const to = params.get("year_to");
-  if (from || to) filters.push(`${from || "..."}–${to || "..."}`);
-
-  const ratingMin = params.get("rating_min");
-  const ratingMax = params.get("rating_max");
-  if (ratingMin || ratingMax) {
-    if (ratingMin && ratingMax)
-      filters.push(t("rating_range").replace("{min}", ratingMin).replace("{max}", ratingMax));
-    else if (ratingMin)
-      filters.push(t("rating_from").replace("{min}", ratingMin));
-    else if (ratingMax)
-      filters.push(t("rating_up_to").replace("{max}", ratingMax));
-  }
-
-  if (params.get("adult") === "0") filters.push(t("under_18"));
-
-  const country = params.get("country");
-  if (country) filters.push(country);
-
-  return filters.length
-    ? `${baseTitle} — ${filters.join(" + ")}`
-    : baseTitle;
-};
-
-if (loading && allItems.length === 0) {
-  const baseTitle = t(category === "series" ? "series" : category === "anime" ? "anime" : category === "cartoons" ? "cartoons" : "films");
-
-  const filters = [];
-
-  const genreParam = params.get("with_genres");
-  if (genreParam) {
-    const genreNames = genreParam
-      .split(",")
-      .map(id => {
-        const eng = GENRE_MAP[id];
-        return eng ? (tg(eng) || eng) : `Genre ${id}`;
-      })
-      .filter(Boolean);
-    if (genreNames.length) filters.push(genreNames.join(" + "));
-  }
-
-  const from = params.get("year_from");
-  const to = params.get("year_to");
-  if (from || to) filters.push(`${from || "..."}–${to || "..."}`);
-
-  const ratingMin = params.get("rating_min");
-  const ratingMax = params.get("rating_max");
-  if (ratingMin || ratingMax) {
-    if (ratingMin && ratingMax)
-      filters.push(t("rating_range").replace("{min}", ratingMin).replace("{max}", ratingMax));
-    else if (ratingMin)
-      filters.push(t("rating_from").replace("{min}", ratingMin));
-    else if (ratingMax)
-      filters.push(t("rating_up_to").replace("{max}", ratingMax));
-  }
-
-  if (params.get("adult") === "0") filters.push(t("under_18"));
-
-  const country = params.get("country");
-  if (country) filters.push(country);
-
-  const loadingText = [t("def_loading"), baseTitle.toLowerCase(), filters.length ? "— " + filters.join(" + ") : ""]
-    .filter(Boolean).join(" ");
-
-  return (
-    <section className="popular container-md text-center py-5">
-      <p className="text-white" style={{ fontSize: "1.8rem" }}>
-        {loadingText}...
-      </p>
-    </section>
-  );
-}
 
   if (error) {
     return <p className="text-danger text-center py-5 fs-3">{error}</p>;
@@ -257,72 +286,76 @@ if (loading && allItems.length === 0) {
   if (allItems.length === 0) {
     return (
       <section className="popular container-md text-center py-5">
-        <p className="text-white" style={{ fontSize: "1.8rem" }}>{t("no_results")}</p>
+        <p className="text-white" style={{ fontSize: "1.8rem" }}>
+          {t("no_results")}
+        </p>
       </section>
     );
   }
- 
+
   return (
-        <section className="popular container-md py-5">
-            <h2 className="title-bg mb-4 text-white noBack">
-                {getTitle()} ({totalLoadedItems}{hasMore ? "" : "."})
-            </h2>
+    <section className="popular container-md py-5">
+      <h2 className="title-bg mb-4 text-white noBack">
+        {getTitle()} ({totalLoadedItems}
+        {hasMore ? "" : "."})
+      </h2>
 
-            <div className="row g-3 g-md-4 px-2">
-                {pageItems.map(item => (
-                    <div
-                        key={`${item.id}-${item.media_type || "movie"}`}
-                        className="col-6 col-md-4 col-lg-2 text-center movie-card"
-                        style={{ position: "relative" }}
-                    >
-                        {item.imdb_rating && (
-                            <div className="imdb-badge">⭐ {item.imdb_rating}</div>
-                        )}
-                        {user && userReviews[item.id] && (
-                          <div className="user-badge"> ✭ {userReviews[item.id]} </div>
-                        )}
-                        <ClickablePoster item={item} />
-
-                        <div className="movie-title-parent">
-                            <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                                {item.title || item.name}
-                            </p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            <div className="text-center my-5">
-                <button
-                    className="btn btn-outline-light me-3"
-                    disabled={currentPage === 1}
-                    onClick={goPrev}
-                >
-                    ← {t("previous")}
-                </button>
-
-                <span
-                    className="text-white mx-4 noBack"
-                    style={{ fontSize: "1.1rem" }}
-                >
-                    {t("page")} <strong>{currentPage}</strong> {t("of")}{" "}
-                    <strong>{totalPagesAvailable}{hasMore ? "+" : ""}</strong>
-                </span>
-
-                <button
-                    className="btn btn-outline-light ms-3"
-                    onClick={goNext}
-                    disabled={loadingMore || (!hasMore && isOnLastPage)}
-                >
-                    {loadingMore ? (t("def_loading")) : (<> {t("next")} →</>)}
-                </button>
-            </div>
-
-            {!hasMore && isOnLastPage && totalLoadedItems > 0 && (
-                <p className="text-center text-white-50 mt-4">
-                    {t("seen_everything")}
-                </p>
+      <div className="row g-3 g-md-4 px-2">
+        {pageItems.map((item) => (
+          <div
+            key={`${item.id}-${item.media_type || "movie"}`}
+            className="col-6 col-md-4 col-lg-2 text-center movie-card"
+            style={{ position: "relative" }}
+          >
+            {item.imdb_rating && (
+              <div className="imdb-badge">⭐ {item.imdb_rating}</div>
             )}
-        </section>
-    );
+            {user && userReviews[item.id] && (
+              <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+            )}
+            <ClickablePoster item={item} />
+
+            <div className="movie-title-parent">
+              <p
+                className="movie-title text-white"
+                style={{ fontSize: "0.9rem" }}
+              >
+                {item.title || item.name}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center my-5">
+        <button
+          className="btn btn-outline-light me-3"
+          disabled={currentPage === 1}
+          onClick={goPrev}
+        >
+          ← {t("previous")}
+        </button>
+
+        <span className="text-white mx-4 noBack" style={{ fontSize: "1.1rem" }}>
+          {t("page")} <strong>{currentPage}</strong> {t("of")}{" "}
+          <strong>
+            {totalPagesAvailable}
+            {hasMore ? "+" : ""}
+          </strong>
+        </span>
+
+        <button
+          className="btn btn-outline-light ms-3"
+          onClick={goNext}
+          disabled={loadingMore || (!hasMore && isOnLastPage)}
+        >
+          {loadingMore ? t("def_loading") : <> {t("next")} →</>}
+        </button>
+      </div>
+
+      {!hasMore && isOnLastPage && totalLoadedItems > 0 && (
+        <p className="text-center text-white-50 mt-4">{t("seen_everything")}</p>
+      )}
+    </section>
+  );
 }

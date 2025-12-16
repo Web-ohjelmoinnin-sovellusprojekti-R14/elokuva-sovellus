@@ -1,39 +1,35 @@
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-=======
 import { useEffect, useState, useCallback } from "react";
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 import { translations } from "../translations";
 
 export const genreMap = {
-  "Action": "28",
-  "Adventure": "12",
-  "Comedy": "35",
-  "Crime": "80",
-  "Drama": "18",
-  "Fantasy": "14",
-  "History": "36",
-  "Horror": "27",
-  "Mystery": "9648",
-  "Romance": "10749",
+  Action: "28",
+  Adventure: "12",
+  Comedy: "35",
+  Crime: "80",
+  Drama: "18",
+  Fantasy: "14",
+  History: "36",
+  Horror: "27",
+  Mystery: "9648",
+  Romance: "10749",
   "Sci-Fi": "878",
-  "Thriller": "53",
-  "War": "10752",
-  "Western": "37",
-  "Musical": "10402",
+  Thriller: "53",
+  War: "10752",
+  Western: "37",
+  Musical: "10402",
   "Action & Adventure": "10759",
   "Sci-Fi & Fantasy": "10765",
   "War & Politics": "10768",
-  "Documentary": "99",
-  "Reality": "10764",
-  "Animation": "16",
-  "Family": "10751"
+  Documentary: "99",
+  Reality: "10764",
+  Animation: "16",
+  Family: "10751",
 };
 
 const genreKeys = Object.fromEntries(
-  Object.keys(genreMap).map(name => [
+  Object.keys(genreMap).map((name) => [
     name,
-    "genre_" + name.toLowerCase().replace(/ & /g, "_").replace(/ /g, "_")
+    "genre_" + name.toLowerCase().replace(/ & /g, "_").replace(/ /g, "_"),
   ])
 );
 
@@ -48,7 +44,11 @@ export function useTranslation() {
 
   const t = (key) => {
     if (key.startsWith("genre_")) {
-      return translations[lang]?.[key] || translations.en[key] || key.replace("genre_", "").replace(/_/g, " ");
+      return (
+        translations[lang]?.[key] ||
+        translations.en[key] ||
+        key.replace("genre_", "").replace(/_/g, " ")
+      );
     }
     return translations[lang]?.[key] || translations.en[key] || key;
   };
@@ -60,19 +60,15 @@ export function useTranslation() {
 
   const getGenreId = (englishName) => genreMap[englishName];
 
-<<<<<<< HEAD
-  return { t, tg, getGenreId, lang };
-=======
-const languageMap = {
-  "ru": "ru-RU",
-  "en": "en-US",
-  "fi": "fi-FI",
-};
+  const languageMap = {
+    ru: "ru-RU",
+    en: "en-US",
+    fi: "fi-FI",
+  };
 
-const getTmdbLanguage = useCallback(() => {
-  return languageMap[lang] || "en-US";
-}, [lang]);
+  const getTmdbLanguage = useCallback(() => {
+    return languageMap[lang] || "en-US";
+  }, [lang]);
 
   return { t, tg, getGenreId, lang, getTmdbLanguage };
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 }

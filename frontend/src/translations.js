@@ -75,8 +75,8 @@ export const translations = {
     no_comment: "No comment.",
     min: "min",
     million: "million",
-    k:"k",
-    m:"m",
+    k: "k",
+    m: "m",
     delete: "Delete",
     posting_review: "Posting...",
     post_review: "Post Review",
@@ -84,9 +84,6 @@ export const translations = {
     loading_colon: "Loading:",
     my_reviews: "My reviews",
     def_no_reviews_yet: "You haven't left any reviews yet.",
-<<<<<<< HEAD
-
-=======
     user_reviews_distribution: "Your ratings",
     mid: "Average rating",
 
@@ -112,13 +109,14 @@ export const translations = {
     logToV: "Log in to view groups",
     load_group: "Loading group...",
     ad: "Access denied",
-    not_a_member: "You are not a member of this group and cannot view this page.",
+    not_a_member:
+      "You are not a member of this group and cannot view this page.",
     to_group: "To my groups",
     no_gro: "Group not found",
     back_to_groups: "Back to groups",
     back_to: "Back",
-    owner_txt:"You are the owner",
-    members:"Members",
+    owner_txt: "You are the owner",
+    members: "Members",
     delete: "Delete",
     remove_user_gr: "Remove user from group?",
     failed_remove_member: "Failed to remove member",
@@ -131,7 +129,8 @@ export const translations = {
     movies_in_group: "Movies in group",
     no_movies_yet: "No movies yet - add the first!",
     added_by: "Added by:",
-    delGrQuestion: "Are you sure you want to delete this group? This action cannot be undone.",
+    delGrQuestion:
+      "Are you sure you want to delete this group? This action cannot be undone.",
     f_del_group: "Failed to delete group",
     er_del_group: "Error deleting group",
     log_gr: "Log in to view groups",
@@ -148,7 +147,6 @@ export const translations = {
     memb: "Member",
     go_to_gr: "Go to group",
     del_gr: "Delete group",
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
 
     genre_action: "Action",
     genre_adventure: "Adventure",
@@ -259,8 +257,8 @@ export const translations = {
     no_comment: "Нет комментария.",
     min: "мин",
     million: "млн",
-    k:"тыс",
-    m:"млн",
+    k: "тыс",
+    m: "млн",
     delete: "Удалить",
     posting_review: "Отправляется...",
     post_review: "Отправить отзыв",
@@ -268,8 +266,6 @@ export const translations = {
     loading_colon: "Загрузка:",
     my_reviews: "Мои отзывы",
     def_no_reviews_yet: "Вы ещё не оставили ни одного отзыва.",
-<<<<<<< HEAD
-=======
     user_reviews_distribution: "Твои оценки",
     mid: "Средний балл",
 
@@ -295,13 +291,14 @@ export const translations = {
     logToV: "Войдите в аккаунт, чтобы просматривать группы",
     load_group: "Загрузка группы...",
     ad: "Нет доступа",
-    not_a_member: "Вы не являетесь участником этой группы и не можете просматривать эту страницу.",
+    not_a_member:
+      "Вы не являетесь участником этой группы и не можете просматривать эту страницу.",
     to_group: "К моим группам",
     no_gro: "Группа не найдена",
     back_to_groups: "Назад к группам",
     back_to: "Назад",
-    owner_txt:"Вы владелец",
-    members:"Участники",
+    owner_txt: "Вы владелец",
+    members: "Участники",
     delete: "Удалить",
     remove_user_gr: "Удалить пользователя из группы?",
     failed_remove_member: "Не удалось удалить участника",
@@ -314,7 +311,8 @@ export const translations = {
     movies_in_group: "Фильмы в группе",
     no_movies_yet: "Пока нет фильмов - добавьте первый!",
     added_by: "Добавил:",
-    delGrQuestion: "Вы уверены, что хотите удалить эту группу? Это действие нельзя отменить.",
+    delGrQuestion:
+      "Вы уверены, что хотите удалить эту группу? Это действие нельзя отменить.",
     f_del_group: "Не удалось удалить группу",
     er_del_group: "Ошибка при удалении группы",
     log_gr: "Войдите в аккаунт, чтобы просматривать группы",
@@ -331,8 +329,6 @@ export const translations = {
     memb: "Участник",
     go_to_gr: "Перейти в группу",
     del_gr: "Удалить группу",
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
-
 
     genre_action: "Боевик",
     genre_adventure: "Приключения",
@@ -443,8 +439,8 @@ export const translations = {
     no_comment: "Ei kommenttia.",
     min: "min",
     million: "milj.",
-    k:"k",
-    m:"m",
+    k: "k",
+    m: "m",
     delete: "Poista",
     posting_review: "Lähetetään...",
     post_review: "Lähetä arvostelu",
@@ -452,8 +448,6 @@ export const translations = {
     loading_colon: "Ladataan:",
     my_reviews: "Omat arvosteluni",
     def_no_reviews_yet: "Et ole vielä jättänyt yhtään arvostelua.",
-<<<<<<< HEAD
-=======
     user_reviews_distribution: "Arviosi",
     mid: "Keskiarvio",
 
@@ -484,8 +478,8 @@ export const translations = {
     no_gro: "Ryhmää ei löytynyt",
     back_to_groups: "Takaisin ryhmiin",
     back_to: "Takaisin",
-    owner_txt:"Olet omistaja",
-    members:"Jäsenet",
+    owner_txt: "Olet omistaja",
+    members: "Jäsenet",
     delete: "Poista",
     remove_user_gr: "Poistetaanko käyttäjä ryhmästä?",
     failed_remove_member: "Jäsenen poistaminen epäonnistui",
@@ -498,7 +492,8 @@ export const translations = {
     movies_in_group: "Elokuvat ryhmässä",
     no_movies_yet: "Ei vielä elokuvia - lisää ensimmäinen!",
     added_by: "Lisäsi:",
-    delGrQuestion: "Haluatko varmasti poistaa tämän ryhmän? Tätä toimintoa ei voi peruuttaa.",
+    delGrQuestion:
+      "Haluatko varmasti poistaa tämän ryhmän? Tätä toimintoa ei voi peruuttaa.",
     f_del_group: "Ryhmän poisto epäonnistui",
     er_del_group: "Virhe ryhmän poistossa",
     log_gr: "Kirjaudu sisään nähdäksesi ryhmät",
@@ -515,8 +510,6 @@ export const translations = {
     memb: "Jäsen",
     go_to_gr: "Siirry ryhmään",
     del_gr: "Poista ryhmä",
->>>>>>> 21c3fbfee366e1e90e1cce2ef46130fbef857a26
-
 
     genre_action: "Toiminta",
     genre_adventure: "Seikkailu",
@@ -550,5 +543,5 @@ export const translations = {
     rating_from: "alkaen {min}",
     rating_up_to: "enintään {max}",
     under_18: "alle 18",
-  }
+  },
 };
