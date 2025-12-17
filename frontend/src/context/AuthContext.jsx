@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -7,11 +9,14 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/me", {
-      credentials: "include",
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    fetch(`${API_URL}/api/me`, { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+        const data = await res.json();
         setUser(data.user || null);
         setLoading(false);
       })
@@ -19,7 +24,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   async function login(username, password) {
-    const res = await fetch("http://localhost:5000/api/login", {
+    const res = await fetch(`${API_URL}/api/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -36,7 +41,7 @@ export function AuthProvider({ children }) {
   }
 
   async function register(username, password) {
-    const res = await fetch("http://localhost:5000/api/register", {
+    const res = await fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -46,7 +51,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await fetch("http://localhost:5000/api/logout", {
+    await fetch(`${API_URL}/api/logout`, {
       method: "POST",
       credentials: "include",
     });
@@ -70,4 +75,4 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   return useContext(AuthContext);
-} 
+}

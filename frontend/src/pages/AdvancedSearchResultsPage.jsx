@@ -4,6 +4,8 @@ import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const ITEMS_PER_PAGE = 18;
 
 const GENRE_MAP = {
@@ -53,7 +55,7 @@ export default function AdvancedSearchResultsPage() {
     }
 
     try {
-      const url = new URL(`http://localhost:5000/api/category/${category}`);
+      const url = new URL(`${API_URL}/api/category/${category}`);
       url.searchParams.set("batch", batch);
       url.searchParams.set("language", getTmdbLanguage());
 
@@ -124,12 +126,9 @@ export default function AdvancedSearchResultsPage() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
-      {
-        credentials: "include",
-      }
-    )
+    fetch(`${API_URL}/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) return;

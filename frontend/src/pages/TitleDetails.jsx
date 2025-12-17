@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import StarRaiting from "../components/StarRaiting";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const IMG = "https://image.tmdb.org/t/p";
 
 export default function TitleDetails() {
@@ -24,7 +26,7 @@ export default function TitleDetails() {
 
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`
+      `${API_URL}/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`
     )
       .then((res) => res.json())
       .then((data) => setTitle(data))
@@ -35,7 +37,7 @@ export default function TitleDetails() {
   useEffect(() => {
     setLoadingReviews(true);
     fetch(
-      `http://localhost:5000/api/get_reviews_by_movie_id?movie_id=${id}&media_type=${mediaType}`,
+      `${API_URL}/api/get_reviews_by_movie_id?movie_id=${id}&media_type=${mediaType}`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -68,7 +70,7 @@ export default function TitleDetails() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:5000/api/save_review", {
+      const res = await fetch(`${API_URL}/api/save_review`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -108,7 +110,7 @@ export default function TitleDetails() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/delete_review?review_id=${reviewId}`,
+        `${API_URL}/api/delete_review?review_id=${reviewId}`,
         {
           method: "DELETE",
           credentials: "include",

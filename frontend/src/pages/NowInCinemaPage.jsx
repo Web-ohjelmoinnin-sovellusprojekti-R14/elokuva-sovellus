@@ -3,6 +3,8 @@ import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const MOVIES_PER_PAGE = 18;
 
 export default function NowInCinemaPage() {
@@ -27,7 +29,7 @@ export default function NowInCinemaPage() {
 
         while (hasMore) {
           const res = await fetch(
-            `http://localhost:5000/api/now_in_cinema?page=${page}&language=${getTmdbLanguage()}`
+            `${API_URL}/api/now_in_cinema?page=${page}&language=${getTmdbLanguage()}`
           );
           const data = await res.json();
 
@@ -57,12 +59,9 @@ export default function NowInCinemaPage() {
   useEffect(() => {
     if (!user) return;
 
-    fetch(
-      `http://localhost:5000/api/get_reviews_by_user_id?user_id=${user.user_id}`,
-      {
-        credentials: "include",
-      }
-    )
+    fetch(`${API_URL}/api/get_reviews_by_user_id?user_id=${user.user_id}`, {
+      credentials: "include",
+    })
       .then((res) => res.json())
       .then((data) => {
         if (!Array.isArray(data)) return;
