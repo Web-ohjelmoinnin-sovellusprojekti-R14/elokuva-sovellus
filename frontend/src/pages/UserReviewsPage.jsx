@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 const groupByRating = (reviews) => {
@@ -159,12 +161,9 @@ export default function UserReviewPage() {
         setLoading(true);
         setProgress({ loaded: 0, total: 1 });
 
-        const res = await fetch(
-          "http://localhost:5000/api/get_reviews_by_user_id",
-          {
-            credentials: "include",
-          }
-        );
+        const res = await fetch(`${API_URL}/api/get_reviews_by_user_id`, {
+          credentials: "include",
+        });
 
         if (!res.ok) throw new Error("No results");
 
@@ -181,7 +180,7 @@ export default function UserReviewPage() {
 
             try {
               const titleRes = await fetch(
-                `http://localhost:5000/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`
+                `${API_URL}/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`
               );
 
               if (!titleRes.ok) {

@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "../hooks/useTranslation";
 import ClickablePoster from "../components/ClickablePoster";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 export default function GroupDetailsPage() {
@@ -34,10 +36,10 @@ export default function GroupDetailsPage() {
     setForbidden(false);
     try {
       const [groupRes, filmsRes] = await Promise.all([
-        fetch(`http://localhost:5000/api/get_group_details?group_id=${id}`, {
+        fetch(`${API_URL}/api/get_group_details?group_id=${id}`, {
           credentials: "include",
         }),
-        fetch(`http://localhost:5000/api/get_group_films?group_id=${id}`, {
+        fetch(`${API_URL}/api/get_group_films?group_id=${id}`, {
           credentials: "include",
         }),
       ]);
@@ -78,7 +80,7 @@ export default function GroupDetailsPage() {
 
         try {
           const res = await fetch(
-            `http://localhost:5000/api/get_title_details?id=${film.movie_id}&media_type=${typeToUse}&language=${getTmdbLanguage()}`
+            `${API_URL}/api/get_title_details?id=${film.movie_id}&media_type=${typeToUse}&language=${getTmdbLanguage()}`
           );
 
           if (!res.ok) throw new Error("Not found");
@@ -142,7 +144,7 @@ export default function GroupDetailsPage() {
       setSearchLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(searchQuery)}&language=${getTmdbLanguage()}`
+          `${API_URL}/api/titlesearch?q=${encodeURIComponent(searchQuery)}&language=${getTmdbLanguage()}`
         );
         const data = await res.json();
         setSearchResults(data.results?.slice(0, 5) || []);
@@ -162,7 +164,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/add_film?group_id=${id}&movie_id=${titleId}&media_type=${titleMediaType}`,
+        `${API_URL}/api/add_film?group_id=${id}&movie_id=${titleId}&media_type=${titleMediaType}`,
         { method: "POST", credentials: "include" }
       );
 
@@ -196,7 +198,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/remove_film?group_id=${id}&movie_id=${movie_id}&media_type=${typeToUse}`,
+        `${API_URL}/api/remove_film?group_id=${id}&movie_id=${movie_id}&media_type=${typeToUse}`,
         { method: "DELETE", credentials: "include" }
       );
 
@@ -220,7 +222,7 @@ export default function GroupDetailsPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/send_invitation?username=${encodeURIComponent(inviteUsername.trim())}&group_id=${id}`,
+        `${API_URL}/api/send_invitation?username=${encodeURIComponent(inviteUsername.trim())}&group_id=${id}`,
         { method: "POST", credentials: "include" }
       );
 
@@ -390,7 +392,7 @@ export default function GroupDetailsPage() {
 
                     try {
                       const res = await fetch(
-                        `http://localhost:5000/api/remove_member?group_id=${group.group_id}&member_id=${m.user_id}`,
+                        `${API_URL}/api/remove_member?group_id=${group.group_id}&member_id=${m.user_id}`,
                         { method: "DELETE", credentials: "include" }
                       );
                       const data = await res.json();
