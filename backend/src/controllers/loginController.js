@@ -29,13 +29,16 @@ async function loginController(req, res) {
       expiresIn: '24h',
     })
 
-    res.cookie("token", token, { 
+    const isProd = process.env.NODE_ENV === 'production'
+
+    res.cookie('token', token, {
       httpOnly: true,
       secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+      sameSite: 'lax',
+      //domain: isProd ? '.kinodroch.top' : 'localhost',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
 
     return res.status(200).json({
       user: {
