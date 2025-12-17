@@ -1,7 +1,8 @@
 import { Router } from 'express'
-import { authMe } from '../controllers/authMeController.js' 
+import { authMe, getCurrentUser } from '../controllers/authMeController.js'
 
 const router = Router()
-router.get('/me', authMe)
+
+router.get('/me', authMe, getCurrentUser)
 
 export default router
