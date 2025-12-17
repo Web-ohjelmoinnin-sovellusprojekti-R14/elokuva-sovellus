@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function SubHeader() {
   const { t, tg, lang } = useTranslation();
   const [query, setQuery] = useState("");
@@ -103,7 +105,7 @@ function SubHeader() {
       setSearchLoading(true);
       try {
         const res = await fetch(
-          `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&language=${lang === "ru" ? "ru-RU" : lang === "fi" ? "fi-FI" : "en-US"}`
+          `${API_URL}/api/titlesearch?q=${encodeURIComponent(query)}&language=${lang === "ru" ? "ru-RU" : lang === "fi" ? "fi-FI" : "en-US"}`
         );
         const data = await res.json();
         setSearchResults(data.results || []);
