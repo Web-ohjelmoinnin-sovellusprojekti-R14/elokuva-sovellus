@@ -35,7 +35,7 @@ async function loginController(req, res) {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
-      //domain: isProd ? '.kinodroch.top' : 'localhost',
+      //domain: isProd ? 'kinodroch.top' : 'localhost',
       path: '/',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     })
