@@ -15,6 +15,7 @@ const groupByRating = (reviews) => {
     groups[rating].push(review);
   });
   return Object.keys(groups)
+    .map(Number)
     .sort((a, b) => b - a)
     .reduce((acc, key) => {
       acc[key] = groups[key];
