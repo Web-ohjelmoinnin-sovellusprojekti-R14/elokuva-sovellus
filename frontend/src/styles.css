@@ -27,6 +27,24 @@
   overflow-x: hidden;
 }
 
+.rating-bar.active {
+  background: linear-gradient(to top, #0066ff, #00ccff);
+}
+
+.col.text-center:hover .rating-bar.active {
+  transform: translateY(-5px) scaleY(1.1);
+  filter: brightness(1.15);
+}
+
+.group-title {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  text-shadow: 0 0 20px rgba(255, 193, 7, 0.15);
+  margin-bottom: 0.75rem;
+}
+
 .group-title {
   font-size: 2.6rem;
   font-weight: 800;
