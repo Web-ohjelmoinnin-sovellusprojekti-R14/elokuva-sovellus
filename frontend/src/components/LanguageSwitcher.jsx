@@ -20,6 +20,8 @@ export default function LanguageSwitcher() {
     localStorage.setItem("language", code);
     document.documentElement.lang = code;
     setOpen(false);
+
+    window.dispatchEvent(new Event("languageChanged"));
   };
 
   return (
