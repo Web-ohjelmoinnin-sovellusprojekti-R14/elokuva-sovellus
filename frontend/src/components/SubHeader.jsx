@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
-const API_URL = process.env.REACT_APP_API_URL;
-
 function SubHeader() {
   const { t, tg, lang } = useTranslation();
   const [query, setQuery] = useState("");
@@ -105,7 +103,7 @@ function SubHeader() {
       setSearchLoading(true);
       try {
         const res = await fetch(
-          `${API_URL}/api/titlesearch?q=${encodeURIComponent(query)}&language=${lang === "ru" ? "ru-RU" : lang === "fi" ? "fi-FI" : "en-US"}`
+          `http://localhost:5000/api/titlesearch?q=${encodeURIComponent(query)}&language=${lang === "ru" ? "ru-RU" : lang === "fi" ? "fi-FI" : "en-US"}`
         );
         const data = await res.json();
         setSearchResults(data.results || []);
@@ -227,14 +225,14 @@ function SubHeader() {
     <section className="sub-header container">
       <div className="categories" ref={menuRef}>
         {[
-          { key: "films", label: "Films", path: "/type?category=movies" },
-          { key: "series", label: "Series", path: "/type?category=series" },
+          { key: "films", label: t("films"), path: "/type?category=movies" },
+          { key: "series", label: t("series"), path: "/type?category=series" },
           {
             key: "cartoons",
-            label: "Cartoons",
+            label: t("cartoons"),
             path: "/type?category=cartoons",
           },
-          { key: "anime", label: "Anime", path: "/type?category=anime" },
+          { key: "anime", label: t("anime"), path: "/type?category=anime" },
         ].map(({ key, label, path }) => (
           <div
             key={key}
@@ -261,7 +259,7 @@ function SubHeader() {
                   className="text-white-50 mb-4 fw-bold"
                   style={{ fontSize: "1.1rem" }}
                 >
-                  {label} — Genres & Subgenres
+                  {label} — {t("genres_subgenres")}
                 </div>
 
                 {/*{renderMenu(menus[key])}*/}
@@ -280,7 +278,7 @@ function SubHeader() {
                               : "btn-outline-light text-white-50 border-secondary"
                           }`}
                         >
-                          <span>{genre}</span>
+                          <span>{tg(genre)}</span>
                           {isActive && <strong className="ms-2">✓</strong>}
                         </button>
                       </div>
@@ -293,7 +291,8 @@ function SubHeader() {
                     className="alert alert-dark py-2 mb-3 small"
                     role="alert"
                   >
-                    <strong>Selected:</strong> {selectedGenres.join(" + ")}
+                    <strong>{t("selected")}:</strong>{" "}
+                    {selectedGenres.join(" + ")}
                   </div>
                 )}
 
@@ -305,12 +304,14 @@ function SubHeader() {
                     className="text-white-50 fw-bold mb-3"
                     style={{ fontSize: "1rem" }}
                   >
-                    Advanced Filters
+                    {t("advanced_filters")}
                   </div>
 
                   <div className="row g-3">
                     <div className="col-6">
-                      <label className="text-white-50 small">Year (from)</label>
+                      <label className="text-white-50 small">
+                        {t("year_from")}
+                      </label>
                       <input
                         type="number"
                         className="form-control bg-dark text-white border-secondary"
@@ -319,7 +320,9 @@ function SubHeader() {
                       />
                     </div>
                     <div className="col-6">
-                      <label className="text-white-50 small">Year (to)</label>
+                      <label className="text-white-50 small">
+                        {t("year_to")}
+                      </label>
                       <input
                         type="number"
                         className="form-control bg-dark text-white border-secondary"
@@ -329,7 +332,9 @@ function SubHeader() {
                     </div>
 
                     <div className="col-6">
-                      <label className="text-white-50 small">Min Rating</label>
+                      <label className="text-white-50 small">
+                        {t("min_rating")}
+                      </label>
                       <input
                         type="number"
                         min="0"
@@ -342,7 +347,9 @@ function SubHeader() {
                     </div>
 
                     <div className="col-6">
-                      <label className="text-white-50 small">Max Rating</label>
+                      <label className="text-white-50 small">
+                        {t("max_rating")}
+                      </label>
                       <input
                         type="number"
                         min="0"
@@ -366,7 +373,7 @@ function SubHeader() {
                         htmlFor="adultToggle"
                         className="text-white-50 small"
                       >
-                        Include 18+ content
+                        {t("include_18")}
                       </label>
                     </div>
 
@@ -375,7 +382,7 @@ function SubHeader() {
                         className="btn btn-primary w-100 mt-2"
                         onClick={goToFilteredSearch}
                       >
-                        Apply Filters
+                        {t("apply_filters")}
                       </button>
                     </div>
                   </div>
@@ -390,7 +397,7 @@ function SubHeader() {
           className="category text-white text-decoration-none"
           onMouseEnter={() => setOpenMenu(null)}
         >
-          In cinemas
+          {t("in_cinemas")}
         </Link>
       </div>
 
@@ -403,7 +410,7 @@ function SubHeader() {
 
         <input
           type="text"
-          placeholder="Search..."
+          placeholder={t("search")}
           className="search-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
