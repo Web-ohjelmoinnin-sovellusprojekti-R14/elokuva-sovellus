@@ -81,3 +81,5 @@ CREATE TABLE Films_in_group (
 5.1) In Terminal open frontend folder
 5.2) Paste command: npm install
 5.3) Paste command: npm start
+
+test
