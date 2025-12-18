@@ -1,7 +1,10 @@
 import { getMovieImdbRating, getTvSeriesImdbRating, getImdbRating } from './imdbRatingController.js'
 import { getMovies, getTvSeries } from '../tmdbClient.js'
+import pLimit from 'p-limit'
 
-async function titleSearchController(req) { 
+const limit = pLimit(3)
+
+async function titleSearchController(req) {
   const query = req.query.q || ''
   const page = req.query.page || 1
   const language = req.query.language || 'en-US'
@@ -10,9 +13,12 @@ async function titleSearchController(req) {
   const tvSeries = await getTvSeries(query, page, language)
 
   const detailedMovies = await Promise.all(
-    movies.results.map(item => getImdbRating({ ...item, media_type: 'movie' }, 'movie'))
+    movies.results.map(item => limit(() => getImdbRating({ ...item, media_type: 'movie' }, 'movie')))
   )
-  const detailedTv = await Promise.all(tvSeries.results.map(item => getImdbRating({ ...item, media_type: 'tv' }, 'tv')))
+
+  const detailedTv = await Promise.all(
+    tvSeries.results.map(item => limit(() => getImdbRating({ ...item, media_type: 'tv' }, 'tv')))
+  )
 
   const combinedResults = [...detailedMovies, ...detailedTv]
     .filter(item => item !== null)

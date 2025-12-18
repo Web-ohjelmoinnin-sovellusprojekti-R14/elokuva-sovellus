@@ -1,10 +1,16 @@
 import { Router } from 'express'
 const router = Router()
-
 import { authMe } from '../controllers/authMeController.js'
 import { getUserInvitationsController } from '../controllers/getUserInvitationsController.js'
+import rateLimit from 'express-rate-limit'
 
-router.get('/get_invitations', authMe, async (req, res) => {
+const limiter = rateLimit({
+  windowMs: 30 * 1000,
+  max: 25,
+  message: { error: 'Too much requests' },
+})
+
+router.get('/get_invitations', limiter, authMe, async (req, res) => {
   const user_id = req.user.user_id
 
   try {
