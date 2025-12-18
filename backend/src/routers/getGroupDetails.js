@@ -3,7 +3,15 @@ const router = Router()
 import { authMe } from '../controllers/authMeController.js'
 import { getGroupDetailsController } from '../controllers/getGroupDetailsController.js'
 
-router.get('/get_group_details', authMe, async (req, res) => {
+import rateLimit from 'express-rate-limit'
+
+const limiter = rateLimit({
+  windowMs: 30 * 1000,
+  max: 25,
+  message: { error: 'Too much requests' },
+})
+
+router.get('/get_group_details', limiter, authMe, async (req, res) => {
   const group_id = req.query.group_id
 
   if (!group_id) {

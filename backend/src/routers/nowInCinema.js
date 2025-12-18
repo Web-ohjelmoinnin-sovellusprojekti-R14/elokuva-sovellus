@@ -1,8 +1,15 @@
 import { Router } from 'express'
 const router = Router()
 import { nowInCinemaController } from '../controllers/nowInCinemaController.js'
+import rateLimit from 'express-rate-limit'
 
-router.get('/now_in_cinema', async (req, res) => {
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 25,
+  message: { error: 'Too much requests for now playing films, try again later' },
+})
+
+router.get('/now_in_cinema', limiter, async (req, res) => {
   const result = await nowInCinemaController(req)
   if (result) {
     res.json(result)
@@ -12,4 +19,3 @@ router.get('/now_in_cinema', async (req, res) => {
 })
 
 export default router
- 

@@ -3,7 +3,15 @@ const router = Router()
 import { authMe } from '../controllers/authMeController.js'
 import { createGroupController } from '../controllers/createGroupController.js'
 
-router.post('/create_group', authMe, async (req, res) => {
+import rateLimit from 'express-rate-limit'
+
+const limiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too much groups created, try again later' },
+})
+
+router.post('/create_group', limiter, authMe, async (req, res) => {
   const name = req.query.name
   const description = req.query.description || null
   const owner_id = req.user.user_id
