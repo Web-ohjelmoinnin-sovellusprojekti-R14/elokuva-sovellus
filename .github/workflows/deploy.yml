@@ -13,6 +13,7 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /elokuva-sovellus
+            cd /root/elokuva-sovellus
             git pull origin main
             docker compose up --build -d
+
