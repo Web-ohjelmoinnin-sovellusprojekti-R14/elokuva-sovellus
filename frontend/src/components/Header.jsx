@@ -45,11 +45,13 @@ function Header() {
           </div>
 
           <div className="header-center">
-            <img
-              src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
-              className="site-title-img"
-              alt="Site Title"
-            />
+            <Link to="/">
+              <img
+                src={`${process.env.PUBLIC_URL}/images/mainTitle.png`}
+                className="site-title-img"
+                alt="Site Title"
+              />
+            </Link>
           </div>
 
           <div className="header-right">

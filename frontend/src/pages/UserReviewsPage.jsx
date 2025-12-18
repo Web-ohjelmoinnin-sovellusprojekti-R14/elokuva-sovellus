@@ -9,17 +9,19 @@ const IMG = "https://image.tmdb.org/t/p/w300";
 
 const groupByRating = (reviews) => {
   const groups = {};
+
   reviews.forEach((review) => {
-    const rating = review.rating;
+    const rating = parseFloat(review.rating);
     if (!groups[rating]) groups[rating] = [];
     groups[rating].push(review);
   });
-  return Object.keys(groups)
-    .sort((a, b) => b - a)
-    .reduce((acc, key) => {
-      acc[key] = groups[key];
-      return acc;
-    }, {});
+
+  return Object.entries(groups)
+    .sort(([a], [b]) => b - a)
+    .map(([rating, reviewsList]) => ({
+      rating: parseFloat(rating),
+      reviewsList,
+    }));
 };
 
 const StarRating = ({ rating }) => {
@@ -111,7 +113,7 @@ const RatingDistributionChart = ({ reviews, onRatingClick }) => {
                 style={{ height: "70px", width: "18px" }}
               >
                 <div
-                  className="w-100 position-absolute bottom-0 rounded-top transition-all"
+                  className={`rating-bar ${count > 0 ? "active" : ""}`}
                   style={{
                     height: `${(count / maxCount) * 100}%`,
                     background:
@@ -314,19 +316,19 @@ export default function UserReviewPage() {
         </div>
       ) : (
         <div className="space-y-8">
-          {Object.entries(groupedReviews).map(([rating, reviewsList]) => (
+          {groupedReviews.map(({ rating, reviewsList }) => (
             <div
               key={rating}
-              ref={(el) => (ratingRefs.current[parseFloat(rating)] = el)}
+              ref={(el) => (ratingRefs.current[rating] = el)}
               className="text-center mb-5"
             >
               <div className="d-inline-flex align-items-center gap-3 mb-5 px-4 py-2 bg-black bg-opacity-50 rounded-pill border border-warning">
                 <h2 className="text-warning fs-3 fw-bold me-3">{rating}/10</h2>
-                <StarRating rating={parseFloat(rating)} />
+                <StarRating rating={rating} />
                 <span className="text-white-50 ms-3">
                   (
                   {reviewsList.length +
-                    (rating === "6" && user?.username === "boss" ? 1 : 0)}
+                    (rating === 6 && user?.username === "boss" ? 1 : 0)}
                   )
                 </span>
               </div>
@@ -339,7 +341,6 @@ export default function UserReviewPage() {
                     (td.release_date || td.first_air_date || "").split(
                       "-"
                     )[0] || "";
-
                   const posterSrc = td.poster_path
                     ? `${IMG}${td.poster_path}`
                     : "/images/no-poster.jpg";
@@ -434,8 +435,8 @@ export default function UserReviewPage() {
                   );
                 })}
 
-                {/*exception because tmdb database doesn't have data for this title*/}
-                {Number(rating) === 6 && user?.username === "boss" && (
+                {/* extencio for "boss" */}
+                {rating === 6 && user?.username === "boss" && (
                   <div className="col-lg-6 col-xl-4">
                     <Link
                       to="/title/286801/tv"

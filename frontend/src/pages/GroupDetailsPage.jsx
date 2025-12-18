@@ -348,7 +348,13 @@ export default function GroupDetailsPage() {
         {t("members")} ({members.length})
       </h3>
       <div className="d-flex flex-wrap gap-2 mb-5">
-        {members.map((m) => {
+        {[...members]
+          .sort((a, b) => {
+            if (a.user_id === group.owner_id) return -1;
+            if (b.user_id === group.owner_id) return 1;
+            return 0;
+          })
+          .map((m) => {
           const isGroupOwner = m.user_id === group.owner_id;
           const canRemoveMember = isOwner && !isGroupOwner;
 
