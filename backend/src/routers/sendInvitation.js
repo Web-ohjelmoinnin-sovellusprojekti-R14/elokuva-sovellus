@@ -3,7 +3,15 @@ const router = Router()
 import { authMe } from '../controllers/authMeController.js'
 import { sendInvitationController } from '../controllers/sendInvitationController.js'
 
-router.post('/send_invitation', authMe, async (req, res) => {
+import rateLimit from 'express-rate-limit'
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 10,
+  message: { error: 'Too much login attempts, try again later' },
+})
+
+router.post('/send_invitation', limiter, authMe, async (req, res) => {
   const owner_id = req.user.user_id
   const username = req.query.username
   const group_id = req.query.group_id

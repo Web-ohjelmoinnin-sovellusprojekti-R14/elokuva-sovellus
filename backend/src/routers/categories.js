@@ -2,6 +2,13 @@ import { Router } from 'express'
 const router = Router()
 import { getImdbRating } from '../controllers/imdbRatingController.js'
 import pLimit from 'p-limit'
+import rateLimit from 'express-rate-limit'
+
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 50,
+  message: { error: 'Too much advanced search requests, try again later' },
+})
 
 const limit = pLimit(5)
 const TMDB_KEY = process.env.TMDB_API_KEY
@@ -107,7 +114,7 @@ async function getBatch(category, batchNum = 1, filters = {}) {
 }
 
 ;['movies', 'series', 'anime', 'cartoons'].forEach(cat => {
-  router.get(`/category/${cat}`, async (req, res) => {
+  router.get(`/category/${cat}`, limiter, async (req, res) => {
     try {
       const batch = parseInt(req.query.batch) || 1
       const { results, hasMore } = await getBatch(cat, batch, req.query)
@@ -119,7 +126,7 @@ async function getBatch(category, batchNum = 1, filters = {}) {
   })
 })
 
-router.get('/trending', async (req, res) => {
+router.get('/trending', limiter, async (req, res) => {
   try {
     const language = req.query.language || 'en-US'
     const resTrend = await fetch(
