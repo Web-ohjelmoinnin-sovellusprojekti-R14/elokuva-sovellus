@@ -6,9 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: registry.digitalocean.com/kinodroch
-  BACKEND_IMAGE: elokuva-backend
-  FRONTEND_IMAGE: elokuva-frontend
+  REGISTRY: registry.digitalocean.com/kinodroch   
+  APP_REPO: elokuva-sovellus                      
 
 jobs:
   build_and_push:
@@ -18,23 +17,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      # Optional – helps debug paths first time
       - name: List repo files
         run: ls -R
 
-      # Build backend (Express) image from backend/Dockerfile
       - name: Build backend image
         run: |
           docker build \
-            -t $REGISTRY/$BACKEND_IMAGE:$(echo $GITHUB_SHA | head -c7) \
+            -t $REGISTRY/$APP_REPO:backend-$(echo $GITHUB_SHA | head -c7) \
             -f backend/Dockerfile \
             backend
 
-      # Build frontend (React) image from frontend/Dockerfile
       - name: Build frontend image
         run: |
           docker build \
-            -t $REGISTRY/$FRONTEND_IMAGE:$(echo $GITHUB_SHA | head -c7) \
+            -t $REGISTRY/$APP_REPO:frontend-$(echo $GITHUB_SHA | head -c7) \
             -f frontend/Dockerfile \
             frontend
 
@@ -46,13 +42,11 @@ jobs:
       - name: Log in to DigitalOcean Container Registry
         run: doctl registry login --expiry-seconds 600
 
-      # Push backend image
       - name: Push backend image
-        run: docker push $REGISTRY/$BACKEND_IMAGE:$(echo $GITHUB_SHA | head -c7)
+        run: docker push $REGISTRY/$APP_REPO:backend-$(echo $GITHUB_SHA | head -c7)
 
-      # Push frontend image
       - name: Push frontend image
-        run: docker push $REGISTRY/$FRONTEND_IMAGE:$(echo $GITHUB_SHA | head -c7)
+        run: docker push $REGISTRY/$APP_REPO:frontend-$(echo $GITHUB_SHA | head -c7)
 
   deploy:
     runs-on: ubuntu-latest
@@ -66,19 +60,21 @@ jobs:
           username: ${{ secrets.DROPLET_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # login to DO registry
             docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
 
-            # Stop old containers if running
-            docker stop $BACKEND_IMAGE || true
-            docker rm $BACKEND_IMAGE || true
-            docker stop $FRONTEND_IMAGE || true
-            docker rm $FRONTEND_IMAGE || true
+            BACKEND_TAG=backend-$(echo $GITHUB_SHA | head -c7)
+            FRONTEND_TAG=frontend-$(echo $GITHUB_SHA | head -c7)
 
-            # Start Postgres (once) if not already running
-            docker volume create db-data || true
+            # Stop & remove old containers
+            docker stop backend || true
+            docker rm backend || true
+            docker stop frontend || true
+            docker rm frontend || true
             docker stop postgres || true
             docker rm postgres || true
+
+            # Start Postgres
+            docker volume create db-data || true
             docker run -d \
               --restart always \
               --name postgres \
@@ -89,10 +85,10 @@ jobs:
               -p 5432:5432 \
               postgres:16
 
-            # Run backend container (adjust envs/ports if needed)
+            # Start backend
             docker run -d \
               --restart always \
-              --name $BACKEND_IMAGE \
+              --name backend \
               --link postgres:postgres \
               -e DB_HOST=postgres \
               -e DB_PORT=5432 \
@@ -100,12 +96,12 @@ jobs:
               -e DB_PASSWORD=10032005 \
               -e DB_NAME=kinodroch_db \
               -p 5000:5000 \
-              $REGISTRY/$BACKEND_IMAGE:$(echo $GITHUB_SHA | head -c7)
+              $REGISTRY/$APP_REPO:$BACKEND_TAG
 
-            # Run frontend container (adjust port if you proxy differently)
+            # Start frontend
             docker run -d \
               --restart always \
-              --name $FRONTEND_IMAGE \
+              --name frontend \
               -e REACT_APP_API_URL=http://157.230.20.251:5000 \
               -p 3000:3000 \
-              $REGISTRY/$FRONTEND_IMAGE:$(echo $GITHUB_SHA | head -c7)
+              $REGISTRY/$APP_REPO:$FRONTEND_TAG
