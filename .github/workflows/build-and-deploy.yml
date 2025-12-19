@@ -73,7 +73,7 @@ jobs:
             echo "Backend image: ${REGISTRY}/${APP_REPO}:${BACKEND_TAG}"
             echo "Frontend image: ${REGISTRY}/${APP_REPO}:${FRONTEND_TAG}"
   
-            # Stop & remove old containers (ignore errors if not running)
+            # Stop & remove old containers
             docker stop backend || true
             docker rm backend || true
             docker stop frontend || true
@@ -93,7 +93,7 @@ jobs:
               -p 5432:5432 \
               postgres:16
   
-            # Start backend (Express)
+            # Start backend
             docker run -d \
               --restart always \
               --name backend \
@@ -106,14 +106,11 @@ jobs:
               -p 5000:5000 \
               "${REGISTRY}/${APP_REPO}:${BACKEND_TAG}"
   
-            # Start frontend (React)
+            # Start frontend
             docker run -d \
               --restart always \
               --name frontend \
-              -e REACT_APP_API_URL=http://YOUR_IP_HERE:5000 \
+              -e REACT_APP_API_URL=http://157.230.20.251:5000 \
               -p 3000:3000 \
               "${REGISTRY}/${APP_REPO}:${FRONTEND_TAG}"
-  
-                -e REACT_APP_API_URL=http://157.230.20.251:5000 \
-                -p 3000:3000 \
-                "$REGISTRY/$APP_REPO:$FRONTEND_TAG"
+
