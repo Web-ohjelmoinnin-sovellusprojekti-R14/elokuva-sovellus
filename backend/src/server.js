@@ -43,8 +43,6 @@ app.use(
 app.use(json())
 app.use(cookieParser())
 
-app.use(globalLimiter)
-
 app.use('/api', searchRouter)
 app.use('/api', nowInCinemaRouter)
 app.use('/api', registrationRouter)
