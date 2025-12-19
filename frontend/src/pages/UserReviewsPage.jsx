@@ -10,7 +10,6 @@ const IMG = "https://image.tmdb.org/t/p/w300";
 const groupByRating = (reviews) => {
   const groups = {};
 
-
   reviews.forEach((review) => {
     const rating = parseFloat(review.rating);
     if (!groups[rating]) groups[rating] = [];
