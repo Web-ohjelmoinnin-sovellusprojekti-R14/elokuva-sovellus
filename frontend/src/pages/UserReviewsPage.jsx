@@ -113,7 +113,7 @@ const RatingDistributionChart = ({ reviews, onRatingClick }) => {
                 style={{ height: "70px", width: "18px" }}
               >
                 <div
-                  className={`rating-bar ${count > 0 ? "active" : ""}`}
+                  className={`rating-bar w-100 position-absolute bottom-0 rounded-top transition-all ${count > 0 ? "active" : ""}`}
                   style={{
                     height: `${(count / maxCount) * 100}%`,
                     background:
