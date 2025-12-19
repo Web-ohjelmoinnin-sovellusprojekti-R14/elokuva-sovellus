@@ -1,0 +1,126 @@
+name: CI/CD via DO Container Registry
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: registry.digitalocean.com/kinodroch
+  APP_REPO: elokuva-sovellus
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: List repo files
+        run: ls -R
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t $REGISTRY/$APP_REPO:backend-$(echo $GITHUB_SHA | head -c7) \
+            -f backend/Dockerfile \
+            backend
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            --build-arg REACT_APP_API_URL=https://kinodroch.top \
+            -t $REGISTRY/$APP_REPO:frontend-$(echo $GITHUB_SHA | head -c7) \
+            -f frontend/Dockerfile \
+            frontend
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Log in to DigitalOcean Container Registry
+        run: doctl registry login --expiry-seconds 600
+
+      - name: Push backend image
+        run: docker push $REGISTRY/$APP_REPO:backend-$(echo $GITHUB_SHA | head -c7)
+
+      - name: Push frontend image
+        run: docker push $REGISTRY/$APP_REPO:frontend-$(echo $GITHUB_SHA | head -c7)
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+
+    steps:
+      - name: Deploy to Droplet via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          APP_REPO: ${{ env.APP_REPO }}
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          OMDB_API_KEY: ${{ secrets.OMDB_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REGISTRY,APP_REPO,GITHUB_SHA,TMDB_API_KEY,OMDB_API_KEY,JWT_SECRET
+          script: |
+            # Login to DigitalOcean registry from Droplet
+            docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
+
+            BACKEND_TAG="backend-$(echo "$GITHUB_SHA" | head -c7)"
+            FRONTEND_TAG="frontend-$(echo "$GITHUB_SHA" | head -c7)"
+
+            echo "Backend image: ${REGISTRY}/${APP_REPO}:${BACKEND_TAG}"
+            echo "Frontend image: ${REGISTRY}/${APP_REPO}:${FRONTEND_TAG}"
+
+            # Stop & remove old containers
+            docker stop backend || true
+            docker rm backend || true
+            docker stop frontend || true
+            docker rm frontend || true
+            docker stop postgres || true
+            docker rm postgres || true
+
+            # Start Postgres
+            docker volume create db-data || true
+            docker run -d \
+              --restart always \
+              --name postgres \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=10032005 \
+              -e POSTGRES_DB=kinodroch_db \
+              -v db-data:/var/lib/postgresql/data \
+              -p 5432:5432 \
+              postgres:16
+
+            # Start backend
+            docker run -d \
+              --restart always \
+              --name backend \
+              --link postgres:postgres \
+              -e DB_HOST=postgres \
+              -e DB_PORT=5432 \
+              -e DB_USER=postgres \
+              -e DB_PASSWORD=10032005 \
+              -e DB_NAME=kinodroch_db \
+              -e TMDB_API_KEY="$TMDB_API_KEY" \
+              -e TMDB_BASE_URL=https://api.themoviedb.org/3 \
+              -e OMDB_API_KEY="$OMDB_API_KEY" \
+              -e OMDB_BASE_URL=http://www.omdbapi.com/ \
+              -e NODE_ENV=production \
+              -e FRONTEND_URL=https://kinodroch.top \
+              -e JWT_SECRET="$JWT_SECRET" \
+              -e PORT=5000 \
+              -p 5000:5000 \
+              "${REGISTRY}/${APP_REPO}:${BACKEND_TAG}"
+
+            # Start frontend
+            docker run -d \
+              --restart always \
+              --name frontend \
+              -p 3000:3000 \
+              "${REGISTRY}/${APP_REPO}:${FRONTEND_TAG}"

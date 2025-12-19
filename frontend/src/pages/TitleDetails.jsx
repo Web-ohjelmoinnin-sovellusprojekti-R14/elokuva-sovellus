@@ -64,7 +64,7 @@ export default function TitleDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    //if (!newComment.trim()) return;
 
     setPosting(true);
     setError(null);
@@ -77,7 +77,7 @@ export default function TitleDetails() {
         body: JSON.stringify({
           rating: newRating,
           movie_id: id,
-          comment: newComment,
+          comment: newComment || "",
           media_type: mediaType,
         }),
       });
@@ -485,7 +485,6 @@ export default function TitleDetails() {
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 rows={3}
-                required
               />
             </div>
             {error && <p className="text-danger">{error}</p>}

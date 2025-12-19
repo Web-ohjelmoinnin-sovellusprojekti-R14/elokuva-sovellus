@@ -2,8 +2,15 @@ import { Router } from 'express'
 const router = Router()
 import { authMe } from '../controllers/authMeController.js'
 import { addFilmToGroupController } from '../controllers/addFilmController.js'
+import rateLimit from 'express-rate-limit'
 
-router.post('/add_film', authMe, async (req, res) => {
+const limiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  message: { error: 'Too much requests to add film' },
+})
+
+router.post('/add_film', limiter, authMe, async (req, res) => {
   const user_id = req.user.user_id
   const group_id = req.query.group_id
   const movie_id = req.query.movie_id
