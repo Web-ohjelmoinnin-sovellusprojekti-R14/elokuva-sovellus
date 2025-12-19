@@ -489,8 +489,4 @@ export default function UserReviewPage() {
     )}
   </div>
 );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 0fae1fd (Message)
