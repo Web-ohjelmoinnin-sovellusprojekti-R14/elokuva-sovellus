@@ -3,7 +3,6 @@ dotenv.config()
 
 import express, { json } from 'express'
 import cors from 'cors'
-import rateLimit from 'express-rate-limit'
 import searchRouter from './routers/search.js'
 import nowInCinemaRouter from './routers/nowInCinema.js'
 import registrationRouter from './routers/registration.js'
@@ -30,17 +29,9 @@ import removeFilmRouter from './routers/removeFilm.js'
 import addFilmRouter from './routers/addFilm.js'
 import getGroupFilmsRouter from './routers/getGroupFilms.js'
 
-const globalLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 1000,
-  message: {
-    error: 'General limit for requests is 500 per 1 hour. Try again later',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-})
-
 const app = express()
+
+app.set('trust proxy', 1)
 
 app.use(
   cors({
