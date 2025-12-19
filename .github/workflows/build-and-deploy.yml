@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 env:
-  REGISTRY: registry.digitalocean.com/kinodroch   
-  APP_REPO: elokuva-sovellus                      
+  REGISTRY: registry.digitalocean.com/kinodroch  
+  APP_REPO: elokuva-sovellus      
 
 jobs:
   build_and_push:
@@ -17,9 +17,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      
       - name: List repo files
         run: ls -R
 
+      
       - name: Build backend image
         run: |
           docker build \
@@ -27,6 +29,7 @@ jobs:
             -f backend/Dockerfile \
             backend
 
+      
       - name: Build frontend image
         run: |
           docker build \
@@ -56,16 +59,20 @@ jobs:
       - name: Deploy to Droplet via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.DROPLET_HOST }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          host: ${{ secrets.DROPLET_HOST }} 
+          username: ${{ secrets.DROPLET_USER }} 
+          key: ${{ secrets.SSH_PRIVATE_KEY }} 
           script: |
+            # Login to DigitalOcean registry from Droplet
             docker login -u ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} -p ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }} registry.digitalocean.com
 
             BACKEND_TAG=backend-$(echo $GITHUB_SHA | head -c7)
             FRONTEND_TAG=frontend-$(echo $GITHUB_SHA | head -c7)
 
-            # Stop & remove old containers
+            echo "Backend image: $REGISTRY/$APP_REPO:$BACKEND_TAG"
+            echo "Frontend image: $REGISTRY/$APP_REPO:$FRONTEND_TAG"
+
+            # Stop & remove old containers (ignore errors if not running)
             docker stop backend || true
             docker rm backend || true
             docker stop frontend || true
@@ -85,7 +92,7 @@ jobs:
               -p 5432:5432 \
               postgres:16
 
-            # Start backend
+            # Start backend (Express)
             docker run -d \
               --restart always \
               --name backend \
@@ -96,12 +103,12 @@ jobs:
               -e DB_PASSWORD=10032005 \
               -e DB_NAME=kinodroch_db \
               -p 5000:5000 \
-              $REGISTRY/$APP_REPO:$BACKEND_TAG
+              "$REGISTRY/$APP_REPO:$BACKEND_TAG"
 
-            # Start frontend
+            # Start frontend (React)
             docker run -d \
               --restart always \
               --name frontend \
               -e REACT_APP_API_URL=http://157.230.20.251:5000 \
               -p 3000:3000 \
-              $REGISTRY/$APP_REPO:$FRONTEND_TAG
+              "$REGISTRY/$APP_REPO:$FRONTEND_TAG"
