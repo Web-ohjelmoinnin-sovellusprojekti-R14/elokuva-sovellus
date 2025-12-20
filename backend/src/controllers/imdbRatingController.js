@@ -78,7 +78,7 @@ async function getMovieImdbRating(item, forTitlePage) {
     return null
   }
 
-  let imdb_rating = null 
+  let imdb_rating = null
   try {
     //console.log('Time before getTitleDetails in getMovieImdbRating for ' + item.title + ': ' + new Date().toISOString())
     const omdbDetails = await getTitleDetails(imdb_id)

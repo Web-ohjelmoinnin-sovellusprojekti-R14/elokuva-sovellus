@@ -3,8 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
-const API_URL = process.env.REACT_APP_API_URL;
-
 const IMG = "https://image.tmdb.org/t/p/w300";
 
 const groupByRating = (reviews) => {
@@ -143,14 +141,16 @@ const RatingDistributionChart = ({ reviews, onRatingClick }) => {
   );
 };
 
-export default function UserReviewPage() {
-  const { t } = useTranslation();
+export default function UserReviewsPage() {
+  const { t, getTmdbLanguage } = useTranslation();
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [progress, setProgress] = useState({ loaded: 0, total: 0 });
+  const [connectionAttempts, setConnectionAttempts] = useState(0);
+  const maxAttempts = 5;
   const ratingRefs = useRef({});
+  const accumulatedReviews = useRef([]);
 
   useEffect(() => {
     if (!user) {
@@ -158,117 +158,75 @@ export default function UserReviewPage() {
       return;
     }
 
-    const fetchUserReviews = async () => {
-      try {
-        setLoading(true);
+    setLoading(true);
+    setProgress({ loaded: 0, total: 0 });
+    accumulatedReviews.current = [];
 
-        const res = await fetch(`${API_URL}/api/get_reviews_by_user_id`, {
-          credentials: "include",
-        });
+    let evtSource = null;
 
-        if (!res.ok) throw new Error("Failed to fetch reviews");
+    const connectSSE = () => {
+      const language = getTmdbLanguage();
+      evtSource = new EventSource(
+        `http://localhost:5000/api/get_reviews_by_user_id_sse?language=${language}`,
+        { withCredentials: true }
+      );
 
-        const data = await res.json();
-        const reviewsArray = Array.isArray(data) ? data : [];
+      evtSource.addEventListener("total", (e) => {
+        const { total } = JSON.parse(e.data);
+        setProgress((prev) => ({ ...prev, total }));
+      });
 
-        const isBoss = user?.username === "boss";
-        const totalItems = reviewsArray.length + (isBoss ? 1 : 0);
-        setProgress({ loaded: 0, total: totalItems || 1 });
+      evtSource.addEventListener("progress", (e) => {
+        const { loaded, total } = JSON.parse(e.data);
+        setProgress({ loaded, total });
+      });
 
-        // Теперь details уже внутри каждой рецензии
-        const enrichedReviews = reviewsArray.map((review) => {
-          setProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
-          return {
-            ...review,
-            title: review.details || {}, // details приходят с бэкенда
-            mediaType: review.media_type || "movie",
-          };
-        });
+      evtSource.addEventListener("reviews", (e) => {
+        const batch = JSON.parse(e.data);
 
-        setReviews(
-          enrichedReviews.sort((a, b) => {
-            if (b.rating !== a.rating) return b.rating - a.rating;
-            return new Date(b.created_at) - new Date(a.created_at);
-          })
-        );
-      } catch (err) {
-        console.error(err);
-        setError(err.message || "Error loading reviews");
-      } finally {
+        const existingIds = new Set(accumulatedReviews.current.map((r) => r.review_id));
+        const newReviews = batch.filter((r) => !existingIds.has(r.review_id));
+
+        if (newReviews.length > 0) {
+          accumulatedReviews.current = [...accumulatedReviews.current, ...newReviews];
+          setReviews([...accumulatedReviews.current]);
+        }
+      });
+
+      evtSource.addEventListener("complete", () => {
         setLoading(false);
-      }
+        setConnectionAttempts(0);
+        evtSource.close();
+      });
+
+      evtSource.addEventListener("error", (e) => {
+        console.warn("SSE error:", e);
+        evtSource.close();
+
+        if (connectionAttempts < maxAttempts) {
+          setConnectionAttempts((prev) => prev + 1);
+          const delay = Math.pow(2, connectionAttempts) * 1000;
+          setTimeout(connectSSE, delay);
+        } else {
+          setLoading(false);
+          console.error("Max reconnection attempts reached");
+        }
+      });
     };
 
-    fetchUserReviews();
-  }, [user]);
+    connectSSE();
+
+    return () => {
+      if (evtSource) evtSource.close();
+      setConnectionAttempts(0);
+    };
+  }, [user, getTmdbLanguage]);
 
   if (!user) {
     return (
       <div className="container py-5 text-center">
         <h2 className="text-white noBack">{t("login_to_see_reviews")}</h2>
       </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="container py-5 text-center">
-        <div
-          className="spinner-border text-light mb-4"
-          style={{ width: "4rem", height: "4rem" }}
-        ></div>
-
-        <div className="w-75 mx-auto">
-          <div
-            className="position-relative rounded-pill overflow-hidden"
-            style={{
-              height: "12px",
-              background: "rgba(255,255,255,0.08)",
-              boxShadow:
-                "inset 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(255,193,7,0.15)",
-              border: "1px solid rgba(255,193,7,0.3)",
-            }}
-          >
-            <div
-              className="h-100 rounded-pill position-relative overflow-hidden"
-              style={{
-                width: `${(progress.loaded / progress.total) * 100}%`,
-                background: "linear-gradient(90deg, #00d4ff, #ff07f3, #ff3300)",
-                transition: "width 0.5s ease",
-                boxShadow: "0 0 20px rgba(255,193,7,0.6)",
-              }}
-            >
-              <div
-                className="position-absolute top-0 start-0 h-100 w-100"
-                style={{
-                  background:
-                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
-                  transform: "translateX(-100%)",
-                  animation: "shimmer 2s infinite",
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="text-center mt-3 noBack">
-            <p className="text-white fs-5 mb-1 noBack">
-              {t("loading_colon")}{" "}
-              <strong className="text-warning noBack">{progress.loaded}</strong>{" "}
-              {t("of")}{" "}
-              <strong className="text-warning noBack">{progress.total}</strong>
-            </p>
-            <p className="text-white-50 small noBack">
-              {Math.round((progress.loaded / progress.total) * 100)}%
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container py-5 text-danger text-center">{error}</div>
     );
   }
 
@@ -284,16 +242,77 @@ export default function UserReviewPage() {
         reviews={reviews}
         onRatingClick={(rating) => {
           const element = ratingRefs.current[rating];
-          if (element)
-            element.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (element) element.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       />
 
-      {reviews.length === 0 ? (
+      {loading && (
+        <div className="container py-5 text-center">
+          <div
+            className="spinner-border text-light mb-4"
+            style={{ width: "4rem", height: "4rem" }}
+          ></div>
+
+          <div className="w-75 mx-auto">
+            <div
+              className="position-relative rounded-pill overflow-hidden"
+              style={{
+                height: "12px",
+                background: "rgba(255,255,255,0.08)",
+                boxShadow:
+                  "inset 0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(255,193,7,0.15)",
+                border: "1px solid rgba(255,193,7,0.3)",
+              }}
+            >
+              <div
+                className="h-100 rounded-pill position-relative overflow-hidden"
+                style={{
+                  width: `${(progress.loaded / Math.max(progress.total, 1)) * 100}%`,
+                  background: "linear-gradient(90deg, #00d4ff, #ff07f3, #ff3300)",
+                  transition: "width 0.5s ease",
+                  boxShadow: "0 0 20px rgba(255,193,7,0.6)",
+                }}
+              >
+                <div
+                  className="position-absolute top-0 start-0 h-100 w-100"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)",
+                    transform: "translateX(-100%)",
+                    animation: "shimmer 2s infinite",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="text-center mt-3 noBack">
+              <p className="text-white fs-5 mb-1 noBack">
+                {t("loading_colon")}{" "}
+                <strong className="text-warning noBack">{progress.loaded}</strong>{" "}
+                {t("of")}{" "}
+                <strong className="text-warning noBack">{user?.username === "boss" ? (progress.total || 0) + 1 : progress.total || "?"}</strong>
+                {/*
+                {connectionAttempts > 0 && (
+                  <span className="text-danger ms-3">
+                    (reconnection {connectionAttempts}/{maxAttempts})
+                  </span>
+                )} */}
+              </p>
+              <p className="text-white-50 small noBack">
+                {Math.round((progress.loaded / Math.max(progress.total, 1)) * 100)}%
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {reviews.length === 0 && !loading && (
         <div className="text-center py-5">
           <p className="text-white-50 fs-4">{t("def_no_reviews_yet")}</p>
         </div>
-      ) : (
+      )}
+
+      {reviews.length > 0 && (
         <div className="space-y-8">
           {groupedReviews.map(({ rating, reviewsList }) => (
             <div
@@ -305,22 +324,16 @@ export default function UserReviewPage() {
                 <h2 className="text-warning fs-3 fw-bold me-3">{rating}/10</h2>
                 <StarRating rating={rating} />
                 <span className="text-white-50 ms-3">
-                  (
-                  {reviewsList.length +
-                    (rating === 6 && user?.username === "boss" ? 1 : 0)}
-                  )
+                  ({reviewsList.length + (rating === 6 && user?.username === "boss" ? 1 : 0)})
                 </span>
               </div>
 
               <div className="row g-4">
                 {reviewsList.map((review) => {
-                  const td = review.title || {};
-                  const name = td.title || td.name || "Без названия";
-                  const year =
-                    (td.release_date || td.first_air_date || "").split("-")[0] || "";
-                  const posterSrc = td.poster_path
-                    ? `${IMG}${td.poster_path}`
-                    : "/images/no-poster.jpg";
+                  const td = review.details || {};
+                  const name = td.title || td.name || "No Title";
+                  const year = (td.release_date || td.first_air_date || "").split("-")[0] || "";
+                  const posterSrc = td.poster_path ? `${IMG}${td.poster_path}` : "/images/no-poster.jpg";
 
                   return (
                     <div key={review.review_id} className="col-lg-6 col-xl-4">
@@ -333,16 +346,12 @@ export default function UserReviewPage() {
                           cursor: "pointer",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.transform =
-                            "scale(1.03) translateY(-8px)";
-                          e.currentTarget.style.boxShadow =
-                            "0 16px 40px rgba(255, 107, 0, 0.4)";
+                          e.currentTarget.style.transform = "scale(1.03) translateY(-8px)";
+                          e.currentTarget.style.boxShadow = "0 16px 40px rgba(255, 107, 0, 0.4)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.transform =
-                            "scale(1) translateY(0)";
-                          e.currentTarget.style.boxShadow =
-                            "0 4px 15px rgba(0,0,0,0.6)";
+                          e.currentTarget.style.transform = "scale(1) translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
                         }}
                       >
                         <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
@@ -402,7 +411,6 @@ export default function UserReviewPage() {
                   );
                 })}
 
-                {/* extencio for "boss" */}
                 {rating === 6 && user?.username === "boss" && (
                   <div className="col-lg-6 col-xl-4">
                     <Link
@@ -414,16 +422,12 @@ export default function UserReviewPage() {
                         cursor: "pointer",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform =
-                          "scale(1.03) translateY(-8px)";
-                        e.currentTarget.style.boxShadow =
-                          "0 16px 40px rgba(255, 107, 0, 0.4)";
+                        e.currentTarget.style.transform = "scale(1.03) translateY(-8px)";
+                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(255, 107, 0, 0.4)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.transform =
-                          "scale(1) translateY(0)";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 15px rgba(0,0,0,0.6)";
+                        e.currentTarget.style.transform = "scale(1) translateY(0)";
+                        e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
                       }}
                     >
                       <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
