@@ -28,7 +28,7 @@ async function getReviewsByMovieIdController(movie_id, media_type) {
     throw new Error('Movie ID is not provided')
   }
   if (!media_type) {
-    return res.status(400).json({ error: 'Movie ID is not provided' })
+    return res.status(400).json({ error: 'Media type is not provided' })
   }
 
   const response = await pool.query(
