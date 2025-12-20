@@ -144,7 +144,7 @@ const RatingDistributionChart = ({ reviews, onRatingClick }) => {
 };
 
 export default function UserReviewPage() {
-  const { t, getTmdbLanguage } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -161,67 +161,46 @@ export default function UserReviewPage() {
     const fetchUserReviews = async () => {
       try {
         setLoading(true);
-        setProgress({ loaded: 0, total: 1 });
 
         const res = await fetch(`${API_URL}/api/get_reviews_by_user_id`, {
           credentials: "include",
         });
 
-        if (!res.ok) throw new Error("No results");
+        if (!res.ok) throw new Error("Failed to fetch reviews");
 
         const data = await res.json();
         const reviewsArray = Array.isArray(data) ? data : [];
+
         const isBoss = user?.username === "boss";
         const totalItems = reviewsArray.length + (isBoss ? 1 : 0);
         setProgress({ loaded: 0, total: totalItems || 1 });
 
-        const enrichedReviews = await Promise.all(
-          reviewsArray.map(async (review) => {
-            const mediaType = review.media_type || "movie";
-            const id = review.movie_id;
-
-            try {
-              const titleRes = await fetch(
-                `${API_URL}/api/get_title_details?id=${id}&media_type=${mediaType}&language=${getTmdbLanguage()}`
-              );
-
-              if (!titleRes.ok) {
-                console.warn(`Title not found: ${id} (${mediaType})`);
-                return null;
-              }
-
-              const titleData = await titleRes.json();
-
-              setProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
-
-              return {
-                ...review,
-                title: titleData,
-                mediaType,
-              };
-            } catch (err) {
-              console.error("Error loading title:", id, mediaType);
-              setProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
-              return null;
-            }
-          })
-        );
+        // Теперь details уже внутри каждой рецензии
+        const enrichedReviews = reviewsArray.map((review) => {
+          setProgress((prev) => ({ ...prev, loaded: prev.loaded + 1 }));
+          return {
+            ...review,
+            title: review.details || {}, // details приходят с бэкенда
+            mediaType: review.media_type || "movie",
+          };
+        });
 
         setReviews(
-          enrichedReviews.filter(Boolean).sort((a, b) => {
+          enrichedReviews.sort((a, b) => {
             if (b.rating !== a.rating) return b.rating - a.rating;
             return new Date(b.created_at) - new Date(a.created_at);
           })
         );
       } catch (err) {
-        setError(err.message);
+        console.error(err);
+        setError(err.message || "Error loading reviews");
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserReviews();
-  }, [user, getTmdbLanguage]);
+  }, [user]);
 
   if (!user) {
     return (
@@ -296,57 +275,138 @@ export default function UserReviewPage() {
   const groupedReviews = groupByRating(reviews);
 
   return (
-  <div className="container py-5">
-    <h1 className="display-5 text-white mb-5 text-center text-uppercase fw-bold opacity-75 noBack">
-      {t("my_reviews")} • {user.username}
-    </h1>
+    <div className="container py-5">
+      <h1 className="display-5 text-white mb-5 text-center text-uppercase fw-bold opacity-75 noBack">
+        {t("my_reviews")} • {user.username}
+      </h1>
 
-    <RatingDistributionChart
-      reviews={reviews}
-      onRatingClick={(rating) => {
-        const element = ratingRefs.current[rating];
-        if (element)
-          element.scrollIntoView({ behavior: "smooth", block: "center" });
-      }}
-    />
+      <RatingDistributionChart
+        reviews={reviews}
+        onRatingClick={(rating) => {
+          const element = ratingRefs.current[rating];
+          if (element)
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+      />
 
-    {reviews.length === 0 ? (
-      <div className="text-center py-5">
-        <p className="text-white-50 fs-4">{t("def_no_reviews_yet")}</p>
-      </div>
-    ) : (
-      <div className="space-y-8">
-        {groupedReviews.map(({ rating, reviewsList }) => (
-          <div
-            key={rating}
-            ref={(el) => (ratingRefs.current[rating] = el)}
-            className="text-center mb-5"
-          >
-            <div className="d-inline-flex align-items-center gap-3 mb-5 px-4 py-2 bg-black bg-opacity-50 rounded-pill border border-warning">
-              <h2 className="text-warning fs-3 fw-bold me-3">{rating}/10</h2>
-              <StarRating rating={rating} />
-              <span className="text-white-50 ms-3">
-                (
-                {reviewsList.length +
-                  (rating === 6 && user?.username === "boss" ? 1 : 0)}
-                )
-              </span>
-            </div>
+      {reviews.length === 0 ? (
+        <div className="text-center py-5">
+          <p className="text-white-50 fs-4">{t("def_no_reviews_yet")}</p>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {groupedReviews.map(({ rating, reviewsList }) => (
+            <div
+              key={rating}
+              ref={(el) => (ratingRefs.current[rating] = el)}
+              className="text-center mb-5"
+            >
+              <div className="d-inline-flex align-items-center gap-3 mb-5 px-4 py-2 bg-black bg-opacity-50 rounded-pill border border-warning">
+                <h2 className="text-warning fs-3 fw-bold me-3">{rating}/10</h2>
+                <StarRating rating={rating} />
+                <span className="text-white-50 ms-3">
+                  (
+                  {reviewsList.length +
+                    (rating === 6 && user?.username === "boss" ? 1 : 0)}
+                  )
+                </span>
+              </div>
 
-            <div className="row g-4">
-              {reviewsList.map((review) => {
-                const td = review.title || {};
-                const name = td.title || td.name || "Без названия";
-                const year =
-                  (td.release_date || td.first_air_date || "").split("-")[0] || "";
-                const posterSrc = td.poster_path
-                  ? `${IMG}${td.poster_path}`
-                  : "/images/no-poster.jpg";
+              <div className="row g-4">
+                {reviewsList.map((review) => {
+                  const td = review.title || {};
+                  const name = td.title || td.name || "Без названия";
+                  const year =
+                    (td.release_date || td.first_air_date || "").split("-")[0] || "";
+                  const posterSrc = td.poster_path
+                    ? `${IMG}${td.poster_path}`
+                    : "/images/no-poster.jpg";
 
-                return (
-                  <div key={review.review_id} className="col-lg-6 col-xl-4">
+                  return (
+                    <div key={review.review_id} className="col-lg-6 col-xl-4">
+                      <Link
+                        to={`/title/${td.id || review.movie_id}/${review.media_type || "movie"}`}
+                        className="text-decoration-none h-100 d-flex flex-column"
+                        style={{
+                          transition: "all 0.3s ease",
+                          boxShadow: "2px 4px 15px rgba(0,0,0,0.6)",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform =
+                            "scale(1.03) translateY(-8px)";
+                          e.currentTarget.style.boxShadow =
+                            "0 16px 40px rgba(255, 107, 0, 0.4)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform =
+                            "scale(1) translateY(0)";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 15px rgba(0,0,0,0.6)";
+                        }}
+                      >
+                        <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
+                          <div className="row g-3 flex-grow-1">
+                            <div className="col-5">
+                              <img
+                                src={posterSrc}
+                                alt={name}
+                                className="img-fluid rounded shadow w-100"
+                                style={{ height: "280px", objectFit: "cover" }}
+                              />
+                            </div>
+                            <div className="col-7 d-flex flex-column">
+                              <h5 className="text-warning fw-bold hover-underline mb-1">
+                                {name}{" "}
+                                {year && <span className="text-white-50 ms-2">({year})</span>}
+                              </h5>
+                              <div
+                                className="flex-grow-1 mt-2 mb-3 d-flex align-items-center justify-content-center px-3 text-white"
+                                style={{ borderRadius: 6 }}
+                              >
+                                {review.comment ? (
+                                  <div
+                                    className="text-white text-center"
+                                    style={{
+                                      lineHeight: "1.55",
+                                      fontSize: "0.95rem",
+                                      wordBreak: "break-word",
+                                      overflow: "hidden",
+                                      display: "-webkit-box",
+                                      WebkitLineClamp: 6,
+                                      WebkitBoxOrient: "vertical",
+                                    }}
+                                  >
+                                    {review.comment}
+                                  </div>
+                                ) : (
+                                  <p className="text-white fst-italic mb-0">{t("no_comment")}</p>
+                                )}
+                              </div>
+                              <div className="mt-auto">
+                                <div className="d-flex align-items-center mb-2">
+                                  <span className="text-white-50 me-2">{t("rating")}</span>
+                                  <span className="badge bg-warning text-dark fs-5 px-3">
+                                    {review.rating}/10
+                                  </span>
+                                </div>
+                                <small className="text-white-50">
+                                  {new Date(review.created_at).toLocaleDateString("ru-RU")}
+                                </small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  );
+                })}
+
+                {/* extencio for "boss" */}
+                {rating === 6 && user?.username === "boss" && (
+                  <div className="col-lg-6 col-xl-4">
                     <Link
-                      to={`/title/${td.id || review.movie_id}/${review.media_type || "movie"}`}
+                      to="/title/286801/tv"
                       className="text-decoration-none h-100 d-flex flex-column"
                       style={{
                         transition: "all 0.3s ease",
@@ -370,123 +430,42 @@ export default function UserReviewPage() {
                         <div className="row g-3 flex-grow-1">
                           <div className="col-5">
                             <img
-                              src={posterSrc}
-                              alt={name}
+                              src="https://m.media-amazon.com/images/M/MV5BZGY2OTcxYWItZDgxNi00Y2E1LTk0YTgtZDcwZjZkNzU4OTJjXkEyXkFqcGc@._V1_.jpg"
+                              alt="Monster"
                               className="img-fluid rounded shadow w-100"
                               style={{ height: "280px", objectFit: "cover" }}
                             />
                           </div>
                           <div className="col-7 d-flex flex-column">
                             <h5 className="text-warning fw-bold hover-underline mb-1">
-                              {name}{" "}
-                              {year && <span className="text-white-50 ms-2">({year})</span>}
+                              Monster: <span className="text-white-50 ms-2">(2022)</span>
                             </h5>
                             <div
                               className="flex-grow-1 mt-2 mb-3 d-flex align-items-center justify-content-center px-3 text-white"
                               style={{ borderRadius: 6 }}
                             >
-                              {review.comment ? (
-                                <div
-                                  className="text-white text-center"
-                                  style={{
-                                    lineHeight: "1.55",
-                                    fontSize: "0.95rem",
-                                    wordBreak: "break-word",
-                                    overflow: "hidden",
-                                    display: "-webkit-box",
-                                    WebkitLineClamp: 6,
-                                    WebkitBoxOrient: "vertical",
-                                  }}
-                                >
-                                  {review.comment}
-                                </div>
-                              ) : (
-                                <p className="text-white fst-italic mb-0">{t("no_comment")}</p>
-                              )}
+                              <p className="text-white fst-italic mb-0">
+                                Monster: The Ed Gein Story, The Jeffrey Dahmer Story, The Lyle and Erik Menendez Story
+                              </p>
                             </div>
                             <div className="mt-auto">
                               <div className="d-flex align-items-center mb-2">
                                 <span className="text-white-50 me-2">{t("rating")}</span>
-                                <span className="badge bg-warning text-dark fs-5 px-3">
-                                  {review.rating}/10
-                                </span>
+                                <span className="badge bg-warning text-dark fs-5 px-3">6.0/10</span>
                               </div>
-                              <small className="text-white-50">
-                                {new Date(review.created_at).toLocaleDateString("ru-RU")}
-                              </small>
+                              <small className="text-white-50">11.12.2025</small>
                             </div>
                           </div>
                         </div>
                       </div>
                     </Link>
                   </div>
-                );
-              })}
-
-              {/* extencio for "boss" */}
-              {rating === 6 && user?.username === "boss" && (
-                <div className="col-lg-6 col-xl-4">
-                  <Link
-                    to="/title/286801/tv"
-                    className="text-decoration-none h-100 d-flex flex-column"
-                    style={{
-                      transition: "all 0.3s ease",
-                      boxShadow: "2px 4px 15px rgba(0,0,0,0.6)",
-                      cursor: "pointer",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform =
-                        "scale(1.03) translateY(-8px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 16px 40px rgba(255, 107, 0, 0.4)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform =
-                        "scale(1) translateY(0)";
-                      e.currentTarget.style.boxShadow =
-                        "0 4px 15px rgba(0,0,0,0.6)";
-                    }}
-                  >
-                    <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
-                      <div className="row g-3 flex-grow-1">
-                        <div className="col-5">
-                          <img
-                            src="https://m.media-amazon.com/images/M/MV5BZGY2OTcxYWItZDgxNi00Y2E1LTk0YTgtZDcwZjZkNzU4OTJjXkEyXkFqcGc@._V1_.jpg"
-                            alt="Monster"
-                            className="img-fluid rounded shadow w-100"
-                            style={{ height: "280px", objectFit: "cover" }}
-                          />
-                        </div>
-                        <div className="col-7 d-flex flex-column">
-                          <h5 className="text-warning fw-bold hover-underline mb-1">
-                            Monster: <span className="text-white-50 ms-2">(2022)</span>
-                          </h5>
-                          <div
-                            className="flex-grow-1 mt-2 mb-3 d-flex align-items-center justify-content-center px-3 text-white"
-                            style={{ borderRadius: 6 }}
-                          >
-                            <p className="text-white fst-italic mb-0">
-                              Monster: The Ed Gein Story, The Jeffrey Dahmer Story, The Lyle and Erik Menendez Story
-                            </p>
-                          </div>
-                          <div className="mt-auto">
-                            <div className="d-flex align-items-center mb-2">
-                              <span className="text-white-50 me-2">{t("rating")}</span>
-                              <span className="badge bg-warning text-dark fs-5 px-3">6.0/10</span>
-                            </div>
-                            <small className="text-white-50">11.12.2025</small>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }

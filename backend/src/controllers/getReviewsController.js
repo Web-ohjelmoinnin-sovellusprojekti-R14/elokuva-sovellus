@@ -39,8 +39,9 @@ async function getReviewsByMovieIdController(movie_id, media_type) {
     [movie_id, media_type]
   )
 
-  const filteredResponse = response.rows.filter(item => item.comment)
-  return filteredResponse
+  //const filteredResponse = response.rows.filter(item => item.comment)
+  //return filteredResponse
+  return response.rows
 }
 
 export { getReviewsByUserIdController, getReviewsByMovieIdController }
