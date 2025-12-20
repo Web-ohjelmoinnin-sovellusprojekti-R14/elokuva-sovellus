@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { saveReviewController } from '../controllers/saveReviewController.js'
 import { authMe } from '../controllers/authMeController.js'
-import { reviewsCache } from './getReviews.js'
+import { reviewsCache } from '../controllers/reviewService.js'
 import rateLimit from 'express-rate-limit'
 
 const router = Router()
@@ -21,10 +21,9 @@ router.post('/save_review', limiter, authMe, async (req, res) => {
 
     const result = await saveReviewController(rating, user_id, movie_id, comment, media_type)
 
-    for (const key of reviewsCache.keys()) {
-      if (key.startsWith(`reviews:user:${user_id}:`)) {
-        reviewsCache.delete(key)
-      }
+    const cacheKey = `user:${user_id}`;
+    if (reviewsCache.has(cacheKey)) {
+      reviewsCache.delete(cacheKey);
     }
 
     return res.status(201).json(result)
