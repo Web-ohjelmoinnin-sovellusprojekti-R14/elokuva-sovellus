@@ -1,10 +1,10 @@
 import { Router } from 'express'
-import { getReviewsByUserIdController, getReviewsByMovieIdController } from '../controllers/getReviewsController.js'
+import { getReviewsByUserIdController } from '../controllers/getReviewsController.js'
 import { authMe } from '../controllers/authMeController.js'
+import { withCache } from '../controllers/cacheWrapper.js'
+import rateLimit from 'express-rate-limit'
 
 const router = Router()
-
-import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
   windowMs: 30 * 1000,
@@ -12,13 +12,22 @@ const limiter = rateLimit({
   message: { error: 'Too much requests' },
 })
 
+export const reviewsCache = new Map()
+
 router.get('/get_reviews_by_user_id', limiter, authMe, async (req, res) => {
   try {
     const user_id = req.user.user_id
-    const language = req.params.language || 'en-US'
-    const response = await getReviewsByUserIdController(user_id, language)
+    const language = req.query.language || 'en-US'
+
+    const cacheKey = `reviews:user:${user_id}:lang:${language}`
+
+    const response = await withCache(reviewsCache, cacheKey, async () => {
+      return await getReviewsByUserIdController(user_id, language)
+    })
+
     return res.status(200).json(response)
   } catch (err) {
+    console.error(err)
     return res.status(500).json({ error: 'Failed to get reviews by User ID' })
   }
 })
