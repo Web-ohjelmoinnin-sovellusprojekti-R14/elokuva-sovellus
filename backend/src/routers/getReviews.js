@@ -15,8 +15,9 @@ const limiter = rateLimit({
 router.get('/get_reviews_by_user_id', limiter, authMe, async (req, res) => {
   try {
     const user_id = req.user.user_id
-    const response = await getReviewsByUserIdController(user_id)
-    return res.status(201).json(response)
+    const language = req.params.language || 'en-US'
+    const response = await getReviewsByUserIdController(user_id, language)
+    return res.status(200).json(response)
   } catch (err) {
     return res.status(500).json({ error: 'Failed to get reviews by User ID' })
   }
