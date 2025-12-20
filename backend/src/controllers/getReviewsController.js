@@ -2,13 +2,34 @@ import pool from '../db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-async function getReviewsByUserIdController(user_id) { 
+const limit = pLimit(5)
+
+async function getReviewsByUserIdController(user_id, language, withDetails = false, specificItem = null) {
   if (!user_id) {
     throw new Error('User ID is not provided')
   }
 
   const response = await pool.query('SELECT * FROM "review" WHERE user_id=$1', [user_id])
-  return response.rows
+
+  if (!withDetails) {
+    return response.rows
+  }
+
+  if (specificItem) {
+    const details = await getTitleDetails(specificItem.movie_id, specificItem.media_type, language)
+    return { ...specificItem, details }
+  }
+
+  const detailedResponse = await Promise.all(
+    response.rows.map(item =>
+      limit(async () => {
+        const details = await getTitleDetails(item.movie_id, item.media_type, language)
+        return { ...item, details }
+      })
+    )
+  )
+
+  return detailedResponse
 }
 
 async function getReviewsByMovieIdController(movie_id, media_type) {
@@ -16,7 +37,7 @@ async function getReviewsByMovieIdController(movie_id, media_type) {
     throw new Error('Movie ID is not provided')
   }
   if (!media_type) {
-    return res.status(400).json({ error: 'Movie ID is not provided' })
+    return res.status(400).json({ error: 'Media type is not provided' })
   }
 
   const response = await pool.query(
