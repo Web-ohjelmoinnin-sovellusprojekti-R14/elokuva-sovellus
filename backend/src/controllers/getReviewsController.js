@@ -4,22 +4,33 @@ import { getTitleDetails } from './getTitleDetailsController.js'
 dotenv.config()
 import pLimit from 'p-limit'
 
-const limit = pLimit(10)
+const limit = pLimit(5)
 
-async function getReviewsByUserIdController(user_id, language) {
+async function getReviewsByUserIdController(user_id, language, withDetails = false, specificItem = null) {
   if (!user_id) {
     throw new Error('User ID is not provided')
   }
 
   const response = await pool.query('SELECT * FROM "review" WHERE user_id=$1', [user_id])
+
+  if (!withDetails) {
+    return response.rows
+  }
+
+  if (specificItem) {
+    const details = await getTitleDetails(specificItem.movie_id, specificItem.media_type, language)
+    return { ...specificItem, details }
+  }
+
   const detailedResponse = await Promise.all(
-    response.rows.map(async item =>
+    response.rows.map(item =>
       limit(async () => {
         const details = await getTitleDetails(item.movie_id, item.media_type, language)
         return { ...item, details }
       })
     )
   )
+
   return detailedResponse
 }
 
