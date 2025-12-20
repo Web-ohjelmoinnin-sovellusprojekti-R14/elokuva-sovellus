@@ -64,7 +64,6 @@ export default function TitleDetails() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //if (!newComment.trim()) return;
 
     setPosting(true);
     setError(null);
@@ -83,18 +82,25 @@ export default function TitleDetails() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to post comment");
+      if (!res.ok) throw new Error(data.error || "Failed to post review");
 
-      setReviews((prev) => [
-        {
-          user_id: user.user_id,
-          username: user.username,
-          rating: newRating,
-          comment: newComment,
-          created_at: new Date().toISOString(),
-        },
-        ...prev.filter((r) => r.user_id !== user.user_id),
-      ]);
+      // Теперь сервер возвращает review_id
+      const savedReviewId = data.review_id;
+
+      setReviews((prev) => {
+        const filtered = prev.filter((r) => r.user_id !== user.user_id);
+        return [
+          {
+            user_id: user.user_id,
+            username: user.username,
+            rating: newRating,
+            comment: newComment || null,
+            created_at: new Date().toISOString(),
+            review_id: savedReviewId, // КЛЮЧЕВОЕ: теперь есть review_id
+          },
+          ...filtered,
+        ];
+      });
 
       setNewComment("");
       setNewRating(5);
@@ -517,7 +523,7 @@ export default function TitleDetails() {
                     boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
                   }}
                 >
-                  {isOwnReview && (
+                  {isOwnReview && r.review_id && (
                     <button
                       onClick={() => handleDelete(r.review_id)}
                       className="btn btn-danger btn-sm position-absolute top-50 end-0 translate-middle-y me-3"
