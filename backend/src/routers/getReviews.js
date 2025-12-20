@@ -4,6 +4,8 @@ import { authMe } from '../controllers/authMeController.js'
 import { withCache } from '../controllers/cacheWrapper.js'
 import rateLimit from 'express-rate-limit'
 import cors from 'cors'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const router = Router()
 
@@ -18,7 +20,7 @@ export const reviewsCache = new Map()
 router.get(
   '/get_reviews_by_user_id',
   cors({
-    origin: 'http://localhost:3000',
+    origin: `${process.env.FRONTEND_URL}`,
     credentials: true,
   }),
   limiter,
