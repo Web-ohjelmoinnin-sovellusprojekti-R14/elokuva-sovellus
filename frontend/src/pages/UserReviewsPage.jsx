@@ -5,6 +5,8 @@ import { useTranslation } from "../hooks/useTranslation";
 
 const IMG = "https://image.tmdb.org/t/p/w300";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const groupByRating = (reviews) => {
   const groups = {};
 
@@ -167,7 +169,7 @@ export default function UserReviewsPage() {
     const connectSSE = () => {
       const language = getTmdbLanguage();
       evtSource = new EventSource(
-        `http://localhost:5000/api/get_reviews_by_user_id_sse?language=${language}`,
+        `${API_URL}/api/get_reviews_by_user_id_sse?language=${language}`,
         { withCredentials: true }
       );
 
@@ -184,11 +186,16 @@ export default function UserReviewsPage() {
       evtSource.addEventListener("reviews", (e) => {
         const batch = JSON.parse(e.data);
 
-        const existingIds = new Set(accumulatedReviews.current.map((r) => r.review_id));
+        const existingIds = new Set(
+          accumulatedReviews.current.map((r) => r.review_id)
+        );
         const newReviews = batch.filter((r) => !existingIds.has(r.review_id));
 
         if (newReviews.length > 0) {
-          accumulatedReviews.current = [...accumulatedReviews.current, ...newReviews];
+          accumulatedReviews.current = [
+            ...accumulatedReviews.current,
+            ...newReviews,
+          ];
           setReviews([...accumulatedReviews.current]);
         }
       });
@@ -242,7 +249,8 @@ export default function UserReviewsPage() {
         reviews={reviews}
         onRatingClick={(rating) => {
           const element = ratingRefs.current[rating];
-          if (element) element.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (element)
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       />
 
@@ -268,7 +276,8 @@ export default function UserReviewsPage() {
                 className="h-100 rounded-pill position-relative overflow-hidden"
                 style={{
                   width: `${(progress.loaded / Math.max(progress.total, 1)) * 100}%`,
-                  background: "linear-gradient(90deg, #00d4ff, #ff07f3, #ff3300)",
+                  background:
+                    "linear-gradient(90deg, #00d4ff, #ff07f3, #ff3300)",
                   transition: "width 0.5s ease",
                   boxShadow: "0 0 20px rgba(255,193,7,0.6)",
                 }}
@@ -288,9 +297,15 @@ export default function UserReviewsPage() {
             <div className="text-center mt-3 noBack">
               <p className="text-white fs-5 mb-1 noBack">
                 {t("loading_colon")}{" "}
-                <strong className="text-warning noBack">{progress.loaded}</strong>{" "}
+                <strong className="text-warning noBack">
+                  {progress.loaded}
+                </strong>{" "}
                 {t("of")}{" "}
-                <strong className="text-warning noBack">{user?.username === "boss" ? (progress.total || 0) + 1 : progress.total || "?"}</strong>
+                <strong className="text-warning noBack">
+                  {user?.username === "boss"
+                    ? (progress.total || 0) + 1
+                    : progress.total || "?"}
+                </strong>
                 {/*
                 {connectionAttempts > 0 && (
                   <span className="text-danger ms-3">
@@ -299,7 +314,10 @@ export default function UserReviewsPage() {
                 )} */}
               </p>
               <p className="text-white-50 small noBack">
-                {Math.round((progress.loaded / Math.max(progress.total, 1)) * 100)}%
+                {Math.round(
+                  (progress.loaded / Math.max(progress.total, 1)) * 100
+                )}
+                %
               </p>
             </div>
           </div>
@@ -324,7 +342,10 @@ export default function UserReviewsPage() {
                 <h2 className="text-warning fs-3 fw-bold me-3">{rating}/10</h2>
                 <StarRating rating={rating} />
                 <span className="text-white-50 ms-3">
-                  ({reviewsList.length + (rating === 6 && user?.username === "boss" ? 1 : 0)})
+                  (
+                  {reviewsList.length +
+                    (rating === 6 && user?.username === "boss" ? 1 : 0)}
+                  )
                 </span>
               </div>
 
@@ -332,8 +353,13 @@ export default function UserReviewsPage() {
                 {reviewsList.map((review) => {
                   const td = review.details || {};
                   const name = td.title || td.name || "No Title";
-                  const year = (td.release_date || td.first_air_date || "").split("-")[0] || "";
-                  const posterSrc = td.poster_path ? `${IMG}${td.poster_path}` : "/images/no-poster.jpg";
+                  const year =
+                    (td.release_date || td.first_air_date || "").split(
+                      "-"
+                    )[0] || "";
+                  const posterSrc = td.poster_path
+                    ? `${IMG}${td.poster_path}`
+                    : "/images/no-poster.jpg";
 
                   return (
                     <div key={review.review_id} className="col-lg-6 col-xl-4">
@@ -346,12 +372,16 @@ export default function UserReviewsPage() {
                           cursor: "pointer",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = "scale(1.03) translateY(-8px)";
-                          e.currentTarget.style.boxShadow = "0 16px 40px rgba(255, 107, 0, 0.4)";
+                          e.currentTarget.style.transform =
+                            "scale(1.03) translateY(-8px)";
+                          e.currentTarget.style.boxShadow =
+                            "0 16px 40px rgba(255, 107, 0, 0.4)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = "scale(1) translateY(0)";
-                          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
+                          e.currentTarget.style.transform =
+                            "scale(1) translateY(0)";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 15px rgba(0,0,0,0.6)";
                         }}
                       >
                         <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
@@ -367,7 +397,11 @@ export default function UserReviewsPage() {
                             <div className="col-7 d-flex flex-column">
                               <h5 className="text-warning fw-bold hover-underline mb-1">
                                 {name}{" "}
-                                {year && <span className="text-white-50 ms-2">({year})</span>}
+                                {year && (
+                                  <span className="text-white-50 ms-2">
+                                    ({year})
+                                  </span>
+                                )}
                               </h5>
                               <div
                                 className="flex-grow-1 mt-2 mb-3 d-flex align-items-center justify-content-center px-3 text-white"
@@ -389,18 +423,24 @@ export default function UserReviewsPage() {
                                     {review.comment}
                                   </div>
                                 ) : (
-                                  <p className="text-white fst-italic mb-0">{t("no_comment")}</p>
+                                  <p className="text-white fst-italic mb-0">
+                                    {t("no_comment")}
+                                  </p>
                                 )}
                               </div>
                               <div className="mt-auto">
                                 <div className="d-flex align-items-center mb-2">
-                                  <span className="text-white-50 me-2">{t("rating")}</span>
+                                  <span className="text-white-50 me-2">
+                                    {t("rating")}
+                                  </span>
                                   <span className="badge bg-warning text-dark fs-5 px-3">
                                     {review.rating}/10
                                   </span>
                                 </div>
                                 <small className="text-white-50">
-                                  {new Date(review.created_at).toLocaleDateString("ru-RU")}
+                                  {new Date(
+                                    review.created_at
+                                  ).toLocaleDateString("ru-RU")}
                                 </small>
                               </div>
                             </div>
@@ -422,12 +462,16 @@ export default function UserReviewsPage() {
                         cursor: "pointer",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = "scale(1.03) translateY(-8px)";
-                        e.currentTarget.style.boxShadow = "0 16px 40px rgba(255, 107, 0, 0.4)";
+                        e.currentTarget.style.transform =
+                          "scale(1.03) translateY(-8px)";
+                        e.currentTarget.style.boxShadow =
+                          "0 16px 40px rgba(255, 107, 0, 0.4)";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = "scale(1) translateY(0)";
-                        e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
+                        e.currentTarget.style.transform =
+                          "scale(1) translateY(0)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 15px rgba(0,0,0,0.6)";
                       }}
                     >
                       <div className="bg-dark bg-opacity-90 rounded-4 p-4 border border-secondary h-100 d-flex flex-column">
@@ -442,22 +486,30 @@ export default function UserReviewsPage() {
                           </div>
                           <div className="col-7 d-flex flex-column">
                             <h5 className="text-warning fw-bold hover-underline mb-1">
-                              Monster: <span className="text-white-50 ms-2">(2022)</span>
+                              Monster:{" "}
+                              <span className="text-white-50 ms-2">(2022)</span>
                             </h5>
                             <div
                               className="flex-grow-1 mt-2 mb-3 d-flex align-items-center justify-content-center px-3 text-white"
                               style={{ borderRadius: 6 }}
                             >
                               <p className="text-white fst-italic mb-0">
-                                Monster: The Ed Gein Story, The Jeffrey Dahmer Story, The Lyle and Erik Menendez Story
+                                Monster: The Ed Gein Story, The Jeffrey Dahmer
+                                Story, The Lyle and Erik Menendez Story
                               </p>
                             </div>
                             <div className="mt-auto">
                               <div className="d-flex align-items-center mb-2">
-                                <span className="text-white-50 me-2">{t("rating")}</span>
-                                <span className="badge bg-warning text-dark fs-5 px-3">6.0/10</span>
+                                <span className="text-white-50 me-2">
+                                  {t("rating")}
+                                </span>
+                                <span className="badge bg-warning text-dark fs-5 px-3">
+                                  6.0/10
+                                </span>
                               </div>
-                              <small className="text-white-50">11.12.2025</small>
+                              <small className="text-white-50">
+                                11.12.2025
+                              </small>
                             </div>
                           </div>
                         </div>
