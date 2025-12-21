@@ -1,10 +1,13 @@
 import { Router } from 'express'
-import { getReviewsByUserIdController, getReviewsByMovieIdController } from '../controllers/getReviewsController.js'
+import { getReviewsByUserIdController, getReviewsByMovieIdController } from '../controllers/getReviewsController.js';
 import { authMe } from '../controllers/authMeController.js'
+import { withCache } from '../controllers/cacheWrapper.js'
+import rateLimit from 'express-rate-limit'
+import cors from 'cors'
+import dotenv from 'dotenv'
+dotenv.config()
 
 const router = Router()
-
-import rateLimit from 'express-rate-limit'
 
 const limiter = rateLimit({
   windowMs: 30 * 1000,
@@ -12,7 +15,17 @@ const limiter = rateLimit({
   message: { error: 'Too much requests' },
 })
 
-router.get('/get_reviews_by_user_id', limiter, authMe, async (req, res) => {
+export const reviewsCache = new Map()
+
+router.get(
+  '/get_reviews_by_user_id',
+  cors({
+    origin: `${process.env.FRONTEND_URL}`,
+    credentials: true,
+  }),
+  limiter,
+  authMe,
+  async (req, res) => { 
   try {
     const user_id = req.user.user_id
     const response = await getReviewsByUserIdController(user_id)
@@ -24,12 +37,12 @@ router.get('/get_reviews_by_user_id', limiter, authMe, async (req, res) => {
 
 router.get('/get_reviews_by_movie_id', async (req, res) => {
   try {
-    const movie_id = req.query.movie_id
-    const media_type = req.query.media_type
-    const response = await getReviewsByMovieIdController(movie_id, media_type)
-    return res.status(201).json(response)
+    const { movie_id, media_type } = req.query;
+    const reviews = await getReviewsByMovieIdController(movie_id, media_type);
+    res.json(reviews);
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to get reviews by Movie ID' })
+    console.error(err);
+    res.status(400).json({ error: err.message });
   }
 })
 

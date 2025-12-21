@@ -2,6 +2,7 @@ import { Router } from 'express'
 const router = Router()
 import { titleSearchController } from '../controllers/titleSearchController.js'
 import rateLimit from 'express-rate-limit'
+import { withCache } from '../controllers/cacheWrapper.js'
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -9,13 +10,22 @@ const limiter = rateLimit({
   message: { error: 'Too much requests' },
 })
 
+const searchCache = new Map()
+
 router.get('/titlesearch', limiter, async (req, res) => {
-  //console.log('Time before titleSearchController: ' + new Date().toISOString())
-  const result = await titleSearchController(req)
-  //console.log('Time after titleSearchController: ' + new Date().toISOString())
-  if (result) {
-    res.json(result)
-  } else {
+  try {
+    const q = req.query.q || ''
+    const page = req.query.page || 1
+    const language = req.query.language || 'en-US'
+    const cacheKey = `titlesearch:q=${q}&page=${page}&language=${language}`
+
+    const result = await withCache(searchCache, cacheKey, async () => {
+      return await titleSearchController(req)
+    })
+
+    return res.json(result)
+  } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to get titles' })
   }
 })

@@ -3,6 +3,7 @@ const router = Router()
 import { getImdbRating } from '../controllers/imdbRatingController.js'
 import pLimit from 'p-limit'
 import rateLimit from 'express-rate-limit'
+import { withCache } from '../controllers/cacheWrapper.js'
 
 const limiter = rateLimit({
   windowMs: 60 * 1000,
@@ -13,9 +14,11 @@ const limiter = rateLimit({
 const limit = pLimit(5)
 const TMDB_KEY = process.env.TMDB_API_KEY
 
+const cache = new Map()
+const trendingCache = new Map()
+
 const PAGES_PER_BATCH = 6
 const ITEMS_PER_BATCH = 110
-const cache = {}
 
 async function fetchTMDBPages(baseUrl, startPage = 1) {
   const results = []
@@ -35,9 +38,6 @@ async function fetchTMDBPages(baseUrl, startPage = 1) {
 }
 
 async function getBatch(category, batchNum = 1, filters = {}) {
-  const cacheKey = `${category}:${batchNum}:${JSON.stringify(filters)}`
-  if (cache[cacheKey]) return cache[cacheKey]
-
   const isTV = category === 'series' || category === 'anime'
   const baseType = isTV ? 'tv' : 'movie'
   const startPage = (batchNum - 1) * PAGES_PER_BATCH + 1
@@ -93,23 +93,26 @@ async function getBatch(category, batchNum = 1, filters = {}) {
     url += `&language=${filters.language}`
   }
 
-  const rawItems = await fetchTMDBPages(url, startPage)
+  const pagedUrl = `${url}&page_start=${startPage}`
 
-  const enriched = await Promise.all(
-    rawItems.map(item => limit(() => getImdbRating({ ...item, media_type: baseType }, baseType)))
-  )
+  const result = await withCache(cache, pagedUrl, async () => {
+    const rawItems = await fetchTMDBPages(url, startPage)
 
-  const filtered = enriched
-    .filter(i => i && i.imdb_rating)
-    .sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating))
-    .slice(0, ITEMS_PER_BATCH * 2)
+    const enriched = await Promise.all(
+      rawItems.map(item => limit(() => getImdbRating({ ...item, media_type: baseType }, baseType)))
+    )
 
-  const result = {
-    results: filtered,
-    hasMore: rawItems.length >= PAGES_PER_BATCH * 18,
-  }
+    const filtered = enriched
+      .filter(i => i && i.imdb_rating)
+      .sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating))
+      .slice(0, ITEMS_PER_BATCH * 2)
 
-  cache[cacheKey] = result
+    return {
+      results: filtered,
+      hasMore: rawItems.length >= PAGES_PER_BATCH * 18,
+    }
+  })
+
   return result
 }
 
@@ -129,19 +132,24 @@ async function getBatch(category, batchNum = 1, filters = {}) {
 router.get('/trending', limiter, async (req, res) => {
   try {
     const language = req.query.language || 'en-US'
-    const resTrend = await fetch(
-      `https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}&language=${language}`
-    )
-    const data = await resTrend.json()
+    const cacheKey = `trending:week:${language}`
 
-    const withImdb = await Promise.all(
-      data.results.slice(0, 20).map(item => limit(() => getImdbRating(item, item.media_type)))
-    )
+    const result = await withCache(trendingCache, cacheKey, async () => {
+      const resTrend = await fetch(
+        `https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}&language=${language}`
+      )
+      const data = await resTrend.json()
 
-    const results = withImdb.filter(i => i?.imdb_rating)
+      const withImdb = await Promise.all(
+        data.results.slice(0, 20).map(item => limit(() => getImdbRating(item, item.media_type)))
+      )
 
-    res.json({ results })
+      return withImdb.filter(i => i?.imdb_rating)
+    })
+
+    res.json({ results: result })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Trending failed' })
   }
 })
