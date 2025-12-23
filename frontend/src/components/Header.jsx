@@ -5,6 +5,8 @@ import RegisterModal from "./modals/RegisterModal";
 import { Link } from "react-router-dom";
 import { useTranslation } from "../hooks/useTranslation";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function Header() {
   const spinImage = (e) => {
     e.currentTarget.style.transition = "transform 0.6s ease-in-out";
@@ -17,8 +19,35 @@ function Header() {
 
   const { t } = useTranslation();
   const { user, logout } = useAuth();
+
   const [openLogin, setOpenLogin] = useState(false);
   const [openRegister, setOpenRegister] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm(t("confirm_delete_account"))) {
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const res = await fetch(`${API_URL}/api/delete_user`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || t("err_del_acc"));
+      }
+      logout();
+    } catch (err) {
+      alert(err.message || t("err_del_acc"));
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -82,6 +111,14 @@ function Header() {
                 )}
                 <button onClick={logout} className="btn btn-danger btn-sm">
                   {t("log_out")}
+                </button>
+
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="btn btn-danger btn-sm"
+                >
+                  {deleting ? "..." : t("delete")}
                 </button>
               </>
             )}

@@ -86,6 +86,8 @@ export const translations = {
     def_no_reviews_yet: "You haven't left any reviews yet.",
     user_reviews_distribution: "Your ratings",
     mid: "Average rating",
+    confirm_delete_account: "Are you sure you want to permanently delete your account? This action cannot be undone.",
+    err_del_acc: "Error deleting account",
 
     g_n_req: "Group name is required",
     f_g: "Failed to create group",
@@ -268,6 +270,8 @@ export const translations = {
     def_no_reviews_yet: "Вы ещё не оставили ни одного отзыва.",
     user_reviews_distribution: "Твои оценки",
     mid: "Средний балл",
+    confirm_delete_account: "Вы уверены, что хотите навсегда удалить свой аккаунт? Это действие нельзя отменить.",
+    err_del_acc: "Ошибка при удалении аккаунта",
 
     g_n_req: "Название группы обязательно",
     f_g: "Не удалось создать группу",
@@ -510,6 +514,8 @@ export const translations = {
     memb: "Jäsen",
     go_to_gr: "Siirry ryhmään",
     del_gr: "Poista ryhmä",
+    confirm_delete_account: "Haluatko varmasti poistaa tilisi pysyvästi? Tätä toimintoa ei voi peruuttaa.",
+    err_del_acc: "Virhe poistettaessa tiliä",
 
     genre_action: "Toiminta",
     genre_adventure: "Seikkailu",
