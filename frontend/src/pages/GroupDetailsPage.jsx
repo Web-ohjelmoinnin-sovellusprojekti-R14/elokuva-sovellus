@@ -546,15 +546,15 @@ export default function GroupDetailsPage() {
                   <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                 )}
 
-                <ClickablePoster item={item} />
-
-                <div className="movie-title-parent">
-                  <p
-                    className="movie-title text-white"
-                    style={{ fontSize: "0.9rem" }}
-                  >
-                    {item.title || item.name}
-                  </p>
+                <div
+                  className="movie-card-inner text-decoration-none"
+                >
+                  <ClickablePoster item={item} />
+                  <div className="movie-title-parent">
+                    <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                      {item.title || item.name}
+                    </p>
+                  </div>
                 </div>
 
                 <small className="text-white-50 d-block mt-1">
