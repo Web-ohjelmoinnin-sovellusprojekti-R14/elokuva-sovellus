@@ -74,6 +74,13 @@ export default function NowInCinemaPage() {
       .catch((err) => console.error(err));
   }, [user]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
+
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
   const startIndex = (currentPage - 1) * MOVIES_PER_PAGE;
@@ -125,28 +132,17 @@ export default function NowInCinemaPage() {
                       ✭ {userReviews[movie.id]}{" "}
                     </div>
                   )}
-                  <ClickablePoster item={movie} />
-                  {/*
-                  <img
-                    src={poster}
-                    alt={movie.title}
-                    className="img-fluid rounded"
-                    style={{
-                      boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
-                      height: "280px",
-                      objectFit: "cover",
-                      width: "100%"
-                    }}
-                  />
-                */}
-                  <div class="movie-title-parent">
-                    <p
-                      className="movie-title text-white"
-                      style={{ fontSize: "0.9rem" }}
-                    >
-                      {movie.title}
-                    </p>
-                  </div>
+            <div
+              className="movie-card-inner text-decoration-none"
+            >
+              <ClickablePoster item={movie} />
+
+              <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  {movie.title}
+                </p>
+              </div>
+            </div>
                 </div>
               );
             })}

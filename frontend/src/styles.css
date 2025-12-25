@@ -27,6 +27,11 @@
   overflow-x: hidden;
 }
 
+* {
+  font-family: 'Huninn', sans-serif !important;
+  font-weight: 1;
+}
+
 .rating-bar.active {
   background: linear-gradient(to top, #0066ff, #00ccff);
 }
@@ -178,6 +183,10 @@ body::after {
   /*background: linear-gradient(180deg, #9f5dd6, #6e6ec2);
   background: linear-gradient(180deg, #5d83d6, #3462e0); */
   background: linear-gradient(180deg, #5d83d6, #3462e0);
+}
+
+.img-rounded{
+  border-radius: 12px 12px 0 0;
 }
 
 .poster-img {
@@ -454,14 +463,32 @@ footer {
   border-bottom: 1px solid #444;
 }
 
+.movie-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.movie-card-inner {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s ease;
+  will-change: transform;
+}
+
+.movie-card:hover .movie-card-inner {
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 16px 40px rgba(255, 107, 0, 0.45);
+}
+
+.movie-card:hover .movie-title {
+  color: #ffc107;
+}
+
 .movie-card img {
   width: 100%;
   height: auto;
-  transition: transform 0.3s ease;
-}
-
-.movie-card img:hover {
-  transform: scale(1.05);
 }
 
 .imdb-badge {
@@ -490,7 +517,7 @@ footer {
   font-weight: bold;
   font-size: 0.85rem;
   border: 1px solid #c4c4c4;
-  transition: font-size 0.25s ease;
+  transition: font-size 0.25s ease, bottom 0.25s ease;
   z-index: 9;
 }
 
@@ -500,6 +527,12 @@ footer {
 
 .movie-card:hover .user-badge {
   font-size: 0.9rem;
+  bottom: 17.5em;
+}
+
+.movie-card:has(button:hover) .movie-card-inner {
+  transform: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
 .movies h2 {
@@ -526,13 +559,12 @@ p.mt-2.text-white {
   justify-content: center;
   display: flex;
   align-items: center;
-  background-color: rgb(102, 102, 102);
-  border-radius: 6px;
-  padding: 4px;
-  margin-top: 7px;
-
+  background-color: #161414;
+  border-radius: 0 0 12px 12px;
+  margin-top: 0px;
   height: 2.6rem;
   line-height: 1.3;
+
 }
 
 .movie-title {
@@ -543,6 +575,10 @@ p.mt-2.text-white {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-left: .25rem !important;
+  padding-right: .25rem !important;
 }
 
 .title-bg {
@@ -557,7 +593,7 @@ p.mt-2.text-white {
 }
 
 .movie-card img:hover {
-  transform: scale(1.05);
+  transform: scale(1.025);
 }
 
 .popular h2 {
@@ -776,7 +812,18 @@ p.mt-2.text-white {
     flex-basis: 100%;
     text-align: center;
     justify-content: center;
-    margin-bottom: 50px;
+  }
+
+  .header-center{
+    margin-bottom: 50px !important;
+  }
+
+  .header-right{
+    margin-top: 50px !important;
+  }
+
+  .header-left{
+    margin-bottom: 50px !important;
   }
 
   .header-right .btn {
@@ -821,6 +868,11 @@ p.mt-2.text-white {
     text-align: center;
     justify-content: center;
     margin-bottom: 50px;
+    -ms-flex-item-align: center; 
+  }
+
+  .header-left{
+    margin-bottom: 70px;
   }
 
   .header-right .btn {
