@@ -5,7 +5,7 @@ import { useTranslation } from "../hooks/useTranslation";
 function Footer() {
   const { t } = useTranslation();
   return (
-    <footer className="footer bg-dark text-white py-3 mt-5 movies">
+    <footer className="footer bg-dark text-white py-3 mt-5">
       <div className="container text-center">
         <h5 className="mb-4 text-uppercase fw-bold opacity-75">
           {" "}
