@@ -141,6 +141,13 @@ export default function AdvancedSearchResultsPage() {
       .catch((err) => console.error(err));
   }, [user]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
+
   const totalLoadedItems = allItems.length;
   const totalPagesAvailable = Math.ceil(totalLoadedItems / ITEMS_PER_PAGE);
   const isOnLastPage = currentPage >= totalPagesAvailable;
@@ -312,15 +319,16 @@ export default function AdvancedSearchResultsPage() {
             {user && userReviews[item.id] && (
               <div className="user-badge"> ✭ {userReviews[item.id]} </div>
             )}
-            <ClickablePoster item={item} />
+            <div
+              className="movie-card-inner text-decoration-none"
+            >
+              <ClickablePoster item={item} />
 
-            <div className="movie-title-parent">
-              <p
-                className="movie-title text-white"
-                style={{ fontSize: "0.9rem" }}
-              >
-                {item.title || item.name}
-              </p>
+              <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  {item.title || item.name}
+                </p>
+              </div>
             </div>
           </div>
         ))}

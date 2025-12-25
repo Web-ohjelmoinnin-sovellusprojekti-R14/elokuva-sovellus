@@ -62,7 +62,7 @@ const MoviesSection = () => {
   return (
     <section className="movies container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">{t("films")}</h2>
-
+      {/*<div className="underline-animation-sec mb-4"></div> */}
       <div className="row g-3 g-md-4 px-2">
         {topMovies.map((movie) => (
           <div
@@ -76,14 +76,16 @@ const MoviesSection = () => {
             {user && userReviews[movie.id] && (
               <div className="user-badge"> ✭ {userReviews[movie.id]} </div>
             )}
-            <ClickablePoster item={{ ...movie, media_type: "movie" }} />
-            <div className="movie-title-parent">
-              <p
-                className="movie-title text-white"
-                style={{ fontSize: "0.9rem" }}
-              >
-                {movie.title || movie.name}
-              </p>
+            <div
+              className="movie-card-inner text-decoration-none"
+            >
+              <ClickablePoster item={{ ...movie, media_type: "movie" }} />
+
+              <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  {movie.title || movie.name}
+                </p>
+              </div>
             </div>
           </div>
         ))}

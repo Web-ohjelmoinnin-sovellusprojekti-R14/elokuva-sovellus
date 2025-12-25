@@ -188,7 +188,7 @@ export default function TitleDetails() {
                        url(${IMG}/original${title.backdrop_path || title.poster_path}) center/cover no-repeat`,
           minHeight: "90vh",
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
           boxShadow: "inset 0 0 80px rgba(0,0,0,0.9)",
         }}
       >
@@ -213,11 +213,23 @@ export default function TitleDetails() {
               </h1>
 
               <div className="d-flex flex-wrap gap-3 mb-4 align-items-center">
-                {user && userReview && (
-                  <span className="badge bg-primary fs-4 px-4 py-2 shadow">
-                    {t("your_rating")}: {userReview.rating.toFixed(1)}
-                  </span>
+                {user && (
+                  <button
+                    className={`btn btn-primary badge fs-4 px-4 py-2 shadow border-0 ${"bg-primary"}`}
+                    style={{ cursor: "pointer", textAlign: "center", alignItems: "center",
+                      justifyContent: "center",
+                      lineHeight: 1,
+                      textAlign: "center", }}
+                    onClick={() =>
+                      document
+                        .getElementById("reviews")
+                        ?.scrollIntoView({ behavior: "smooth" })
+                    }
+                  >
+                    {userReview ? `${t("your_rating")}: ${userReview.rating.toFixed(1)}` : t("rate_movie")}
+                  </button>
                 )}
+
                 {title.imdb_rating && (
                   <span className="badge bg-warning text-dark fs-4 px-4 py-2 shadow">
                     IMDb {title.imdb_rating}
@@ -479,6 +491,7 @@ export default function TitleDetails() {
         {user && (
           <form
             onSubmit={handleSubmit}
+            id="reviews"
             className="mb-0 bg-dark bg-opacity-90 rounded-4 p-3 border border-secondary rounded-3"
           >
             <label className="form-label">{t("rating")}</label>

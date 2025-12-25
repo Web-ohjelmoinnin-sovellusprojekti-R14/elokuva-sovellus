@@ -85,6 +85,13 @@ export default function SearchResultsPage() {
       .catch((err) => console.error(err));
   }, [user]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
+
   const totalItems = allItems.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -129,14 +136,16 @@ export default function SearchResultsPage() {
                   {user && userReviews[item.id] && (
                     <div className="user-badge"> ✭ {userReviews[item.id]} </div>
                   )}
-                  <ClickablePoster item={item} />
-                  <div className="movie-title-parent">
-                    <p
-                      className="movie-title text-white"
-                      style={{ fontSize: "0.9rem" }}
-                    >
-                      {item.title || item.name}
-                    </p>
+                  <div
+                    className="movie-card-inner text-decoration-none"
+                  >
+                    <ClickablePoster item={item} />
+
+                    <div className="movie-title-parent">
+                      <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                        {item.title || item.name}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );

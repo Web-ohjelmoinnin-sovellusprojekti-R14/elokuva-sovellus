@@ -32,23 +32,15 @@ const ClickablePoster = ({ item }) => {
             : gifPoster
         }
         alt = {title}
-        className="img-fluid rounded"
+        className="img-fluid img-rounded"
         style = {{
           height: "280px",
           objectFit: "cover",
           width: "100%",
           boxShadow: "0 4px 15px rgba(0,0,0,0.6)",
-          transition: "all 0.3s ease",
         }}
         onError = {handleImageError}
-        onMouseEnter = {(e) => {
-          e.currentTarget.style.transform = "scale(1.05)";
-          e.currentTarget.style.boxShadow = "0 12px 30px rgba(255, 107, 0, 0.4)";
-        }}
-        onMouseLeave = {(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0 4px 15px rgba(0,0,0,0.6)";
-        }}
+
         onClick={ handleClick }
       />
     </div>

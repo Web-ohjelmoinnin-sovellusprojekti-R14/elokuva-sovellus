@@ -28,7 +28,8 @@ import cookieParser from 'cookie-parser'
 import removeFilmRouter from './routers/removeFilm.js'
 import addFilmRouter from './routers/addFilm.js'
 import getGroupFilmsRouter from './routers/getGroupFilms.js'
-import getReviewsSseRouter from './routers/getReviewsSSE.js';
+import getReviewsSseRouter from './routers/getReviewsSSE.js'
+import deleteUserRouter from './routers/deleteUser.js'
 
 const app = express()
 
@@ -73,6 +74,7 @@ app.use('/api', addFilmRouter)
 app.use('/api', removeFilmRouter)
 app.use('/api', getGroupFilmsRouter)
 app.use('/api', getReviewsSseRouter)
+app.use('/api', deleteUserRouter)
 
 const PORT = process.env.PORT || 5000
 

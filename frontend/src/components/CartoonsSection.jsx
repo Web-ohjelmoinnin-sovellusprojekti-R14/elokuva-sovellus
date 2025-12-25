@@ -75,14 +75,16 @@ const CartoonsSection = () => {
             {user && userReviews[cartoon.id] && (
               <div className="user-badge"> ✭ {userReviews[cartoon.id]} </div>
             )}
-            <ClickablePoster item={{ ...cartoon, media_type: "movie" }} />
-            <div className="movie-title-parent">
-              <p
-                className="movie-title text-white"
-                style={{ fontSize: "0.9rem" }}
-              >
-                {cartoon.title || cartoon.name}
-              </p>
+            <div
+              className="movie-card-inner text-decoration-none"
+            >
+              <ClickablePoster item={{ ...cartoon, media_type: "movie" }} />
+
+              <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  {cartoon.title || cartoon.name}
+                </p>
+              </div>
             </div>
           </div>
         ))}

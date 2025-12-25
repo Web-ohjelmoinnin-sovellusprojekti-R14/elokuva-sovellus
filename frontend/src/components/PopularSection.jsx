@@ -66,6 +66,7 @@ const PopularSection = () => {
       <h2 className="title-bg mb-4 text-white noBack">
         {t("trending_this_week")}
       </h2>
+      {/*<div className="underline-animation-sec mb-4"></div> */}
       <div className="row g-3 g-md-4 px-2">
         {trending.slice(0, 12).map((item) => (
           <div
@@ -74,19 +75,23 @@ const PopularSection = () => {
             style={{ position: "relative" }}
           >
             {item.imdb_rating && (
-              <div className="imdb-badge"> ⭐ {item.imdb_rating}</div>
+              <div className="imdb-badge">⭐ {item.imdb_rating}</div>
             )}
+
             {user && userReviews[item.id] && (
-              <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+              <div className="user-badge">✭ {userReviews[item.id]}</div>
             )}
-            <ClickablePoster item={item} />
-            <div className="movie-title-parent">
-              <p
-                className="movie-title text-white"
-                style={{ fontSize: "0.9rem" }}
-              >
-                {item.title || item.name}
-              </p>
+
+            <div
+              className="movie-card-inner text-decoration-none"
+            >
+              <ClickablePoster item={item} />
+
+              <div className="movie-title-parent">
+                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                  {item.title || item.name}
+                </p>
+              </div>
             </div>
           </div>
         ))}
