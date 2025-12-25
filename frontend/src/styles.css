@@ -460,7 +460,9 @@ footer {
 
 .movies {
   background-color: rgb(61, 61, 61);
-  border-bottom: 1px solid #444;
+  background: linear-gradient(-110deg, #363636 0%, #504f4f 50%, #3a3a3a 100%);
+  animation: subtle-glow 15s ease-in-out infinite alternate;
+  border-bottom: 1px solid #4b4a4a;
 }
 
 .movie-card {
@@ -542,8 +544,14 @@ footer {
 }
 
 .popular {
-  background-color: rgb(39, 39, 39);
+  background: linear-gradient(135deg, #202020 0%, #303030 50%, #252525 100%);
+  animation: subtle-glow 15s ease-in-out infinite alternate;
   border-bottom: 1px solid #444;
+}
+
+@keyframes subtle-glow {
+  0% { box-shadow: 0 0px 60px rgba(0,0,0,0.4); }
+  100% { box-shadow: 0 px 60px rgba(114,9,183,0.3); }
 }
 
 p.mt-2.text-white {
@@ -600,6 +608,52 @@ p.mt-2.text-white {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   color: white;
+}
+
+.underline-animation {
+  height: 4px;
+  width: 80px;
+  background: #ffc107;
+  border-radius: 2px;
+  margin-left: 10px;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.8);
+  animation: underlineExpand 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes underlineExpand {
+  0% {
+    width: 80px;
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.6);
+  }
+  100% {
+    width: 220px;
+    opacity: 1;
+    box-shadow: 0 0 25px rgba(255, 193, 7, 1);
+  }
+}
+
+.underline-animation-sec {
+  height: 4px;
+  width: 80px;
+  background: #d6d2da;
+  border-radius: 2px;
+  margin-left: 10px;
+  box-shadow: 0 0 15px rgba(180, 178, 182, 0.8);
+  animation: underlineExpand2 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes underlineExpand2 {
+  0% {
+    width: 80px;
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(133, 132, 133, 0.6);
+  }
+  100% {
+    width: 220px;
+    opacity: 1;
+    box-shadow: 0 0 25px rgb(121, 121, 121);
+  }
 }
 
 .title-under {

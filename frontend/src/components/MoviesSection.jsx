@@ -62,7 +62,7 @@ const MoviesSection = () => {
   return (
     <section className="movies container-md py-5">
       <h2 className="title-bg mb-4 text-white noBack">{t("films")}</h2>
-
+      {/*<div className="underline-animation-sec mb-4"></div> */}
       <div className="row g-3 g-md-4 px-2">
         {topMovies.map((movie) => (
           <div

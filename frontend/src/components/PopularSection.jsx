@@ -66,6 +66,7 @@ const PopularSection = () => {
       <h2 className="title-bg mb-4 text-white noBack">
         {t("trending_this_week")}
       </h2>
+      {/*<div className="underline-animation-sec mb-4"></div> */}
       <div className="row g-3 g-md-4 px-2">
         {trending.slice(0, 12).map((item) => (
           <div
