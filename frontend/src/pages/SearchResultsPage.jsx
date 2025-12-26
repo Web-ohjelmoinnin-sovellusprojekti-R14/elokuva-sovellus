@@ -78,7 +78,9 @@ export default function SearchResultsPage() {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
+          //reviewMap[`${r.movie_id}`] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -112,7 +114,7 @@ export default function SearchResultsPage() {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
+      <h2 className="title-bg mb-4 py-2 px-3 blackTitle withMargin text-SilverColor">
         {t("search_results_for")} "{query}" ({totalItems})
       </h2>
 
@@ -120,25 +122,32 @@ export default function SearchResultsPage() {
         <>
           <div className="row g-3 g-md-4 px-2">
             {pageItems.map((item) => {
+              const mediaType = item.media_type || (item.title ? "movie" : "tv");
               const poster = item.poster_path
                 ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
                 : "/images/no-poster.png";
 
               return (
                 <div
-                  key={item.id}
+                  //key={item.id}
+                  key={`${mediaType}-${item.id}`}
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
                   style={{ position: "relative" }}
                 >
                   {item.imdb_rating && (
                     <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                   )}
-                  {user && userReviews[item.id] && (
-                    <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+                  {user && userReviews[`${mediaType}-${item.id}`] && (
+                    <div className="user-badge"> ✭ {userReviews[`${mediaType}-${item.id}`]} </div>
                   )}
                   <div
                     className="movie-card-inner text-decoration-none"
                   >
+                    {user && userReviews[`${mediaType}-${item.id}`] ? (
+                      <div className="underline-animation me-auto"></div>
+                    ) : (
+                      <div className="underline-animation-sec me-auto"></div>
+                    )}
                     <ClickablePoster item={item} />
 
                     <div className="movie-title-parent">

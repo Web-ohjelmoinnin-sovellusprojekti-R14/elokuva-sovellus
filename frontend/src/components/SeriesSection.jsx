@@ -41,7 +41,8 @@ const SeriesSection = () => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type || "tv"}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -61,10 +62,12 @@ const SeriesSection = () => {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">{t("tv_series")}</h2>
+      <h2 className="title-bg py-2 px-3 text-white blackTitle withMargin">{t("tv_series")}</h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {topSeries.map((series) => (
+        {topSeries.map((series) => {
+          const mediaType = "tv";
+          return(
           <div
             key={series.id}
             className="col-6 col-md-4 col-lg-2 text-center movie-card"
@@ -73,12 +76,17 @@ const SeriesSection = () => {
             {series.imdb_rating && (
               <div className="imdb-badge">⭐ {series.imdb_rating}</div>
             )}
-            {user && userReviews[series.id] && (
-              <div className="user-badge"> ✭ {userReviews[series.id]} </div>
+            {user && userReviews[`${mediaType}-${series.id}`] && (
+              <div className="user-badge"> ✭ {userReviews[`${mediaType}-${series.id}`]} </div>
             )}
             <div
               className="movie-card-inner text-decoration-none"
             >
+              {user && userReviews[`${mediaType}-${series.id}`] ? (
+                <div className="underline-animation me-auto"></div>
+              ) : (
+                <div className="underline-animation-sec me-auto"></div>
+              )}
               <ClickablePoster item={{ ...series, media_type: "tv" }} />
 
               <div className="movie-title-parent">
@@ -88,7 +96,8 @@ const SeriesSection = () => {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="text-center mt-5">
