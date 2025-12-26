@@ -21,6 +21,8 @@ export default function NowInCinemaPage() {
     const fetchAllPages = async () => {
       setLoading(true);
       setError(null);
+      setAllMovies([]);
+      setCurrentPage(1);
       const movies = [];
 
       try {
@@ -67,7 +69,8 @@ export default function NowInCinemaPage() {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type || "movie"}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -105,7 +108,7 @@ export default function NowInCinemaPage() {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
+      <h2 className="title-bg mb-4 py-2 px-3 blackTitle withMargin text-SilverColor">
         {t("now_in_cinemas")} ({totalMovies} {t("def_films")})
       </h2>
 
@@ -113,6 +116,7 @@ export default function NowInCinemaPage() {
         <>
           <div className="row g-3 g-md-4 px-2">
             {currentMovies.map((movie) => {
+              const mediaType = "movie";
               const poster = movie.poster_path
                 ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                 : "/images/no-poster.png";
@@ -126,15 +130,20 @@ export default function NowInCinemaPage() {
                   {movie.imdb_rating && (
                     <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
                   )}
-                  {user && userReviews[movie.id] && (
+                  {user && userReviews[`${mediaType}-${movie.id}`] && (
                     <div className="user-badge">
                       {" "}
-                      ✭ {userReviews[movie.id]}{" "}
+                      ✭ {userReviews[`${mediaType}-${movie.id}`]}{" "}
                     </div>
                   )}
             <div
               className="movie-card-inner text-decoration-none"
             >
+              {user && userReviews[`${mediaType}-${movie.id}`] ? (
+                <div className="underline-animation me-auto"></div>
+              ) : (
+                <div className="underline-animation-sec me-auto"></div>
+              )}
               <ClickablePoster item={movie} />
 
               <div className="movie-title-parent">

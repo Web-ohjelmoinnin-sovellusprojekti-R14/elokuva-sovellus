@@ -40,7 +40,8 @@ const CartoonsSection = () => {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type || "movie"}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -60,10 +61,12 @@ const CartoonsSection = () => {
 
   return (
     <section className="movies container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">{t("cartoons")}</h2>
+      <h2 className="title-bg py-2 px-3 text-white brightTitle withMargin">{t("cartoons")}</h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {topCartoons.map((cartoon) => (
+        {topCartoons.map((cartoon) => {
+          const mediaType = "movie";
+          return(
           <div
             key={cartoon.id}
             className="col-6 col-md-4 col-lg-2 text-center movie-card"
@@ -72,12 +75,17 @@ const CartoonsSection = () => {
             {cartoon.imdb_rating && (
               <div className="imdb-badge">⭐ {cartoon.imdb_rating}</div>
             )}
-            {user && userReviews[cartoon.id] && (
-              <div className="user-badge"> ✭ {userReviews[cartoon.id]} </div>
+            {user && userReviews[`${mediaType}-${cartoon.id}`] && (
+              <div className="user-badge"> ✭ {userReviews[`${mediaType}-${cartoon.id}`]} </div>
             )}
             <div
               className="movie-card-inner text-decoration-none"
             >
+              {user && userReviews[`${mediaType}-${cartoon.id}`] ? (
+                <div className="underline-animation me-auto"></div>
+              ) : (
+                <div className="underline-animation-sec me-auto"></div>
+              )}
               <ClickablePoster item={{ ...cartoon, media_type: "movie" }} />
 
               <div className="movie-title-parent">
@@ -87,7 +95,8 @@ const CartoonsSection = () => {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="text-center mt-5">
