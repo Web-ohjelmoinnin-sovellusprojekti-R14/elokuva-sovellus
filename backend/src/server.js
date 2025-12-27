@@ -30,6 +30,7 @@ import addFilmRouter from './routers/addFilm.js'
 import getGroupFilmsRouter from './routers/getGroupFilms.js'
 import getReviewsSseRouter from './routers/getReviewsSSE.js'
 import deleteUserRouter from './routers/deleteUser.js'
+import versionRouter from './routers/version.js'
 
 const app = express()
 
@@ -75,6 +76,8 @@ app.use('/api', removeFilmRouter)
 app.use('/api', getGroupFilmsRouter)
 app.use('/api', getReviewsSseRouter)
 app.use('/api', deleteUserRouter)
+
+app.use('/version', versionRouter)
 
 const PORT = process.env.PORT || 5000
 
