@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import ClickablePoster from "../components/ClickablePoster";
 import { useAuth } from "../context/AuthContext";
@@ -78,7 +78,8 @@ export default function SearchResultsPage() {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -91,6 +92,49 @@ export default function SearchResultsPage() {
       behavior: "smooth",
     });
   }, [currentPage]);
+
+  const [dots, setDots] = useState([]);
+  const lineRef = useRef(null);
+  
+  useEffect(() => {
+    if (!lineRef.current) return;
+    const line = lineRef.current;
+  
+    function renderDottedLine() {
+      const lineWidth = line.offsetWidth;
+      const dotDiameter = 8;
+      const gap = 8;
+      const totalStep = dotDiameter + gap;
+      const count = Math.floor(lineWidth / totalStep);
+  
+      const newDots = [];
+      for (let i = 0; i < count; i++) {
+        const t = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(45 + (255 - 45) * t);
+        const g = Math.round(153 + (53 - 153) * t);
+        const b = Math.round(255 + (57 - 255) * t);
+        newDots.push(
+          <span
+            key={i}
+            style={{
+              backgroundColor: `rgb(${r},${g},${b})`,
+              width: dotDiameter,
+              height: dotDiameter,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      }
+      setDots(newDots);
+    }
+  
+    const observer = new ResizeObserver(renderDottedLine);
+    observer.observe(line);
+  
+    renderDottedLine();
+    return () => observer.disconnect();
+  }, [loading]);
 
   const totalLoadedItems = allItems.length;
   const totalPagesAvailable = Math.ceil(totalLoadedItems / ITEMS_PER_PAGE);
@@ -115,10 +159,10 @@ export default function SearchResultsPage() {
     if (q) return `Search: "${q}"`;
 
     const map = {
-      movies: "Films",
-      series: "Series",
-      anime: "Anime",
-      cartoons: "Cartoons",
+      movies: t("films"),
+      series: t("series"),
+      anime: t("anime"),
+      cartoons: t("cartoons"),
     };
 
     return map[category] || "Content";
@@ -140,27 +184,35 @@ export default function SearchResultsPage() {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
+      <h2 className="title-bg mb-4 py-2 withMargin text-white">
         {getTitle()} ({totalLoadedItems}
         {hasMore ? "" : "."})
+        <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
       </h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {pageItems.map((item) => (
+        {pageItems.map((item) => {
+          const mediaType = item.media_type || (item.title ? "movie" : "tv");
+          return (
           <div
-            key={`${item.id}-${item.media_type || "movie"}`}
+            key={`${mediaType}-${item.id}`}
             className="col-6 col-md-4 col-lg-2 text-center movie-card"
             style={{ position: "relative" }}
           >
             {item.imdb_rating && (
               <div className="imdb-badge">⭐ {item.imdb_rating}</div>
             )}
-            {user && userReviews[item.id] && (
-              <div className="user-badge"> ✭ {userReviews[item.id]} </div>
+            {user && userReviews[`${mediaType}-${item.id}`] && (
+              <div className="user-badge"> ✭ {userReviews[`${mediaType}-${item.id}`]} </div>
             )}
             <div
               className="movie-card-inner text-decoration-none"
             >
+              {user && userReviews[`${mediaType}-${item.id}`] ? (
+                <div className="underline-animation me-auto"></div>
+              ) : (
+                <div className="underline-animation-sec me-auto"></div>
+              )}
               <ClickablePoster item={item} />
 
               <div className="movie-title-parent">
@@ -170,7 +222,8 @@ export default function SearchResultsPage() {
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="text-center my-5">

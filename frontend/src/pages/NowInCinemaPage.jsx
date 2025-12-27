@@ -21,6 +21,8 @@ export default function NowInCinemaPage() {
     const fetchAllPages = async () => {
       setLoading(true);
       setError(null);
+      setAllMovies([]);
+      setCurrentPage(1);
       const movies = [];
 
       try {
@@ -67,7 +69,8 @@ export default function NowInCinemaPage() {
         if (!Array.isArray(data)) return;
         const reviewMap = {};
         data.forEach((r) => {
-          reviewMap[`${r.movie_id}`] = r.rating;
+          const key = `${r.media_type || "movie"}-${r.movie_id}`;
+          reviewMap[key] = r.rating;
         });
         setUserReviews(reviewMap);
       })
@@ -80,6 +83,49 @@ export default function NowInCinemaPage() {
       behavior: "smooth",
     });
   }, [currentPage]);
+
+const [dots, setDots] = useState([]);
+const lineRef = useRef(null);
+
+useEffect(() => {
+  if (!lineRef.current) return;
+  const line = lineRef.current;
+
+  function renderDottedLine() {
+    const lineWidth = line.offsetWidth;
+    const dotDiameter = 8;
+    const gap = 8;
+    const totalStep = dotDiameter + gap;
+    const count = Math.floor(lineWidth / totalStep);
+
+    const newDots = [];
+    for (let i = 0; i < count; i++) {
+      const t = count > 1 ? i / (count - 1) : 0;
+      const r = Math.round(45 + (255 - 45) * t);
+      const g = Math.round(153 + (53 - 153) * t);
+      const b = Math.round(255 + (57 - 255) * t);
+      newDots.push(
+        <span
+          key={i}
+          style={{
+            backgroundColor: `rgb(${r},${g},${b})`,
+            width: dotDiameter,
+            height: dotDiameter,
+            borderRadius: "50%",
+            display: "inline-block",
+          }}
+        />
+      );
+    }
+    setDots(newDots);
+  }
+
+  const observer = new ResizeObserver(renderDottedLine);
+  observer.observe(line);
+
+  renderDottedLine();
+  return () => observer.disconnect();
+}, [loading]);
 
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
@@ -105,14 +151,15 @@ export default function NowInCinemaPage() {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 text-white noBack">
+      <h2 className="title-bg mb-4 py-2 withMargin text-white">
         {t("now_in_cinemas")} ({totalMovies} {t("def_films")})
+              <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
       </h2>
-
       {currentMovies.length > 0 ? (
         <>
           <div className="row g-3 g-md-4 px-2">
             {currentMovies.map((movie) => {
+              const mediaType = "movie";
               const poster = movie.poster_path
                 ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                 : "/images/no-poster.png";
@@ -126,15 +173,20 @@ export default function NowInCinemaPage() {
                   {movie.imdb_rating && (
                     <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
                   )}
-                  {user && userReviews[movie.id] && (
+                  {user && userReviews[`${mediaType}-${movie.id}`] && (
                     <div className="user-badge">
                       {" "}
-                      ✭ {userReviews[movie.id]}{" "}
+                      ✭ {userReviews[`${mediaType}-${movie.id}`]}{" "}
                     </div>
                   )}
             <div
               className="movie-card-inner text-decoration-none"
             >
+              {user && userReviews[`${mediaType}-${movie.id}`] ? (
+                <div className="underline-animation me-auto"></div>
+              ) : (
+                <div className="underline-animation-sec me-auto"></div>
+              )}
               <ClickablePoster item={movie} />
 
               <div className="movie-title-parent">
