@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ClickablePoster from "./ClickablePoster";
 import { useAuth } from "../context/AuthContext";
@@ -43,6 +43,49 @@ const AnimeSection = () => {
       .catch((err) => console.error(err));
   }, [user]);
 
+      const [dots, setDots] = useState([]);
+        const lineRef = useRef(null);
+        
+        useEffect(() => {
+          if (!lineRef.current) return;
+          const line = lineRef.current;
+        
+          function renderDottedLine() {
+            const lineWidth = line.offsetWidth;
+            const dotDiameter = 8;
+            const gap = 8;
+            const totalStep = dotDiameter + gap;
+            const count = Math.floor(lineWidth / totalStep);
+        
+            const newDots = [];
+            for (let i = 0; i < count; i++) {
+              const t = count > 1 ? i / (count - 1) : 0;
+              const r = Math.round(45 + (255 - 45) * t);
+              const g = Math.round(153 + (53 - 153) * t);
+              const b = Math.round(255 + (57 - 255) * t);
+              newDots.push(
+                <span
+                  key={i}
+                  style={{
+                    backgroundColor: `rgb(${r},${g},${b})`,
+                    width: dotDiameter,
+                    height: dotDiameter,
+                    borderRadius: "50%",
+                    display: "inline-block",
+                  }}
+                />
+              );
+            }
+            setDots(newDots);
+          }
+        
+          const observer = new ResizeObserver(renderDottedLine);
+          observer.observe(line);
+        
+          renderDottedLine();
+          return () => observer.disconnect();
+        }, [loading]);
+
   if (loading) {
     return (
       <section className="popular container-md py-5 text-center">
@@ -54,7 +97,9 @@ const AnimeSection = () => {
 
   return (
     <section className="popular container-md py-5">
-      <h2 class="title-bg py-2 px-3 text-white blackTitle withMargin">{t("anime")}</h2>
+      <h2 class="title-bg py-2 text-white withMargin">{t("anime")}
+        <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
+      </h2>
 
       <div className="row g-3 g-md-4 px-2">
         {topAnime.map((anime) => {

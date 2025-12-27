@@ -94,6 +94,49 @@ export default function SearchResultsPage() {
     });
   }, [currentPage]);
 
+      const [dots, setDots] = useState([]);
+        const lineRef = useRef(null);
+        
+        useEffect(() => {
+          if (!lineRef.current) return;
+          const line = lineRef.current;
+        
+          function renderDottedLine() {
+            const lineWidth = line.offsetWidth;
+            const dotDiameter = 8;
+            const gap = 8;
+            const totalStep = dotDiameter + gap;
+            const count = Math.floor(lineWidth / totalStep);
+        
+            const newDots = [];
+            for (let i = 0; i < count; i++) {
+              const t = count > 1 ? i / (count - 1) : 0;
+              const r = Math.round(45 + (255 - 45) * t);
+              const g = Math.round(153 + (53 - 153) * t);
+              const b = Math.round(255 + (57 - 255) * t);
+              newDots.push(
+                <span
+                  key={i}
+                  style={{
+                    backgroundColor: `rgb(${r},${g},${b})`,
+                    width: dotDiameter,
+                    height: dotDiameter,
+                    borderRadius: "50%",
+                    display: "inline-block",
+                  }}
+                />
+              );
+            }
+            setDots(newDots);
+          }
+        
+          const observer = new ResizeObserver(renderDottedLine);
+          observer.observe(line);
+        
+          renderDottedLine();
+          return () => observer.disconnect();
+        }, [loading]);
+
   const totalItems = allItems.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
@@ -114,8 +157,9 @@ export default function SearchResultsPage() {
 
   return (
     <section className="popular container-md py-5">
-      <h2 className="title-bg mb-4 py-2 px-3 blackTitle withMargin text-SilverColor">
+      <h2 className="title-bg mb-4 py-2 withMargin text-white">
         {t("search_results_for")} "{query}" ({totalItems})
+        <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
       </h2>
 
       {pageItems.length > 0 ? (
