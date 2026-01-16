@@ -14,10 +14,7 @@ export async function getUserReviews(user_id) {
     return reviewsCache.get(cacheKey)
   }
 
-  const res = await pool.query(
-    'SELECT * FROM "review" WHERE user_id = $1 ORDER BY created_at DESC',
-    [user_id]
-  )
+  const res = await pool.query('SELECT * FROM "review" WHERE user_id = $1 ORDER BY created_at DESC', [user_id])
 
   reviewsCache.set(cacheKey, res.rows)
   return res.rows
@@ -31,12 +28,18 @@ export async function enrichReview(review, language) {
   }
 
   return limit(async () => {
-    const details = await getTitleDetails(
-      review.movie_id,
-      review.media_type,
-      language
-    )
-
+    const details = await getTitleDetails(review.movie_id, review.media_type, language)
+    if (review.media_type == 'tv') {
+      let episode_run_time = details.episode_run_time[0]
+      if (!episode_run_time) {
+        if (details.genres[0].id == 16) {
+          episode_run_time = 20
+        } else {
+          episode_run_time = 50
+        }
+      }
+      details.runtime = episode_run_time * details.number_of_episodes
+    }
     detailsCache.set(cacheKey, details)
     return { ...review, details }
   })
