@@ -30,12 +30,14 @@ export async function enrichReview(review, language) {
   return limit(async () => {
     const details = await getTitleDetails(review.movie_id, review.media_type, language)
     if (review.media_type == 'tv') {
-      let episode_run_time = details.episode_run_time[0]
+      let episode_run_time = details.episode_run_time[0] || 0
       if (!episode_run_time) {
-        if (details.genres[0].id == 16) {
-          episode_run_time = 20
-        } else {
-          episode_run_time = 50
+        if (details.genres.length > 0) {
+          if (details.genres[0].id == 16) {
+            episode_run_time = 20
+          } else {
+            episode_run_time = 50
+          }
         }
       }
       details.runtime = episode_run_time * details.number_of_episodes
