@@ -89,6 +89,8 @@ export const translations = {
     confirm_delete_account: "Are you sure you want to permanently delete your account? This action cannot be undone.",
     err_del_acc: "Error deleting account",
     rate_movie: "Rate",
+    hours_watched: "Hours watched",
+    site_rating: "User points",
 
     g_n_req: "Group name is required",
     f_g: "Failed to create group",
@@ -274,6 +276,8 @@ export const translations = {
     confirm_delete_account: "Вы уверены, что хотите навсегда удалить свой аккаунт? Это действие нельзя отменить.",
     err_del_acc: "Ошибка при удалении аккаунта",
     rate_movie: "Оценить",
+    hours_watched: "Просмотрено часов",
+    site_rating: "Рейтинг пользователя",
 
     g_n_req: "Название группы обязательно",
     f_g: "Не удалось создать группу",
@@ -457,6 +461,8 @@ export const translations = {
     user_reviews_distribution: "Arviosi",
     mid: "Keskiarvio",
     rate_movie: "Arvioi",
+    hours_watched: "Katsottuja tunteja",
+    site_rating: "Käyttäjän pisteet",
 
     g_n_req: "Ryhmän nimi on pakollinen",
     f_g: "Ryhmää ei voitu luoda",

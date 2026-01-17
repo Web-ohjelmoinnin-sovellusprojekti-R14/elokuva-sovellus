@@ -48,6 +48,7 @@ const RatingDistributionChart = ({ reviews, onRatingClick, watchtime = 0, rating
   const { user } = useAuth();
 
   const effectiveReviews = [...reviews];
+
   const isBossProfile = reviews.some(r => r.username === "boss");
 
   if (isBossProfile) {
@@ -86,7 +87,10 @@ const RatingDistributionChart = ({ reviews, onRatingClick, watchtime = 0, rating
   const totalReviews = effectiveReviews.length;
   const avgRating =
     totalReviews > 0
-      ? (effectiveReviews.reduce((sum, r) => sum + parseFloat(r.rating), 0) / totalReviews).toFixed(1)
+      ? (
+          effectiveReviews.reduce((sum, r) => sum + parseFloat(r.rating), 0) /
+          totalReviews
+        ).toFixed(1)
       : "—";
 
   return (
@@ -194,7 +198,6 @@ export default function UserReviewsPage() {
 
   const [targetUserId, setTargetUserId] = useState(null);
   const [username, setUsername] = useState(null);
-  const [usernameLoading, setUsernameLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState({ loaded: 0, total: 0 });
@@ -222,10 +225,7 @@ export default function UserReviewsPage() {
     if (!targetUserId) return;
 
     setLoading(true);
-    setUsernameLoading(true);
     setProgress({ loaded: 0, total: 0 });
-    setWatchtime(0);
-    setRating(0);
     accumulatedReviews.current = [];
     setConnectionAttempts(0);
     setError(null);
@@ -256,7 +256,7 @@ export default function UserReviewsPage() {
         } catch {}
       });
 
-      evtSource.addEventListener("progress", (e) => {
+     evtSource.addEventListener("progress", (e) => {
         try {
           const data = JSON.parse(e.data);
 
@@ -264,7 +264,6 @@ export default function UserReviewsPage() {
 
           if (data.username && !username) {
             setUsername(data.username);
-            setUsernameLoading(false);
           }
 
           if (data.watchtime !== undefined) {
@@ -299,7 +298,6 @@ export default function UserReviewsPage() {
         setLoading(false);
         setConnectionAttempts(0);
         evtSource.close();
-        if (usernameLoading) setUsernameLoading(false);
       });
 
       evtSource.addEventListener("error", (e) => {
@@ -312,7 +310,6 @@ export default function UserReviewsPage() {
           setTimeout(connectSSE, delay);
         } else {
           setLoading(false);
-          setUsernameLoading(false);
           setError("Failed to load reviews");
         }
       });
@@ -324,24 +321,15 @@ export default function UserReviewsPage() {
       if (evtSource) evtSource.close();
       setConnectionAttempts(0);
     };
-  }, [targetUserId, currentUser?.user_id, getTmdbLanguage]); // ← добавлена зависимость от языка!
+  }, [targetUserId, currentUser?.user_id, getTmdbLanguage]);
 
-  if (!currentUser) {
-    return (
-      <div className="container py-5 text-center">
-        <h2 className="text-white noBack">{t("login_to_see_reviews")}</h2>
-      </div>
-    );
-  }
+  const isOwnProfile = currentUser && currentUser.user_id === Number(targetUserId);
 
-  const isOwnProfile = currentUser.user_id === Number(targetUserId);
   const isBossProfile = username === "boss";
 
   const displayName = isOwnProfile
-    ? currentUser?.username || t("loading_user")
-    : usernameLoading
-      ? t("loading_user")
-      : username || `User ${targetUserId}`;
+    ? currentUser?.username
+    : username || `User ID ${targetUserId}`;
 
   if (!targetUserId) {
     return <div className="text-danger text-center py-5">No user selected</div>;
@@ -357,7 +345,7 @@ export default function UserReviewsPage() {
     <div className="container py-5">
       <h1 className="display-5 text-white mb-5 text-center text-uppercase fw-bold opacity-75 noBack">
         {isOwnProfile 
-          ? `${t("my_reviews")} • ${currentUser?.username || t("loading_user")}` 
+          ? `${t("my_reviews")} • ${currentUser?.username}` 
           : `${t("reviews")} • ${displayName}`}
       </h1>
 

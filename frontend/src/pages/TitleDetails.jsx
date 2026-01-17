@@ -186,14 +186,13 @@ export default function TitleDetails() {
         style={{
           background: `linear-gradient(to top, #0d0d12 0%, rgba(10,10,20,0.7) 50%, rgba(10,10,20,0.9) 100%),
                        url(${IMG}/original${title.backdrop_path || title.poster_path}) center/cover no-repeat`,
-          minHeight: "90vh",
           display: "flex",
           alignItems: "center",
           boxShadow: "inset 0 0 80px rgba(0,0,0,0.9)",
         }}
       >
         <div className="container pb-5">
-          <div className="row align-items-end">
+          <div className="row align-items-center">
             <div className="col-lg-4 mb-4 mb-lg-0">
               <img
                 src={
@@ -547,7 +546,17 @@ export default function TitleDetails() {
                   )}
 
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <strong className="fs-5">{r.username}</strong>
+                    <Link
+                      to={
+                        isOwnReview
+                          ? "/my-reviews"
+                          : `/user-reviews?user_id=${r.user_id}`
+                      }
+                      className="text-info fs-5 text-white review-author-link"
+                      style={{ textDecoration: "none" }}
+                    >
+                      {r.username}
+                    </Link>
                     <div className="d-flex align-items-center">
                       {Array.from({ length: 10 }).map((_, i) => {
                         const value = i + 1;
