@@ -23,4 +23,20 @@ router.get(
   getReviewsByUserIdSSE
 )
 
+router.get(
+  '/get_others_reviews_by_user_id_sse',
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
+  limiter,
+  async (req, res) => {
+    if (!req.query.user_id) {
+      return res.status(400).json({ error: 'User ID is not provided' })
+    }
+    req.user = { user_id: req.query.user_id }
+    getReviewsByUserIdSSE(req, res)
+  }
+)
+
 export default router

@@ -38,9 +38,9 @@ const MoviesSection = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) return;
+        if (!Array.isArray(data.rows)) return;
         const reviewMap = {};
-        data.forEach((r) => {
+        data.rows.forEach((r) => {
           const key = `${r.media_type || "movie"}-${r.movie_id}`;
           reviewMap[key] = r.rating;
         });
@@ -50,47 +50,47 @@ const MoviesSection = () => {
   }, [user]);
 
   const [dots, setDots] = useState([]);
-    const lineRef = useRef(null);
-    
-    useEffect(() => {
-      if (!lineRef.current) return;
-      const line = lineRef.current;
-    
-      function renderDottedLine() {
-        const lineWidth = line.offsetWidth;
-        const dotDiameter = 8;
-        const gap = 8;
-        const totalStep = dotDiameter + gap;
-        const count = Math.floor(lineWidth / totalStep);
-    
-        const newDots = [];
-        for (let i = 0; i < count; i++) {
-          const t = count > 1 ? i / (count - 1) : 0;
-          const r = Math.round(45 + (255 - 45) * t);
-          const g = Math.round(153 + (53 - 153) * t);
-          const b = Math.round(255 + (57 - 255) * t);
-          newDots.push(
-            <span
-              key={i}
-              style={{
-                backgroundColor: `rgb(${r},${g},${b})`,
-                width: dotDiameter,
-                height: dotDiameter,
-                borderRadius: "50%",
-                display: "inline-block",
-              }}
-            />
-          );
-        }
-        setDots(newDots);
+  const lineRef = useRef(null);
+
+  useEffect(() => {
+    if (!lineRef.current) return;
+    const line = lineRef.current;
+
+    function renderDottedLine() {
+      const lineWidth = line.offsetWidth;
+      const dotDiameter = 8;
+      const gap = 8;
+      const totalStep = dotDiameter + gap;
+      const count = Math.floor(lineWidth / totalStep);
+
+      const newDots = [];
+      for (let i = 0; i < count; i++) {
+        const t = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(45 + (255 - 45) * t);
+        const g = Math.round(153 + (53 - 153) * t);
+        const b = Math.round(255 + (57 - 255) * t);
+        newDots.push(
+          <span
+            key={i}
+            style={{
+              backgroundColor: `rgb(${r},${g},${b})`,
+              width: dotDiameter,
+              height: dotDiameter,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
       }
-    
-      const observer = new ResizeObserver(renderDottedLine);
-      observer.observe(line);
-    
-      renderDottedLine();
-      return () => observer.disconnect();
-    }, [loading]);
+      setDots(newDots);
+    }
+
+    const observer = new ResizeObserver(renderDottedLine);
+    observer.observe(line);
+
+    renderDottedLine();
+    return () => observer.disconnect();
+  }, [loading]);
 
   if (loading) {
     return (
@@ -105,41 +105,48 @@ const MoviesSection = () => {
 
   return (
     <section className="movies container-md py-5">
-      <h2 className="title-bg py-2 text-white withMargin">{t("films")}
-              <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
+      <h2 className="title-bg py-2 text-white withMargin">
+        {t("films")}
+        <div className="title-bg-line" ref={lineRef}>
+          {dots} {/**/}
+        </div>
       </h2>
       <div className="row g-3 g-md-4 px-2">
         {topMovies.map((movie) => {
           const mediaType = "movie";
-          return(
-          <div
-            key={movie.id}
-            className="col-6 col-md-4 col-lg-2 text-center movie-card"
-            style={{ position: "relative" }}
-          >
-            {movie.imdb_rating && (
-              <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
-            )}
-            {user && userReviews[`${mediaType}-${movie.id}`] && (
-              <div className="user-badge"> ✭ {userReviews[`${mediaType}-${movie.id}`]} </div>
-            )}
+          return (
             <div
-              className="movie-card-inner text-decoration-none"
+              key={movie.id}
+              className="col-6 col-md-4 col-lg-2 text-center movie-card"
+              style={{ position: "relative" }}
             >
-              {user && userReviews[`${mediaType}-${movie.id}`] ? (
-                <div className="underline-animation me-auto"></div>
-              ) : (
-                <div className="underline-animation-sec me-auto"></div>
+              {movie.imdb_rating && (
+                <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
               )}
-              <ClickablePoster item={{ ...movie, media_type: "movie" }} />
+              {user && userReviews[`${mediaType}-${movie.id}`] && (
+                <div className="user-badge">
+                  {" "}
+                  ✭ {userReviews[`${mediaType}-${movie.id}`]}{" "}
+                </div>
+              )}
+              <div className="movie-card-inner text-decoration-none">
+                {user && userReviews[`${mediaType}-${movie.id}`] ? (
+                  <div className="underline-animation me-auto"></div>
+                ) : (
+                  <div className="underline-animation-sec me-auto"></div>
+                )}
+                <ClickablePoster item={{ ...movie, media_type: "movie" }} />
 
-              <div className="movie-title-parent">
-                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                  {movie.title || movie.name}
-                </p>
+                <div className="movie-title-parent">
+                  <p
+                    className="movie-title text-white"
+                    style={{ fontSize: "0.9rem" }}
+                  >
+                    {movie.title || movie.name}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
           );
         })}
       </div>

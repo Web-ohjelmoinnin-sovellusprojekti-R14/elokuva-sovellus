@@ -103,7 +103,7 @@ async function getBatch(category, batchNum = 1, filters = {}) {
     )
 
     const filtered = enriched
-      .filter(i => i && i.imdb_rating)
+      .filter(i => i && i.imdb_rating && i.imdb_rating != 10)
       .sort((a, b) => parseFloat(b.imdb_rating) - parseFloat(a.imdb_rating))
       .slice(0, ITEMS_PER_BATCH * 2)
 
