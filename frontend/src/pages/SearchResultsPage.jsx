@@ -75,9 +75,9 @@ export default function SearchResultsPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) return;
+        if (!Array.isArray(data.rows)) return;
         const reviewMap = {};
-        data.forEach((r) => {
+        data.rows.forEach((r) => {
           const key = `${r.media_type}-${r.movie_id}`;
           reviewMap[key] = r.rating;
           //reviewMap[`${r.movie_id}`] = r.rating;
@@ -94,48 +94,48 @@ export default function SearchResultsPage() {
     });
   }, [currentPage]);
 
-      const [dots, setDots] = useState([]);
-        const lineRef = useRef(null);
-        
-        useEffect(() => {
-          if (!lineRef.current) return;
-          const line = lineRef.current;
-        
-          function renderDottedLine() {
-            const lineWidth = line.offsetWidth;
-            const dotDiameter = 8;
-            const gap = 8;
-            const totalStep = dotDiameter + gap;
-            const count = Math.floor(lineWidth / totalStep);
-        
-            const newDots = [];
-            for (let i = 0; i < count; i++) {
-              const t = count > 1 ? i / (count - 1) : 0;
-              const r = Math.round(45 + (255 - 45) * t);
-              const g = Math.round(153 + (53 - 153) * t);
-              const b = Math.round(255 + (57 - 255) * t);
-              newDots.push(
-                <span
-                  key={i}
-                  style={{
-                    backgroundColor: `rgb(${r},${g},${b})`,
-                    width: dotDiameter,
-                    height: dotDiameter,
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                />
-              );
-            }
-            setDots(newDots);
-          }
-        
-          const observer = new ResizeObserver(renderDottedLine);
-          observer.observe(line);
-        
-          renderDottedLine();
-          return () => observer.disconnect();
-        }, [loading]);
+  const [dots, setDots] = useState([]);
+  const lineRef = useRef(null);
+
+  useEffect(() => {
+    if (!lineRef.current) return;
+    const line = lineRef.current;
+
+    function renderDottedLine() {
+      const lineWidth = line.offsetWidth;
+      const dotDiameter = 8;
+      const gap = 8;
+      const totalStep = dotDiameter + gap;
+      const count = Math.floor(lineWidth / totalStep);
+
+      const newDots = [];
+      for (let i = 0; i < count; i++) {
+        const t = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(45 + (255 - 45) * t);
+        const g = Math.round(153 + (53 - 153) * t);
+        const b = Math.round(255 + (57 - 255) * t);
+        newDots.push(
+          <span
+            key={i}
+            style={{
+              backgroundColor: `rgb(${r},${g},${b})`,
+              width: dotDiameter,
+              height: dotDiameter,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      }
+      setDots(newDots);
+    }
+
+    const observer = new ResizeObserver(renderDottedLine);
+    observer.observe(line);
+
+    renderDottedLine();
+    return () => observer.disconnect();
+  }, [loading]);
 
   const totalItems = allItems.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -159,14 +159,17 @@ export default function SearchResultsPage() {
     <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 py-2 withMargin text-white">
         {t("search_results_for")} "{query}" ({totalItems})
-        <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
+        <div className="title-bg-line" ref={lineRef}>
+          {dots} {/**/}
+        </div>
       </h2>
 
       {pageItems.length > 0 ? (
         <>
           <div className="row g-3 g-md-4 px-2">
             {pageItems.map((item) => {
-              const mediaType = item.media_type || (item.title ? "movie" : "tv");
+              const mediaType =
+                item.media_type || (item.title ? "movie" : "tv");
               const poster = item.poster_path
                 ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
                 : "/images/no-poster.png";
@@ -182,11 +185,12 @@ export default function SearchResultsPage() {
                     <div className="imdb-badge">⭐ {item.imdb_rating}</div>
                   )}
                   {user && userReviews[`${mediaType}-${item.id}`] && (
-                    <div className="user-badge"> ✭ {userReviews[`${mediaType}-${item.id}`]} </div>
+                    <div className="user-badge">
+                      {" "}
+                      ✭ {userReviews[`${mediaType}-${item.id}`]}{" "}
+                    </div>
                   )}
-                  <div
-                    className="movie-card-inner text-decoration-none"
-                  >
+                  <div className="movie-card-inner text-decoration-none">
                     {user && userReviews[`${mediaType}-${item.id}`] ? (
                       <div className="underline-animation me-auto"></div>
                     ) : (
@@ -195,7 +199,10 @@ export default function SearchResultsPage() {
                     <ClickablePoster item={item} />
 
                     <div className="movie-title-parent">
-                      <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
+                      <p
+                        className="movie-title text-white"
+                        style={{ fontSize: "0.9rem" }}
+                      >
                         {item.title || item.name}
                       </p>
                     </div>

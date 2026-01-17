@@ -40,6 +40,9 @@ export async function enrichReview(review, language) {
       }
       details.runtime = episode_run_time * details.number_of_episodes
     }
+    if (review.media_type == 'movie' && (!details.runtime || details.runtime == 0)) {
+      details.runtime = 90
+    }
     detailsCache.set(cacheKey, details)
     return { ...review, details }
   })

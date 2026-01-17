@@ -32,9 +32,9 @@ const AnimeSection = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) return;
+        if (!Array.isArray(data.rows)) return;
         const reviewMap = {};
-        data.forEach((r) => {
+        data.rows.forEach((r) => {
           const key = `${r.media_type || "tv"}-${r.movie_id}`;
           reviewMap[key] = r.rating;
         });
@@ -43,48 +43,48 @@ const AnimeSection = () => {
       .catch((err) => console.error(err));
   }, [user]);
 
-      const [dots, setDots] = useState([]);
-        const lineRef = useRef(null);
-        
-        useEffect(() => {
-          if (!lineRef.current) return;
-          const line = lineRef.current;
-        
-          function renderDottedLine() {
-            const lineWidth = line.offsetWidth;
-            const dotDiameter = 8;
-            const gap = 8;
-            const totalStep = dotDiameter + gap;
-            const count = Math.floor(lineWidth / totalStep);
-        
-            const newDots = [];
-            for (let i = 0; i < count; i++) {
-              const t = count > 1 ? i / (count - 1) : 0;
-              const r = Math.round(45 + (255 - 45) * t);
-              const g = Math.round(153 + (53 - 153) * t);
-              const b = Math.round(255 + (57 - 255) * t);
-              newDots.push(
-                <span
-                  key={i}
-                  style={{
-                    backgroundColor: `rgb(${r},${g},${b})`,
-                    width: dotDiameter,
-                    height: dotDiameter,
-                    borderRadius: "50%",
-                    display: "inline-block",
-                  }}
-                />
-              );
-            }
-            setDots(newDots);
-          }
-        
-          const observer = new ResizeObserver(renderDottedLine);
-          observer.observe(line);
-        
-          renderDottedLine();
-          return () => observer.disconnect();
-        }, [loading]);
+  const [dots, setDots] = useState([]);
+  const lineRef = useRef(null);
+
+  useEffect(() => {
+    if (!lineRef.current) return;
+    const line = lineRef.current;
+
+    function renderDottedLine() {
+      const lineWidth = line.offsetWidth;
+      const dotDiameter = 8;
+      const gap = 8;
+      const totalStep = dotDiameter + gap;
+      const count = Math.floor(lineWidth / totalStep);
+
+      const newDots = [];
+      for (let i = 0; i < count; i++) {
+        const t = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(45 + (255 - 45) * t);
+        const g = Math.round(153 + (53 - 153) * t);
+        const b = Math.round(255 + (57 - 255) * t);
+        newDots.push(
+          <span
+            key={i}
+            style={{
+              backgroundColor: `rgb(${r},${g},${b})`,
+              width: dotDiameter,
+              height: dotDiameter,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      }
+      setDots(newDots);
+    }
+
+    const observer = new ResizeObserver(renderDottedLine);
+    observer.observe(line);
+
+    renderDottedLine();
+    return () => observer.disconnect();
+  }, [loading]);
 
   if (loading) {
     return (
@@ -97,42 +97,49 @@ const AnimeSection = () => {
 
   return (
     <section className="popular container-md py-5">
-      <h2 class="title-bg py-2 text-white withMargin">{t("anime")}
-        <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
+      <h2 class="title-bg py-2 text-white withMargin">
+        {t("anime")}
+        <div className="title-bg-line" ref={lineRef}>
+          {dots} {/**/}
+        </div>
       </h2>
 
       <div className="row g-3 g-md-4 px-2">
         {topAnime.map((anime) => {
           const mediaType = "tv";
-          return(
-          <div
-            key={anime.id}
-            className="col-6 col-md-4 col-lg-2 text-center movie-card"
-            style={{ position: "relative" }}
-          >
-            {anime.imdb_rating && (
-              <div className="imdb-badge">⭐ {anime.imdb_rating}</div>
-            )}
-            {user && userReviews[`${mediaType}-${anime.id}`] && (
-              <div className="user-badge"> ✭ {userReviews[`${mediaType}-${anime.id}`]} </div>
-            )}
+          return (
             <div
-              className="movie-card-inner text-decoration-none"
+              key={anime.id}
+              className="col-6 col-md-4 col-lg-2 text-center movie-card"
+              style={{ position: "relative" }}
             >
-              {user && userReviews[`${mediaType}-${anime.id}`] ? (
-                <div className="underline-animation me-auto"></div>
-              ) : (
-                <div className="underline-animation-sec me-auto"></div>
+              {anime.imdb_rating && (
+                <div className="imdb-badge">⭐ {anime.imdb_rating}</div>
               )}
-              <ClickablePoster item={{ ...anime, media_type: "tv" }} />
+              {user && userReviews[`${mediaType}-${anime.id}`] && (
+                <div className="user-badge">
+                  {" "}
+                  ✭ {userReviews[`${mediaType}-${anime.id}`]}{" "}
+                </div>
+              )}
+              <div className="movie-card-inner text-decoration-none">
+                {user && userReviews[`${mediaType}-${anime.id}`] ? (
+                  <div className="underline-animation me-auto"></div>
+                ) : (
+                  <div className="underline-animation-sec me-auto"></div>
+                )}
+                <ClickablePoster item={{ ...anime, media_type: "tv" }} />
 
-              <div className="movie-title-parent">
-                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                   {anime.title || anime.name}
-                </p>
+                <div className="movie-title-parent">
+                  <p
+                    className="movie-title text-white"
+                    style={{ fontSize: "0.9rem" }}
+                  >
+                    {anime.title || anime.name}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
           );
         })}
       </div>

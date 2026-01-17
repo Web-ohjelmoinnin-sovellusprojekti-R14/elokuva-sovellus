@@ -66,9 +66,9 @@ export default function NowInCinemaPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!Array.isArray(data)) return;
+        if (!Array.isArray(data.rows)) return;
         const reviewMap = {};
-        data.forEach((r) => {
+        data.rows.forEach((r) => {
           const key = `${r.media_type || "movie"}-${r.movie_id}`;
           reviewMap[key] = r.rating;
         });
@@ -84,48 +84,48 @@ export default function NowInCinemaPage() {
     });
   }, [currentPage]);
 
-const [dots, setDots] = useState([]);
-const lineRef = useRef(null);
+  const [dots, setDots] = useState([]);
+  const lineRef = useRef(null);
 
-useEffect(() => {
-  if (!lineRef.current) return;
-  const line = lineRef.current;
+  useEffect(() => {
+    if (!lineRef.current) return;
+    const line = lineRef.current;
 
-  function renderDottedLine() {
-    const lineWidth = line.offsetWidth;
-    const dotDiameter = 8;
-    const gap = 8;
-    const totalStep = dotDiameter + gap;
-    const count = Math.floor(lineWidth / totalStep);
+    function renderDottedLine() {
+      const lineWidth = line.offsetWidth;
+      const dotDiameter = 8;
+      const gap = 8;
+      const totalStep = dotDiameter + gap;
+      const count = Math.floor(lineWidth / totalStep);
 
-    const newDots = [];
-    for (let i = 0; i < count; i++) {
-      const t = count > 1 ? i / (count - 1) : 0;
-      const r = Math.round(45 + (255 - 45) * t);
-      const g = Math.round(153 + (53 - 153) * t);
-      const b = Math.round(255 + (57 - 255) * t);
-      newDots.push(
-        <span
-          key={i}
-          style={{
-            backgroundColor: `rgb(${r},${g},${b})`,
-            width: dotDiameter,
-            height: dotDiameter,
-            borderRadius: "50%",
-            display: "inline-block",
-          }}
-        />
-      );
+      const newDots = [];
+      for (let i = 0; i < count; i++) {
+        const t = count > 1 ? i / (count - 1) : 0;
+        const r = Math.round(45 + (255 - 45) * t);
+        const g = Math.round(153 + (53 - 153) * t);
+        const b = Math.round(255 + (57 - 255) * t);
+        newDots.push(
+          <span
+            key={i}
+            style={{
+              backgroundColor: `rgb(${r},${g},${b})`,
+              width: dotDiameter,
+              height: dotDiameter,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+        );
+      }
+      setDots(newDots);
     }
-    setDots(newDots);
-  }
 
-  const observer = new ResizeObserver(renderDottedLine);
-  observer.observe(line);
+    const observer = new ResizeObserver(renderDottedLine);
+    observer.observe(line);
 
-  renderDottedLine();
-  return () => observer.disconnect();
-}, [loading]);
+    renderDottedLine();
+    return () => observer.disconnect();
+  }, [loading]);
 
   const totalMovies = allMovies.length;
   const totalPages = Math.ceil(totalMovies / MOVIES_PER_PAGE);
@@ -153,7 +153,9 @@ useEffect(() => {
     <section className="popular container-md py-5">
       <h2 className="title-bg mb-4 py-2 withMargin text-white">
         {t("now_in_cinemas")} ({totalMovies} {t("def_films")})
-              <div className="title-bg-line" ref={lineRef}>{dots} {/**/}</div>
+        <div className="title-bg-line" ref={lineRef}>
+          {dots} {/**/}
+        </div>
       </h2>
       {currentMovies.length > 0 ? (
         <>
@@ -179,22 +181,23 @@ useEffect(() => {
                       ✭ {userReviews[`${mediaType}-${movie.id}`]}{" "}
                     </div>
                   )}
-            <div
-              className="movie-card-inner text-decoration-none"
-            >
-              {user && userReviews[`${mediaType}-${movie.id}`] ? (
-                <div className="underline-animation me-auto"></div>
-              ) : (
-                <div className="underline-animation-sec me-auto"></div>
-              )}
-              <ClickablePoster item={movie} />
+                  <div className="movie-card-inner text-decoration-none">
+                    {user && userReviews[`${mediaType}-${movie.id}`] ? (
+                      <div className="underline-animation me-auto"></div>
+                    ) : (
+                      <div className="underline-animation-sec me-auto"></div>
+                    )}
+                    <ClickablePoster item={movie} />
 
-              <div className="movie-title-parent">
-                <p className="movie-title text-white" style={{ fontSize: "0.9rem" }}>
-                  {movie.title}
-                </p>
-              </div>
-            </div>
+                    <div className="movie-title-parent">
+                      <p
+                        className="movie-title text-white"
+                        style={{ fontSize: "0.9rem" }}
+                      >
+                        {movie.title}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               );
             })}
