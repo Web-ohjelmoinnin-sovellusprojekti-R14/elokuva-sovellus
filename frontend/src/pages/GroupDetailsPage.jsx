@@ -357,11 +357,17 @@ export default function GroupDetailsPage() {
           .map((m) => {
           const isGroupOwner = m.user_id === group.owner_id;
           const canRemoveMember = isOwner && !isGroupOwner;
+          const isOwnProfile = user && m.user_id === user.user_id;
 
           return (
             <div key={m.user_id} className="d-flex align-items-center gap-2">
-              <span
-                className="badge px-3 py-2"
+              <Link
+                to={
+                  isOwnProfile
+                  ? "/my-reviews"
+                  : `/user-reviews?user_id=${m.user_id}`
+                }
+                className="badge px-3 py-2 btn-sm"
                 style={
                   isGroupOwner
                     ? {
@@ -369,18 +375,20 @@ export default function GroupDetailsPage() {
                         color: "#000",
                         fontWeight: "700",
                         boxShadow: "0 0 10px rgba(255,193,7,0.6)",
+                        textDecoration: "none"
                       }
                     : {
                         background:
                           "linear-gradient(135deg, #6c757d, #4d4c4cff)",
                         color: "#000",
                         fontWeight: "700",
+                        textDecoration: "none"
                       }
                 }
               >
                 {isGroupOwner && "👑 "}
                 {m.username}
-              </span>
+              </Link>
 
               {canRemoveMember && (
                 <button
@@ -393,7 +401,7 @@ export default function GroupDetailsPage() {
                     (e.currentTarget.style.transform = "scale(1)")
                   }
                   onClick={async () => {
-                    if (!window.confirm(`${m.username},` + t("remove_user_gr")))
+                    if (!window.confirm(`${m.username}, ` + t("remove_user_gr")))
                       return;
 
                     try {
@@ -558,7 +566,7 @@ export default function GroupDetailsPage() {
                 </div>
 
                 <small className="text-white-50 d-block mt-1">
-                  {t("added_by")}: {item.added_by_username}
+                  {t("added_by")} {item.added_by_username}
                 </small>
 
                 {canRemove && (

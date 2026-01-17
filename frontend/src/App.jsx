@@ -17,6 +17,7 @@ import Footer from "./components/Footer";
 import UserReviewsPage from "./pages/UserReviewsPage";
 import MyGroupsPage from "./pages/MyGroupsPage";
 import GroupDetailsPage from "./pages/GroupDetailsPage";
+import OtherUserReviewPage from "./pages/OtherUserReviewPage";
 
 function App() {
   return (
@@ -63,6 +64,7 @@ function App() {
             <Route path="/my-reviews" element={<UserReviewsPage />} />
             <Route path="/my-groups" element={<MyGroupsPage />} />
             <Route path="/group/:id" element={<GroupDetailsPage />} />
+            <Route path="/user-reviews" element={<OtherUserReviewPage />} />
           </Routes>
         </main>
 

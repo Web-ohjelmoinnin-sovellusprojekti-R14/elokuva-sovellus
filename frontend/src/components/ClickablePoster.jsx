@@ -22,7 +22,8 @@ const ClickablePoster = ({ item }) => {
   };
  
   return (
-    <div
+    <Link
+      to={`/title/${item.id}/${item.media_type || "movie"}`}
       className="d-block text-decoration-none"
     >
       <img
@@ -43,7 +44,7 @@ const ClickablePoster = ({ item }) => {
 
         onClick={ handleClick }
       />
-    </div>
+    </Link>
   );
 };
 
