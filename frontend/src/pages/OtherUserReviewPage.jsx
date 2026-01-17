@@ -43,13 +43,18 @@ const StarRating = ({ rating }) => {
   );
 };
 
-const RatingDistributionChart = ({ reviews, onRatingClick, watchtime = 0, rating = 0 }) => {
+const RatingDistributionChart = ({
+  reviews,
+  onRatingClick,
+  watchtime = 0,
+  rating = 0,
+}) => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
   const effectiveReviews = [...reviews];
 
-  const isBossProfile = reviews.some(r => r.username === "boss");
+  const isBossProfile = reviews.some((r) => r.username === "boss");
 
   if (isBossProfile) {
     effectiveReviews.push({ rating: 6 });
@@ -78,7 +83,7 @@ const RatingDistributionChart = ({ reviews, onRatingClick, watchtime = 0, rating
     const len = value.toString().length;
     if (len >= 7) return "0.8rem";
     if (len >= 6) return "0.9rem";
-    if (len >= 5) return "1rem";
+    if (len >= 5) return "1.1rem";
     if (len >= 4) return "1.2rem";
     return "1.4rem";
   };
@@ -103,88 +108,111 @@ const RatingDistributionChart = ({ reviews, onRatingClick, watchtime = 0, rating
           )}
         </h4>
       </div>
-  
-  <div className="position-absolute top-0 end-0 m-4 d-none d-md-flex gap-3">
-    {[{ value: watchtime, label: t("hours_watched") }, { value: rating, label: t("site_rating") }].map((item, idx) => (
-      <div key={idx} className="d-flex flex-column align-items-center">
-        <div
-          className="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center shadow-lg"
-          style={{ width: "50px", height: "50px", minWidth: "50px" }}
-        >
-          <span
-            className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
-            style={{ fontSize: getFontSize(formatHours(item.value)), lineHeight: 1 }}
-          >
-            {formatHours(item.value)}
-          </span>
-        </div>
-        <span className="text-white-50 mt-1">{item.label}</span>
-      </div>
-    ))}
-  </div>
 
-  <div className="d-flex flex-wrap justify-content-center gap-3 mb-4 d-md-none">
-    {[{ value: watchtime, label: t("hours_watched") }, { value: rating, label: t("site_rating") }].map((item, idx) => (
-      <div key={idx} className="d-flex flex-column align-items-center">
-        <div
-          className="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center shadow-lg"
-          style={{ width: "45px", height: "45px", minWidth: "45px" }}
-        >
-          <span
-            className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
-            style={{ fontSize: getFontSize(formatHours(item.value)), lineHeight: 1 }}
-          >
-            {formatHours(item.value)}
-          </span>
-        </div>
-        <small className="text-white-50 mt-1">{item.label}</small>
+      <div className="position-absolute top-0 end-0 m-4 d-none d-md-flex gap-3">
+        {[
+          { value: watchtime, label: t("hours_watched") },
+          { value: rating, label: t("site_rating") },
+        ].map((item, idx) => (
+          <div key={idx} className="d-flex flex-column align-items-center">
+            <div
+              className="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center shadow-lg"
+              style={{ width: "60px", height: "60px", minWidth: "60px" }}
+            >
+              <span
+                className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
+                style={{
+                  fontSize: getFontSize(item.value),
+                  lineHeight: 1,
+                }}
+              >
+                {item.value}
+              </span>
+            </div>
+            <span className="text-white-50 mt-1">{item.label}</span>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
 
-  <div className="text-center mb-4">
-    <div className="d-inline-flex align-items-center gap-3 bg-dark bg-opacity-80 px-4 py-3 rounded-3 border border-secondary">
-      <div>
-        <div className="fs-2 text-warning fw-bold lh-1">{avgRating}</div>
-        <small className="text-white-50">{t("mid")}</small>
+      <div className="d-flex flex-wrap justify-content-center gap-3 mb-4 d-md-none">
+        {[
+          { value: watchtime, label: t("hours_watched") },
+          { value: rating, label: t("site_rating") },
+        ].map((item, idx) => (
+          <div key={idx} className="d-flex flex-column align-items-center">
+            <div
+              className="rounded-circle bg-warning text-dark d-flex align-items-center justify-content-center shadow-lg"
+              style={{ width: "45px", height: "45px", minWidth: "45px" }}
+            >
+              <span
+                className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
+                style={{
+                  fontSize: getFontSize(formatHours(item.value)),
+                  lineHeight: 1,
+                }}
+              >
+                {formatHours(item.value)}
+              </span>
+            </div>
+            <small className="text-white-50 mt-1">{item.label}</small>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mb-4">
+        <div className="d-inline-flex align-items-center gap-3 bg-dark bg-opacity-80 px-4 py-3 rounded-3 border border-secondary">
+          <div>
+            <div className="fs-2 text-warning fw-bold lh-1">{avgRating}</div>
+            <small className="text-white-50">{t("mid")}</small>
+          </div>
+        </div>
+      </div>
+
+      <div className="row g-1 justify-content-center align-items-end">
+        {Object.entries(histogram)
+          .reverse()
+          .map(([ratingVal, count]) => (
+            <div
+              key={ratingVal}
+              className="col text-center"
+              style={{ cursor: count > 0 ? "pointer" : "default" }}
+              onClick={() =>
+                count > 0 && onRatingClick?.(parseFloat(ratingVal))
+              }
+              title={count > 0 ? `${count} ${ratingVal}` : ""}
+            >
+              <div
+                className="mx-auto mb-1 position-relative"
+                style={{ height: "70px", width: "18px" }}
+              >
+                <div
+                  className={`rating-bar w-100 position-absolute bottom-0 rounded-top transition-all ${count > 0 ? "active" : ""}`}
+                  style={{
+                    height: `${(count / maxCount) * 100}%`,
+                    background:
+                      count > 0
+                        ? "linear-gradient(to top, #0066ff, #00ccff)"
+                        : "rgba(255,255,255,0.08)",
+                    borderRadius: "4px 4px 0 0",
+                    boxShadow:
+                      count > 0 ? "0 0 12px rgba(0, 200, 255, 0.5)" : "none",
+                    transition: "all 0.3s ease",
+                  }}
+                />
+              </div>
+              <div className="text-white-50 text-xs">{ratingVal}</div>
+              {count > 0 && (
+                <div className="text-info fw-bold text-xs">{count}</div>
+              )}
+            </div>
+          ))}
+      </div>
+
+      <div className="d-flex justify-content-between mt-2 px-2">
+        <small className="text-white-50">1</small>
+        <small className="text-white-50">10.0</small>
       </div>
     </div>
-  </div>
-
-  <div className="row g-1 justify-content-center align-items-end">
-    {Object.entries(histogram)
-      .reverse()
-      .map(([ratingVal, count]) => (
-        <div
-          key={ratingVal}
-          className="col text-center"
-          style={{ cursor: count > 0 ? "pointer" : "default" }}
-          onClick={() => count > 0 && onRatingClick?.(parseFloat(ratingVal))}
-          title={count > 0 ? `${count} ${ratingVal}` : ""}
-        >
-          <div className="mx-auto mb-1 position-relative" style={{ height: "70px", width: "18px" }}>
-            <div
-              className={`rating-bar w-100 position-absolute bottom-0 rounded-top transition-all ${count > 0 ? "active" : ""}`}
-              style={{
-                height: `${(count / maxCount) * 100}%`,
-                background: count > 0 ? "linear-gradient(to top, #0066ff, #00ccff)" : "rgba(255,255,255,0.08)",
-                borderRadius: "4px 4px 0 0",
-                boxShadow: count > 0 ? "0 0 12px rgba(0, 200, 255, 0.5)" : "none",
-                transition: "all 0.3s ease",
-              }}
-            />
-          </div>
-          <div className="text-white-50 text-xs">{ratingVal}</div>
-          {count > 0 && <div className="text-info fw-bold text-xs">{count}</div>}
-        </div>
-      ))}
-  </div>
-
-  <div className="d-flex justify-content-between mt-2 px-2">
-    <small className="text-white-50">1</small>
-    <small className="text-white-50">10.0</small>
-  </div>
-</div>
   );
 };
 
@@ -210,7 +238,8 @@ export default function UserReviewsPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const effectiveUserId = queryUserId || (currentUser ? currentUser.user_id : null);
+    const effectiveUserId =
+      queryUserId || (currentUser ? currentUser.user_id : null);
 
     if (!effectiveUserId) {
       setLoading(false);
@@ -231,7 +260,8 @@ export default function UserReviewsPage() {
     setError(null);
     setUsername(null);
 
-    const isOwnProfile = currentUser && currentUser.user_id === Number(targetUserId);
+    const isOwnProfile =
+      currentUser && currentUser.user_id === Number(targetUserId);
 
     let evtSource = null;
 
@@ -256,11 +286,15 @@ export default function UserReviewsPage() {
         } catch {}
       });
 
-     evtSource.addEventListener("progress", (e) => {
+      evtSource.addEventListener("progress", (e) => {
         try {
           const data = JSON.parse(e.data);
 
-          setProgress((prev) => ({ ...prev, loaded: data.loaded, total: data.total }));
+          setProgress((prev) => ({
+            ...prev,
+            loaded: data.loaded,
+            total: data.total,
+          }));
 
           if (data.username && !username) {
             setUsername(data.username);
@@ -323,7 +357,8 @@ export default function UserReviewsPage() {
     };
   }, [targetUserId, currentUser?.user_id, getTmdbLanguage]);
 
-  const isOwnProfile = currentUser && currentUser.user_id === Number(targetUserId);
+  const isOwnProfile =
+    currentUser && currentUser.user_id === Number(targetUserId);
 
   const isBossProfile = username === "boss";
 
@@ -344,8 +379,8 @@ export default function UserReviewsPage() {
   return (
     <div className="container py-5">
       <h1 className="display-5 text-white mb-5 text-center text-uppercase fw-bold opacity-75 noBack">
-        {isOwnProfile 
-          ? `${t("my_reviews")} • ${currentUser?.username}` 
+        {isOwnProfile
+          ? `${t("my_reviews")} • ${currentUser?.username}`
           : `${t("reviews")} • ${displayName}`}
       </h1>
 
@@ -355,7 +390,8 @@ export default function UserReviewsPage() {
         rating={rating}
         onRatingClick={(rating) => {
           const element = ratingRefs.current[rating];
-          if (element) element.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (element)
+            element.scrollIntoView({ behavior: "smooth", block: "center" });
         }}
       />
 
@@ -437,15 +473,15 @@ export default function UserReviewsPage() {
               ref={(el) => (ratingRefs.current[rating] = el)}
               className="text-center mb-5"
             >
-              <div
-                className="d-inline-flex align-items-center gap-3 mb-5 px-0 px-md-4 py-1 bg-black bg-opacity-50 rounded-pill border border-warning"
-              >
+              <div className="d-inline-flex align-items-center gap-3 mb-5 px-0 px-md-4 py-1 bg-black bg-opacity-50 rounded-pill border border-warning">
                 <h2 className="text-warning fs-3 fw-bold me-0 me-md-3 d-flex align-items-center px-2 px-md-0">
-                    {rating}/10
-                  </h2>
-                  <StarRating rating={rating} />
+                  {rating}/10
+                </h2>
+                <StarRating rating={rating} />
                 <span className="text-white-50 ms-0 ms-md-3 px-2 px-md-0 md-0 d-flex align-items-center mt-2">
-                  ({reviewsList.length + (rating === 6 && isBossProfile ? 1 : 0)})
+                  (
+                  {reviewsList.length + (rating === 6 && isBossProfile ? 1 : 0)}
+                  )
                 </span>
               </div>
 
@@ -454,7 +490,9 @@ export default function UserReviewsPage() {
                   const td = review.details || {};
                   const name = td.title || td.name || "No Title";
                   const year =
-                    (td.release_date || td.first_air_date || "").split("-")[0] || "";
+                    (td.release_date || td.first_air_date || "").split(
+                      "-"
+                    )[0] || "";
                   const posterSrc = td.poster_path
                     ? `${IMG}${td.poster_path}`
                     : "/images/no-poster.jpg";
@@ -547,7 +585,9 @@ export default function UserReviewsPage() {
                                   </span>
                                 </div>
                                 <small className="text-white-50">
-                                  {new Date(review.created_at).toLocaleDateString("ru-RU")}
+                                  {new Date(
+                                    review.created_at
+                                  ).toLocaleDateString("ru-RU")}
                                 </small>
                               </div>
                             </div>
