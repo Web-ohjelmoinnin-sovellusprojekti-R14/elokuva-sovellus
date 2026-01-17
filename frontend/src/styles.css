@@ -523,6 +523,34 @@ footer {
   z-index: 9;
 }
 
+.review-author-link {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.review-author-link:hover {
+  transform: translateY(-2px);
+}
+
+.review-author-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 50%;
+  background: linear-gradient(90deg, #2f99fc, #eb1652);
+  transition: width 0.25s ease;
+  transform: translateX(-50%);
+  border-radius: 2px;
+}
+
+.review-author-link:hover::after {
+  width: 100%;
+}
+
 .movie-card:hover .imdb-badge {
   font-size: 0.9rem;
 }
