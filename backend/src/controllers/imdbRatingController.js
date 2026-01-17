@@ -75,7 +75,7 @@ async function getMovieImdbRating(item, forTitlePage) {
   const media_type = 'movie'
 
   if (!imdb_id) {
-    return null
+    return item
   }
 
   let imdb_rating = null
@@ -114,7 +114,7 @@ async function getTvSeriesImdbRating(item, forTitlePage) {
   const media_type = 'tv'
 
   if (!imdb_id) {
-    return null
+    return item
   }
   let imdb_rating = null
   try {

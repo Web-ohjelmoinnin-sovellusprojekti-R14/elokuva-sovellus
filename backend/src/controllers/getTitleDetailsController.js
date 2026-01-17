@@ -6,15 +6,11 @@ async function getTitleDetails(id, media_type, language) {
     switch (media_type) {
       case 'movie':
         const movieDetails = await getMovieDetails(id, language)
-
         const movieResponse = getMovieImdbRating(movieDetails, true)
-
         return movieResponse
       case 'tv':
         const tvDetails = await getTvDetails(id, language)
-
         const tvResponse = getTvSeriesImdbRating(tvDetails, true)
-
         return tvResponse
       default:
         return { error: 'Media type is not provided' }
