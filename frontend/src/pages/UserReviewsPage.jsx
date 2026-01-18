@@ -53,7 +53,7 @@ const RatingDistributionChart = ({
   const { user } = useAuth();
 
   const effectiveReviews = [...reviews];
-  const isBossProfile = reviews.some((r) => r.username === "boss");
+  const isBossProfile = false;
 
   if (isBossProfile) {
     effectiveReviews.push({ rating: 6 });
@@ -85,6 +85,15 @@ const RatingDistributionChart = ({
     if (len >= 5) return "1.1rem";
     if (len >= 4) return "1.2rem";
     return "1.4rem";
+  };
+
+  const getFontSizeMobile = (value) => {
+    const len = value.toString().length;
+    if (len >= 7) return "0.6rem";
+    if (len >= 6) return "0.675rem";
+    if (len >= 5) return "0.825rem";
+    if (len >= 4) return "0.9rem";
+    return "1.05rem";
   };
 
   const maxCount = Math.max(...Object.values(histogram), 1);
@@ -142,12 +151,9 @@ const RatingDistributionChart = ({
             >
               <span
                 className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
-                style={{
-                  fontSize: getFontSize(formatHours(item.value)),
-                  lineHeight: 1,
-                }}
+                style={{ fontSize: getFontSizeMobile(item.value), lineHeight: 1 }}
               >
-                {formatHours(item.value)}
+                {item.value}
               </span>
             </div>
             <small className="text-white-50 mt-1">{item.label}</small>
@@ -233,6 +239,7 @@ export default function UserReviewsPage() {
   const ratingRefs = useRef({});
   const accumulatedReviews = useRef([]);
   const [error, setError] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const effectiveUserId =
@@ -369,7 +376,7 @@ export default function UserReviewsPage() {
   }
 
   const isOwnProfile = currentUser.user_id === Number(targetUserId);
-  const isBossProfile = username === "boss";
+  const isBossProfile = false;
 
   const displayName = isOwnProfile
     ? currentUser?.username || t("loading_user")
@@ -387,13 +394,52 @@ export default function UserReviewsPage() {
 
   const groupedReviews = groupByRating(reviews);
 
+  const handleCopy = async () => {
+    const url = `${window.location.origin}/user-reviews?user_id=${targetUserId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      alert(t("error_profile_link"));
+    }
+  };
+
   return (
     <div className="container py-5">
-      <h1 className="display-5 text-white mb-5 text-center text-uppercase fw-bold opacity-75 noBack">
-        {isOwnProfile
-          ? `${t("my_reviews")} • ${currentUser?.username || t("loading_user")}`
-          : `${t("reviews")} • ${displayName}`}
-      </h1>
+      <div className="d-flex align-items-center justify-content-center mb-5 gap-3 gap-md-4 flex-wrap flex-md-nowrap">
+        <h1
+            className="display-5 text-white text-uppercase fw-bold opacity-75 noBack mb-0"
+            style={{ whiteSpace: "nowrap" }}
+          >
+            {isOwnProfile ? t("my_reviews") : t("reviews")}
+            {'\u00A0 •'}
+          </h1>
+
+          <h1
+            className="display-5 text-white text-uppercase fw-bold opacity-75 noBack mb-0"
+            style={{ whiteSpace: "nowrap", marginLeft: "0.1em"}}
+          >
+            {isOwnProfile
+              ? currentUser?.username || t("loading_user")
+              : displayName}
+          </h1>
+
+        <button
+          className="Btn flex-shrink-0 mt-0 mt-md-0"
+          onClick={
+            handleCopy
+}
+          title={t("copy_profile_link")}
+        >
+          <div className="sign">
+            <svg viewBox="0 0 512 512">
+              <path d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"></path>
+            </svg>
+          </div>
+          <div className="text">{copied ? (t("copied")) : (t("copy_link"))}</div>
+        </button>
+      </div>
 
       <RatingDistributionChart
         reviews={reviews}
@@ -485,11 +531,11 @@ export default function UserReviewsPage() {
               className="text-center mb-5"
             >
               <div className="d-inline-flex align-items-center gap-3 mb-5 px-0 px-md-4 py-1 bg-black bg-opacity-50 rounded-pill border border-warning">
-                <h2 className="text-warning fs-3 fw-bold me-0 me-md-3 d-flex align-items-center px-2 px-md-0">
+                <h2 className="text-warning fs-3 fw-bold me-0 me-md-3 d-flex align-items-center px-2 px-md-0 mt-2">
                   {rating}/10
                 </h2>
                 <StarRating rating={rating} />
-                <span className="text-white-50 ms-0 ms-md-3 px-2 px-md-0 md-0 d-flex align-items-center mt-2">
+                <span className="text-white-50 ms-0 ms-md-3 px-2 px-md-0 md-0 d-flex align-items-center">
                   (
                   {reviewsList.length + (rating === 6 && isBossProfile ? 1 : 0)}
                   )
