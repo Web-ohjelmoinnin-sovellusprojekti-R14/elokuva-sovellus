@@ -54,7 +54,7 @@ const RatingDistributionChart = ({
 
   const effectiveReviews = [...reviews];
 
-  const isBossProfile = reviews.some((r) => r.username === "boss");
+  const isBossProfile = false;
 
   if (isBossProfile) {
     effectiveReviews.push({ rating: 6 });
@@ -86,6 +86,15 @@ const RatingDistributionChart = ({
     if (len >= 5) return "1.1rem";
     if (len >= 4) return "1.2rem";
     return "1.4rem";
+  };
+
+  const getFontSizeMobile = (value) => {
+    const len = value.toString().length;
+    if (len >= 7) return "0.6rem";
+    if (len >= 6) return "0.675rem";
+    if (len >= 5) return "0.825rem";
+    if (len >= 4) return "0.9rem";
+    return "1.05rem";
   };
 
   const maxCount = Math.max(...Object.values(histogram), 1);
@@ -146,12 +155,9 @@ const RatingDistributionChart = ({
             >
               <span
                 className="fw-bold d-flex align-items-baseline justify-content-center text-nowrap"
-                style={{
-                  fontSize: getFontSize(formatHours(item.value)),
-                  lineHeight: 1,
-                }}
+                style={{ fontSize: getFontSizeMobile(item.value), lineHeight: 1 }}
               >
-                {formatHours(item.value)}
+                {item.value}
               </span>
             </div>
             <small className="text-white-50 mt-1">{item.label}</small>
@@ -360,7 +366,7 @@ export default function UserReviewsPage() {
   const isOwnProfile =
     currentUser && currentUser.user_id === Number(targetUserId);
 
-  const isBossProfile = username === "boss";
+  const isBossProfile = false;
 
   const displayName = isOwnProfile
     ? currentUser?.username
@@ -474,11 +480,11 @@ export default function UserReviewsPage() {
               className="text-center mb-5"
             >
               <div className="d-inline-flex align-items-center gap-3 mb-5 px-0 px-md-4 py-1 bg-black bg-opacity-50 rounded-pill border border-warning">
-                <h2 className="text-warning fs-3 fw-bold me-0 me-md-3 d-flex align-items-center px-2 px-md-0">
+                <h2 className="text-warning fs-3 fw-bold me-0 me-md-3 d-flex align-items-center px-2 px-md-0 mt-2">
                   {rating}/10
                 </h2>
                 <StarRating rating={rating} />
-                <span className="text-white-50 ms-0 ms-md-3 px-2 px-md-0 md-0 d-flex align-items-center mt-2">
+                <span className="text-white-50 ms-0 ms-md-3 px-2 px-md-0 md-0 d-flex align-items-center">
                   (
                   {reviewsList.length + (rating === 6 && isBossProfile ? 1 : 0)}
                   )
