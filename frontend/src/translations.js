@@ -91,6 +91,10 @@ export const translations = {
     rate_movie: "Rate",
     hours_watched: "Hours watched",
     site_rating: "User points",
+    copy_profile_link: "Copy profile link",
+    error_profile_link: "Failed to copy",
+    copy_link: "Copy link",
+    copied: "Link copied",
 
     g_n_req: "Group name is required",
     f_g: "Failed to create group",
@@ -278,6 +282,10 @@ export const translations = {
     rate_movie: "Оценить",
     hours_watched: "Просмотрено часов",
     site_rating: "Рейтинг пользователя",
+    copy_profile_link: "Скопировать ссылку профиля",
+    error_profile_link: "Не удалось скопировать",
+    copy_link: "Копир. ссылку",
+    copied: "Ссылка скопир.",
 
     g_n_req: "Название группы обязательно",
     f_g: "Не удалось создать группу",
@@ -463,6 +471,10 @@ export const translations = {
     rate_movie: "Arvioi",
     hours_watched: "Katsottuja tunteja",
     site_rating: "Käyttäjän pisteet",
+    copy_profile_link: "Kopioi profiililinkki",
+    error_profile_link: "Kopiointi epäonnistui",
+    copy_link: "Kopioi linkki",
+    copied: "Linkki kopioitu",
 
     g_n_req: "Ryhmän nimi on pakollinen",
     f_g: "Ryhmää ei voitu luoda",

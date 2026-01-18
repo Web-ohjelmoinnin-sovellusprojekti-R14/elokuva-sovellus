@@ -535,67 +535,103 @@ export default function TitleDetails() {
                     boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
                   }}
                 >
-                  {isOwnReview && r.review_id && (
-                    <button
-                      onClick={() => handleDelete(r.review_id)}
-                      className="btn btn-danger btn-sm position-absolute top-50 end-0 translate-middle-y me-3"
-                      style={{ zIndex: 10, fontSize: "0.8rem" }}
-                    >
-                      {t("delete")}
-                    </button>
-                  )}
+          {isOwnReview && r.review_id && (
+            <button
+              onClick={() => handleDelete(r.review_id)}
+              className={`
+                btn btn-danger btn-sm 
+                position-absolute 
+                end-0 
+                d-none d-sm-block
+              `}
+              style={{
+                top: "55%",
+                transform: "translateY(-50%)",
+                zIndex: 10,
+                fontSize: "0.8rem",
+                marginRight: "0.75rem",
+              }}
+            >
+              {t("delete")}
+            </button>
+          )}
 
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <Link
-                      to={
-                        isOwnReview
-                          ? "/my-reviews"
-                          : `/user-reviews?user_id=${r.user_id}`
-                      }
-                      className="text-info fs-5 text-white review-author-link"
-                      style={{ textDecoration: "none" }}
-                    >
-                      {r.username}
-                    </Link>
-                    <div className="d-flex align-items-center">
-                      {Array.from({ length: 10 }).map((_, i) => {
-                        const value = i + 1;
-                        if (r.rating >= value)
-                          return (
-                            <span key={i} style={{ color: "#ffc107" }}>
-                              ★
-                            </span>
-                          );
-                        if (r.rating >= value - 0.5)
-                          return (
-                            <span key={i} style={{ color: "#ffc107" }}>
-                              ☆
-                            </span>
-                          );
-                        return (
-                          <span key={i} style={{ color: "#555" }}>
-                            ★
-                          </span>
-                        );
-                      })}
-                      <span className="ms-2 text-white-50">{r.rating}/10</span>
-                    </div>
-                  </div>
+          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-2 gap-2">
+            <Link
+              to={
+                isOwnReview
+                  ? "/my-reviews"
+                  : `/user-reviews?user_id=${r.user_id}`
+              }
+              className="text-info fs-5 text-white review-author-link"
+              style={{ 
+                textDecoration: "none",
+                maxWidth: "70%",
+                flexShrink: 1,
+              }}
+            >
+              {r.username}
+            </Link>
 
-                  <p
-                    className="mb-2"
-                    style={{ lineHeight: "1.6", fontSize: "1rem" }}
-                  >
-                    {r.comment || (
-                      <span className="text-white-50 fst-italic">
-                        {t("no_comment")}
-                      </span>
-                    )}
-                  </p>
-                  <small className="text-white-50">
-                    {new Date(r.created_at).toLocaleDateString()}
-                  </small>
-                </div>
+            <div 
+              className="d-flex align-items-center flex-shrink-0 pe-5 pe-sm-0"
+            >
+              {Array.from({ length: 10 }).map((_, i) => {
+                const value = i + 1;
+                if (r.rating >= value)
+                  return (
+                    <span key={i} style={{ color: "#ffc107" }}>
+                      ★
+                    </span>
+                  );
+                if (r.rating >= value - 0.5)
+                  return (
+                    <span key={i} style={{ color: "#ffc107" }}>
+                      ☆
+                    </span>
+                  );
+                return (
+                  <span key={i} style={{ color: "#555" }}>
+                    ★
+                  </span>
+                );
+              })}
+              <span className="ms-2 text-white-50">{r.rating}/10</span>
+            </div>
+          </div>
+
+          <p
+            className="mb-2 review-comment"
+            style={{ lineHeight: "1.6", fontSize: "1rem" }}
+          >
+            {r.comment || (
+              <span className="text-white-50 fst-italic">
+                {t("no_comment")}
+              </span>
+            )}
+          </p>
+          <small className="text-white-50 d-none d-sm-block">
+            {new Date(r.created_at).toLocaleDateString()}
+          </small>
+          {isOwnReview && r.review_id && (
+            <div className="d-flex justify-content-between align-items-center mt-2 mb-0 d-sm-none">
+              <small className="text-white-50">
+                {new Date(r.created_at).toLocaleDateString()}
+              </small>
+
+              <button
+                onClick={() => handleDelete(r.review_id)}
+                className="btn btn-danger btn-sm"
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "0.25rem 0.75rem",
+                }}
+              >
+                {t("delete")}
+              </button>
+            </div>
+          )}
+              </div>
               );
             })}
           </div>
