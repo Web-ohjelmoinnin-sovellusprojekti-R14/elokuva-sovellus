@@ -31,6 +31,8 @@ import getGroupFilmsRouter from './routers/getGroupFilms.js'
 import getReviewsSseRouter from './routers/getReviewsSSE.js'
 import deleteUserRouter from './routers/deleteUser.js'
 import versionRouter from './routers/version.js'
+import addToWatchlist from './routers/addToWatchlist.js'
+import getWatchlist from './routers/getWatchlist.js'
 
 const app = express()
 
@@ -76,6 +78,8 @@ app.use('/api', removeFilmRouter)
 app.use('/api', getGroupFilmsRouter)
 app.use('/api', getReviewsSseRouter)
 app.use('/api', deleteUserRouter)
+app.use('/api', addToWatchlist)
+app.use('/api', getWatchlist)
 
 app.use('/version', versionRouter)
 
