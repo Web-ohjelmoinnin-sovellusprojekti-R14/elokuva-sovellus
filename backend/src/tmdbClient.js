@@ -44,8 +44,10 @@ async function getTvSeries(query, page, language) {
   return res.data
 }
 
-async function getMovieDetails(movie_id, language) {
-  const res = await tmdb.get(`/movie/${movie_id}?language=${language}`)
+async function getMovieDetails(movie_id, language = 'en-US') {
+  const res = await tmdb.get(`/movie/${movie_id}`, {
+    params: { language },
+  })
   return res.data
 }
 
@@ -66,8 +68,10 @@ async function getMovies(query, page, language) {
   return res.data;*/
 }
 
-async function getTvDetails(series_id, language) {
-  const res = await tmdb.get(`/tv/${series_id}?language=${language}`)
+async function getTvDetails(series_id, language = 'en-US') {
+  const res = await tmdb.get(`/tv/${series_id}`, {
+    params: { language },
+  })
   return res.data
 }
 
