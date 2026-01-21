@@ -13,6 +13,35 @@ const MoviesSection = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const itemsRef = useRef([]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '0px 0px 15% 0px',
+        threshold: 0.15
+      }
+    );
+
+    itemsRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      itemsRef.current.forEach((el) => {
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, [topMovies]);
+
   useEffect(() => {
     fetch(
       `${API_URL}/api/category/movies?batch=1&language=${getTmdbLanguage()}`
@@ -112,13 +141,14 @@ const MoviesSection = () => {
         </div>
       </h2>
       <div className="row g-3 g-md-4 px-2">
-        {topMovies.map((movie) => {
+        {topMovies.map((movie, index) => {
           const mediaType = "movie";
           return (
             <div
               key={movie.id}
-              className="col-6 col-md-4 col-lg-2 text-center movie-card"
-              style={{ position: "relative" }}
+              className="col-6 col-md-4 col-lg-2 text-center movie-card autoShow"
+              style={{ position: "relative", '--order': index % 6 }}
+              ref={el => itemsRef.current[index] = el}
             >
               {movie.imdb_rating && (
                 <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
