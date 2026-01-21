@@ -12,6 +12,35 @@ const AnimeSection = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
+  const itemsRef = useRef([]);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            obs.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        rootMargin: '0px 0px 15% 0px',
+        threshold: 0.15
+      }
+    );
+
+    itemsRef.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      itemsRef.current.forEach((el) => {
+        if (el) observer.unobserve(el);
+      });
+    };
+  }, [topAnime]);
+
   useEffect(() => {
     fetch(`${API_URL}/api/category/anime?batch=1&language=${getTmdbLanguage()}`)
       .then((res) => res.json())
@@ -105,13 +134,14 @@ const AnimeSection = () => {
       </h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {topAnime.map((anime) => {
+        {topAnime.map((anime, index) => {
           const mediaType = "tv";
           return (
             <div
               key={anime.id}
-              className="col-6 col-md-4 col-lg-2 text-center movie-card"
-              style={{ position: "relative" }}
+              className="col-6 col-md-4 col-lg-2 text-center movie-card autoShow"
+              style={{ position: "relative", '--order': index % 6 }}
+              ref={el => itemsRef.current[index] = el}
             >
               {anime.imdb_rating && (
                 <div className="imdb-badge">⭐ {anime.imdb_rating}</div>
