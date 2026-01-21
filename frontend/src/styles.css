@@ -467,7 +467,16 @@ footer {
 
 .movie-card {
   cursor: pointer;
+  transform: translateY(var(--offset)) scale(0.92);
+  animation: cardAppear var(--duration) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay);
   transition: all 0.3s ease;
+}
+
+@keyframes cardAppear {
+  to {
+    transform: translateY(0) scale(1);
+  }
 }
 
 .movie-card-inner {
@@ -613,6 +622,45 @@ footer {
 
 .Btn:active {
   transform: translate(2px ,2px);
+}
+
+.autoShow {
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.autoShow:nth-child(-n+6) {
+  transform: translateX(140px);
+}
+.autoShow:nth-child(-n+6).is-visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: calc(var(--order) * 80ms);
+}
+
+.autoShow:nth-child(n+7) {
+  transform: translateX(-140px);
+}
+.autoShow:nth-child(n+7).is-visible {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: calc(var(--order) * 80ms);
+}
+
+.review-card {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.review-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeUp2 {
+  0% { opacity: 0; transform: translateY(40px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .review-comment {

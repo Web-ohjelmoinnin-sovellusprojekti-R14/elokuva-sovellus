@@ -152,6 +152,12 @@ export default function AdvancedSearchResultsPage() {
   const [dots, setDots] = useState([]);
   const lineRef = useRef(null);
 
+    const [animateKey, setAnimateKey] = useState(0);
+  
+    useEffect(() => {
+      setAnimateKey(k => k + 1);
+    }, [currentPage, loading]);
+
   useEffect(() => {
     if (!lineRef.current) return;
     const line = lineRef.current;
@@ -354,13 +360,20 @@ export default function AdvancedSearchResultsPage() {
       </h2>
 
       <div className="row g-3 g-md-4 px-2">
-        {pageItems.map((item) => {
+        {pageItems.map((item, index) => {
           const mediaType = item.media_type || (item.title ? "movie" : "tv");
+          const COLUMNS = 6;
+          const rowIndex = Math.floor(index / COLUMNS);
           return (
             <div
-              key={`${mediaType}-${item.id}`}
+              key={`${mediaType}-${item.id}-page-${currentPage}`}
               className="col-6 col-md-4 col-lg-2 text-center movie-card"
-              style={{ position: "relative" }}
+              style={{
+                position: "relative",
+                "--delay": `${rowIndex * 120}ms`,
+                "--duration": "480ms",
+                "--offset": rowIndex % 2 === 0 ? "120px" : "-120px",
+              }}
             >
               {item.imdb_rating && (
                 <div className="imdb-badge">⭐ {item.imdb_rating}</div>

@@ -87,6 +87,12 @@ export default function NowInCinemaPage() {
   const [dots, setDots] = useState([]);
   const lineRef = useRef(null);
 
+  const [animateKey, setAnimateKey] = useState(0);
+
+  useEffect(() => {
+    setAnimateKey(k => k + 1);
+  }, [currentPage, loading]);
+
   useEffect(() => {
     if (!lineRef.current) return;
     const line = lineRef.current;
@@ -160,17 +166,23 @@ export default function NowInCinemaPage() {
       {currentMovies.length > 0 ? (
         <>
           <div className="row g-3 g-md-4 px-2">
-            {currentMovies.map((movie) => {
+            {currentMovies.map((movie, index) => {
               const mediaType = "movie";
               const poster = movie.poster_path
                 ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                 : "/images/no-poster.png";
-
+              const COLUMNS = 6;
+              const rowIndex = Math.floor(index / COLUMNS);
               return (
                 <div
-                  key={movie.id}
+                  key={`${movie.id}-page-${currentPage}`}
                   className="col-6 col-md-4 col-lg-2 text-center movie-card"
-                  style={{ position: "relative" }}
+                  style={{
+                    position: "relative",
+                    "--delay": `${rowIndex * 120}ms`,
+                    "--duration": "480ms",
+                    "--offset": rowIndex % 2 === 0 ? "120px" : "-120px",
+                  }}
                 >
                   {movie.imdb_rating && (
                     <div className="imdb-badge">⭐ {movie.imdb_rating}</div>
