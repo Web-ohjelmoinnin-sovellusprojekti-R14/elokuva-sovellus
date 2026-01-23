@@ -33,7 +33,10 @@ async function getWatchlistController(user_id, language) {
       return detailed
     })
 
-    return detailedWatchlist
+    return {
+      items: detailedWatchlist,
+      length: detailedWatchlist.length,
+    }
   } catch (err) {
     console.error('getWatchlistController error:', err)
     return { status: 500, error: 'Failed to get watchlist' }
